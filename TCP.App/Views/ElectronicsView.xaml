@@ -93,7 +93,7 @@
                                                FontSize="{StaticResource FontSize.XL}"
                                                Foreground="{DynamicResource Brush.Accent.Primary}"
                                                VerticalAlignment="Center"
-                                               Margin="0,0,{StaticResource Spacing.S},0"/>
+                                               Margin="0,0,8,0"/>
                                     <!-- Board name -->
                                     <TextBlock Text="{Binding Name}"
                                                FontSize="{StaticResource FontSize.M}"
@@ -103,7 +103,7 @@
                             </Border>
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
-                                    <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}"/>
+                                    <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource Brush.Accent.Primary}"/>
                                     <Setter TargetName="ItemBorder" Property="BorderThickness" Value="2"/>
                                 </DataTrigger>
                             </DataTemplate.Triggers>
@@ -161,7 +161,7 @@
                                FontSize="{StaticResource FontSize.Title}"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource Brush.Text.Primary}"
-                               Margin="0,0,0,{StaticResource Spacing.L}"/>
+                               Margin="0,0,0,16"/>
                     
                     <!-- Summary Cards using reusable components -->
                     <!-- TCP-0.6.1: Using BoardDetailCard and KeyValueRow components -->
@@ -190,7 +190,7 @@
                                FontSize="{StaticResource FontSize.M}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
                                TextWrapping="Wrap"
-                               Margin="0,{StaticResource Spacing.L},0,0">
+                               Margin="0,16,0,0">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed"/>

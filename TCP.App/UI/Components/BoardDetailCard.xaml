@@ -37,7 +37,7 @@
                        FontSize="{StaticResource FontSize.L}"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource Brush.Text.Primary}"
-                       Margin="0,0,0,{StaticResource Spacing.M}"/>
+                       Margin="0,0,0,12"/>
             
             <!-- Content Area -->
             <!-- Content comes from UserControl.Content (inherited from ContentControl) -->

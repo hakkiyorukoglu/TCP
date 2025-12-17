@@ -45,7 +45,7 @@
                  TextWrapping="NoWrap"
                  VerticalScrollBarVisibility="Auto"
                  HorizontalScrollBarVisibility="Auto"
-                 Margin="0,0,0,{StaticResource Spacing.M}">
+                 Margin="0,0,0,12">
             <!-- Placeholder text (hardcoded as per requirement) -->
             <TextBox.Text>
                 // Board code placeholder

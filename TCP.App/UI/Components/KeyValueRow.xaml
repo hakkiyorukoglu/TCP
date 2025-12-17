@@ -33,16 +33,16 @@
         <!-- Key (Label) -->
         <TextBlock Grid.Column="0"
                    Text="{Binding Key, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                   FontSize="{StaticResource FontSizeNormal}"
+                   FontSize="{StaticResource FontSize.M}"
                    FontWeight="SemiBold"
                    Foreground="{DynamicResource Brush.Text.Secondary}"
                    VerticalAlignment="Center"
-                   Margin="0,0,{StaticResource Spacing.M},0"/>
+                   Margin="0,0,12,0"/>
         
         <!-- Value -->
         <TextBlock Grid.Column="1"
                    Text="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                   FontSize="{StaticResource FontSizeNormal}"
+                   FontSize="{StaticResource FontSize.M}"
                    Foreground="{DynamicResource Brush.Text.Primary}"
                    VerticalAlignment="Center"
                    TextWrapping="Wrap"/>
