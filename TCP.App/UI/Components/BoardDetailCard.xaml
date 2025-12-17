@@ -34,7 +34,7 @@
         <StackPanel>
             <!-- Header (Title) -->
             <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                       FontSize="{StaticResource FontSize.L}"
+                       FontSize="{StaticResource FontSizeLarge}"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource Brush.Text.Primary}"
                        Margin="0,0,0,12"/>
