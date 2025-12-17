@@ -1,0 +1,50 @@
+<UserControl x:Class="TCP.App.UI.Components.KeyValueRow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="30" d:DesignWidth="400">
+    <!--
+        KeyValueRow.xaml - Reusable Key/Value row component
+        
+        TCP-0.6.1: Board Details Components (Reusable)
+        
+        Purpose: Display key-value information consistently across the app.
+        
+        Properties:
+        - Key (string): Label text
+        - Value (string): Value text
+        
+        Rules:
+        - Zero business logic
+        - Uses ONLY theme tokens (no hardcoded values)
+        - OneWay binding only
+        - Long values wrap gracefully
+    -->
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <!-- Key column -->
+            <ColumnDefinition Width="Auto"/>
+            <!-- Value column -->
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- Key (Label) -->
+        <TextBlock Grid.Column="0"
+                   Text="{Binding Key, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                   FontSize="{StaticResource FontSizeNormal}"
+                   FontWeight="SemiBold"
+                   Foreground="{DynamicResource TextSecondaryBrush}"
+                   VerticalAlignment="Center"
+                   Margin="0,0,12,0"/>
+        
+        <!-- Value -->
+        <TextBlock Grid.Column="1"
+                   Text="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                   FontSize="{StaticResource FontSizeNormal}"
+                   Foreground="{DynamicResource TextPrimaryBrush}"
+                   VerticalAlignment="Center"
+                   TextWrapping="Wrap"/>
+    </Grid>
+</UserControl>

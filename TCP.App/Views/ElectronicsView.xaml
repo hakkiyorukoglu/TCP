@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
              xmlns:local="clr-namespace:TCP.App"
+             xmlns:components="clr-namespace:TCP.App.UI.Components"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              Background="{DynamicResource BackgroundPrimaryBrush}">
@@ -155,55 +156,39 @@
                 <StackPanel Margin="20">
                     <!-- Board Name -->
                     <TextBlock Text="{Binding SelectedBoard.Name, FallbackValue='No board selected'}"
-                               FontSize="20"
+                               FontSize="{StaticResource FontSizeTitle}"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}"
-                               Margin="0,0,0,20"/>
+                               Margin="0,0,0,16"/>
                     
-                    <!-- Summary Cards -->
-                    <ItemsControl ItemsSource="{Binding SelectedBoardSummaryData}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <!-- Summary Card -->
-                                <Border Background="{DynamicResource BackgroundPrimaryBrush}"
-                                        BorderBrush="{DynamicResource BorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="4"
-                                        Padding="15,12"
-                                        Margin="0,0,0,10">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        
-                                        <!-- Key -->
-                                        <TextBlock Grid.Column="0"
-                                                   Text="{Binding Key, StringFormat='{}{0}:'}"
-                                                   FontSize="12"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource TextSecondaryBrush}"
-                                                   VerticalAlignment="Center"
-                                                   Margin="0,0,10,0"/>
-                                        
-                                        <!-- Value -->
-                                        <TextBlock Grid.Column="1"
-                                                   Text="{Binding Value}"
-                                                   FontSize="12"
-                                                   Foreground="{DynamicResource TextPrimaryBrush}"
-                                                   VerticalAlignment="Center"/>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <!-- Summary Cards using reusable components -->
+                    <!-- TCP-0.6.1: Using BoardDetailCard and KeyValueRow components -->
+                    <StackPanel>
+                        <!-- Connection Info Card -->
+                        <components:BoardDetailCard Title="Connection Info"
+                                                    Margin="0,0,0,12">
+                            <components:BoardDetailCard.Content>
+                                <StackPanel>
+                                    <ItemsControl ItemsSource="{Binding SelectedBoardSummaryData}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <components:KeyValueRow Key="{Binding Key}"
+                                                                        Value="{Binding Value}"
+                                                                        Margin="0,0,0,8"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </components:BoardDetailCard.Content>
+                        </components:BoardDetailCard>
+                    </StackPanel>
                     
                     <!-- Fallback message when no board selected -->
                     <TextBlock Text="Select a board to view details"
-                               FontSize="13"
+                               FontSize="{StaticResource FontSizeNormal}"
                                Foreground="{DynamicResource TextSecondaryBrush}"
                                TextWrapping="Wrap"
-                               Margin="0,20,0,0">
+                               Margin="0,16,0,0">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed"/>
