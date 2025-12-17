@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using TCP.App.Services;
@@ -56,9 +57,10 @@ public class MainViewModel : ViewModelBase, INotifyPropertyChanged
     }
     
     /// <summary>
-    /// All available search suggestions (hardcoded)
+    /// Search registry - Single source of truth for search suggestions
+    /// TCP-0.5.2: Search Registry
     /// </summary>
-    public ObservableCollection<SearchItem> Suggestions { get; }
+    private readonly ISearchRegistry _searchRegistry;
     
     /// <summary>
     /// Filtered suggestions based on search text
@@ -122,19 +124,13 @@ public class MainViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand SelectSearchItemCommand { get; }
     
     /// <summary>
-    /// Constructor - Initialize search suggestions
+    /// Constructor - Initialize search suggestions from registry
+    /// TCP-0.5.2: Search Registry (Single Source of Truth)
     /// </summary>
     public MainViewModel()
     {
-        // Hardcoded search suggestions
-        Suggestions = new ObservableCollection<SearchItem>
-        {
-            new SearchItem { DisplayText = "Go to Home", TargetRoute = "Home" },
-            new SearchItem { DisplayText = "Go to Electronics", TargetRoute = "Electronics" },
-            new SearchItem { DisplayText = "Go to Simulation", TargetRoute = "Simulation" },
-            new SearchItem { DisplayText = "Go to Settings", TargetRoute = "Settings" },
-            new SearchItem { DisplayText = "Open Info Panel", TargetRoute = "Info" }
-        };
+        // Get search registry instance
+        _searchRegistry = SearchRegistry.Instance;
         
         FilteredSuggestions = new ObservableCollection<SearchItem>();
         
@@ -143,7 +139,7 @@ public class MainViewModel : ViewModelBase, INotifyPropertyChanged
     
     /// <summary>
     /// Filter suggestions based on search text
-    /// Naive filtering: if SearchText.Length > 0, show all suggestions
+    /// TCP-0.5.2: Match Title OR Keywords (case-insensitive)
     /// </summary>
     private void FilterSuggestions()
     {
@@ -155,10 +151,31 @@ public class MainViewModel : ViewModelBase, INotifyPropertyChanged
             return;
         }
         
-        // Naive filtering: show all suggestions when typing
-        foreach (var suggestion in Suggestions)
+        var searchTextLower = SearchText.ToLowerInvariant();
+        var allItems = _searchRegistry.GetAll();
+        
+        // Filter: Match Title OR any Keyword (case-insensitive contains check)
+        var matched = allItems.Where(item =>
         {
-            FilteredSuggestions.Add(suggestion);
+            // Match title
+            if (item.Title.ToLowerInvariant().Contains(searchTextLower))
+            {
+                return true;
+            }
+            
+            // Match any keyword
+            if (item.Keywords != null && item.Keywords.Any(keyword =>
+                keyword.ToLowerInvariant().Contains(searchTextLower)))
+            {
+                return true;
+            }
+            
+            return false;
+        });
+        
+        foreach (var item in matched)
+        {
+            FilteredSuggestions.Add(item);
         }
         
         IsDropdownVisible = FilteredSuggestions.Count > 0;
@@ -166,12 +183,13 @@ public class MainViewModel : ViewModelBase, INotifyPropertyChanged
     
     /// <summary>
     /// Select search item and navigate
+    /// TCP-0.5.2: Use Route property
     /// </summary>
     private void SelectSearchItem(SearchItem? item)
     {
         if (item == null) return;
         
-        NavigateRequested?.Invoke(item.TargetRoute);
+        NavigateRequested?.Invoke(item.Route);
         SearchText = string.Empty;
         IsDropdownVisible = false;
         SelectedSearchItem = null;
