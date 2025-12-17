@@ -91,6 +91,12 @@ public partial class MainWindow : Window
             description: "Added Shortcuts Map UI list in Settings > Shortcuts. Disabled theme switching - app now uses Dark theme only. Theme selector removed from Appearance page."
         );
         
+        // TCP-0.9.0: Info Panel v1 + Version History UI
+        changeTracker.RegisterChange(
+            category: "Info / Feature",
+            description: "Added Info panel with version history and topbar navigation. Clicking version text in TopBar opens Info page. Sections: Overview, Architecture, Features, Version History."
+        );
+        
         // Pencere sürükleme için MouseDown event'i ekle
         // WindowStyle="None" olduğu için manuel sürükleme implementasyonu gerekli
         this.MouseDown += MainWindow_MouseDown;
@@ -165,6 +171,10 @@ public partial class MainWindow : Window
                 NavigateToView(new SettingsView(), "Settings");
                 // Settings tab yok, SetActiveTab çağrılmaz
                 break;
+            case "Info":
+                NavigateToView(new InfoView(), "Info");
+                // Info tab yok, SetActiveTab çağrılmaz
+                break;
             default:
                 // Unknown route → default: Home
                 NavigateToView(new HomeView(), "Home");
@@ -200,8 +210,9 @@ public partial class MainWindow : Window
                 // Note: Settings tab is not in TopBar navigation tabs, so no SetActiveTab call
                 break;
             case "Info":
-                // Info view henüz yok, placeholder
-                // NavigateToView(new InfoPanel());
+                var infoViewFromSearch = new InfoView();
+                NavigateToView(infoViewFromSearch, "Info");
+                // Note: Info is not in TopBar navigation tabs, so no SetActiveTab call
                 break;
         }
     }
@@ -303,6 +314,18 @@ public partial class MainWindow : Window
         var settingsView = new SettingsView();
         NavigateToView(settingsView, "Settings");
         // Note: Settings is not in TopBar navigation tabs, so no SetActiveTab call
+    }
+    
+    /// <summary>
+    /// Navigation: Version text click handler
+    /// TCP-0.9.0: Info Panel v1 + Version History UI
+    /// Opens Info page and selects Overview section
+    /// </summary>
+    private void VersionText_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        var infoView = new InfoView();
+        NavigateToView(infoView, "Info");
+        // Note: Info is not in TopBar navigation tabs, so no SetActiveTab call
     }
     
     /// <summary>

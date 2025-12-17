@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP
 C:\Users\nurul\Desktop\TCP\TCP.App\App.xaml
-10-1274870493
+11-1254174855
 
-361971426118
+38-965404319
 199-1561768398
-Shell\MainWindow.xaml;UI\Components\BoardDetailCard.xaml;UI\Components\CodeEditorPanel.xaml;UI\Components\KeyValueRow.xaml;Views\EditorView.xaml;Views\ElectronicsView.xaml;Views\HomeView.xaml;Views\InfoPanel.xaml;Views\SettingsView.xaml;Views\SimulationView.xaml;
+Shell\MainWindow.xaml;UI\Components\BoardDetailCard.xaml;UI\Components\CodeEditorPanel.xaml;UI\Components\KeyValueRow.xaml;Views\EditorView.xaml;Views\ElectronicsView.xaml;Views\HomeView.xaml;Views\InfoPanel.xaml;Views\InfoView.xaml;Views\SettingsView.xaml;Views\SimulationView.xaml;
 
 False
 

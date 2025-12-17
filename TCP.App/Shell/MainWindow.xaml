@@ -379,12 +379,26 @@
                                    ToolTip="Info (coming soon)"/>
                         
                     <!-- Versiyon bilgisi - TCP-0.7.1: Centralized version display -->
+                    <!-- TCP-0.9.0: Version text is clickable, opens Info page -->
                     <TextBlock Text="{x:Static services:VersionManager.DisplayVersion}"
                                FontSize="{DynamicResource Font.Caption}"
                                FontFamily="{DynamicResource Font.Primary}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
                                VerticalAlignment="Center"
-                               Margin="0,0,15,0"/>
+                               Margin="0,0,15,0"
+                               Cursor="Hand"
+                               ToolTip="Click to open Info"
+                               MouseLeftButtonDown="VersionText_MouseLeftButtonDown">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Primary}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                     
                     <!-- Window butonları: Minimize, Maximize/Restore, Close -->
                     <StackPanel Orientation="Horizontal">

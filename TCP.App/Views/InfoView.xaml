@@ -1,0 +1,315 @@
+<UserControl x:Class="TCP.App.Views.InfoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
+             xmlns:services="clr-namespace:TCP.App.Services"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="{DynamicResource Brush.Background.Primary}">
+    <!--
+        InfoView.xaml - Info panel view
+        
+        TCP-0.9.0: Info Panel v1 + Version History UI
+        
+        Layout:
+        - Two-column layout
+        - Left: Section list (fixed width ~240)
+        - Right: Content area with ScrollViewer (star width)
+        - No layout jumping
+        
+        MVVM Pattern: Sadece UI, hiçbir mantık içermez.
+    -->
+    <UserControl.DataContext>
+        <viewmodels:InfoViewModel/>
+    </UserControl.DataContext>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <!-- Section List - Fixed width to prevent layout jumps -->
+            <ColumnDefinition Width="240"/>
+            <!-- Content Container - Star width with ScrollViewer inside -->
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- Section List (Left Panel) -->
+        <Border Grid.Column="0"
+                Background="{DynamicResource Brush.Surface}"
+                BorderBrush="{DynamicResource Brush.Border}"
+                BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <!-- Header -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Section List -->
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Header -->
+                <TextBlock Grid.Row="0"
+                           Text="Info"
+                           FontSize="{DynamicResource Font.Heading.Medium}"
+                           FontFamily="{DynamicResource Font.Primary}"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource Brush.Text.Primary}"
+                           Margin="16,16,16,12"/>
+                
+                <!-- Section List -->
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding Sections}"
+                         SelectedItem="{Binding SelectedSection}"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         Margin="8,0,8,8">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="SectionItemBorder"
+                                    Background="{DynamicResource Brush.Background.Primary}"
+                                    BorderBrush="{DynamicResource Brush.Border}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Margin="0,4,0,0"
+                                    Padding="12,10">
+                                <TextBlock Text="{Binding}"
+                                           FontSize="{DynamicResource Font.Body}"
+                                           FontFamily="{DynamicResource Font.Primary}"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource Brush.Text.Primary}"/>
+                            </Border>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                    <Setter TargetName="SectionItemBorder" Property="BorderBrush" Value="{DynamicResource Brush.Accent.Primary}"/>
+                                    <Setter TargetName="SectionItemBorder" Property="BorderThickness" Value="2"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderThickness="0"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </Grid>
+        </Border>
+        
+        <!-- Content Container (Right Panel) -->
+        <Border Grid.Column="1"
+                Background="{DynamicResource Brush.Background.Primary}">
+            <!-- ScrollViewer INSIDE content area only -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="24">
+                    
+                    <!-- Overview Section -->
+                    <StackPanel Margin="0,0,0,24">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedSection}" Value="Overview">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="Overview"
+                                   FontSize="{DynamicResource Font.Heading.Large}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,0,0,16"/>
+                        <TextBlock Text="TCP (Train Control Platform) is a professional WPF application designed for train control and simulation. The application provides a modular architecture with support for electronics board management, code editing, simulation, and comprehensive settings management."
+                                   FontSize="{DynamicResource Font.Body}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   TextWrapping="Wrap"
+                                   LineHeight="24"
+                                   Margin="0,0,0,12"/>
+                        <TextBlock Text="The platform is built with modern software engineering principles, emphasizing clean code, MVVM architecture, and a token-based theming system for consistent user experience."
+                                   FontSize="{DynamicResource Font.Body}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   TextWrapping="Wrap"
+                                   LineHeight="24"/>
+                    </StackPanel>
+                    
+                    <!-- Architecture Section -->
+                    <StackPanel Margin="0,0,0,24">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedSection}" Value="Architecture">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="Architecture"
+                                   FontSize="{DynamicResource Font.Heading.Large}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,0,0,16"/>
+                        <StackPanel Margin="0,0,0,8">
+                            <TextBlock Text="• WPF (.NET 8)"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       Margin="0,0,0,8"/>
+                            <TextBlock Text="• MVVM Pattern"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       Margin="0,0,0,8"/>
+                            <TextBlock Text="• Token-based Theming"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       Margin="0,0,0,8"/>
+                            <TextBlock Text="• Registry-driven Navigation &amp; Search"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       Margin="0,0,0,8"/>
+                            <TextBlock Text="• Modular Electronics Model"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       Margin="0,0,0,8"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <!-- Features Section -->
+                    <StackPanel Margin="0,0,0,24">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedSection}" Value="Features">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="Features"
+                                   FontSize="{DynamicResource Font.Heading.Large}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,0,0,16"/>
+                        <StackPanel Margin="0,0,0,8">
+                            <TextBlock Text="• Electronics Registry"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       Margin="0,0,0,8"/>
+                            <TextBlock Text="• Editor Placeholder"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       Margin="0,0,0,8"/>
+                            <TextBlock Text="• Simulation Placeholder"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       Margin="0,0,0,8"/>
+                            <TextBlock Text="• Settings System"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       Margin="0,0,0,8"/>
+                            <TextBlock Text="• Global Search"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       Margin="0,0,0,8"/>
+                            <TextBlock Text="• Versioning"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       Margin="0,0,0,8"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <!-- Version History Section -->
+                    <StackPanel Margin="0,0,0,24">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedSection}" Value="Version History">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="Version History"
+                                   FontSize="{DynamicResource Font.Heading.Large}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,0,0,16"/>
+                        <ItemsControl ItemsSource="{Binding VersionHistory}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource Brush.Surface}"
+                                            BorderBrush="{DynamicResource Brush.Border}"
+                                            BorderThickness="1"
+                                            CornerRadius="4"
+                                            Padding="16,12"
+                                            Margin="0,0,0,12">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                                <TextBlock Text="{Binding Version}"
+                                                           FontSize="{DynamicResource Font.Heading.Small}"
+                                                           FontFamily="{DynamicResource Font.Primary}"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource Brush.Text.Primary}"
+                                                           Margin="0,0,12,0"/>
+                                                <TextBlock Text="{Binding Title}"
+                                                           FontSize="{DynamicResource Font.Heading.Small}"
+                                                           FontFamily="{DynamicResource Font.Primary}"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource Brush.Accent.Primary}"/>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Description}"
+                                                       FontSize="{DynamicResource Font.Body}"
+                                                       FontFamily="{DynamicResource Font.Primary}"
+                                                       Foreground="{DynamicResource Brush.Text.Secondary}"
+                                                       TextWrapping="Wrap"
+                                                       LineHeight="20"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                    
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

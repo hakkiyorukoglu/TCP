@@ -43,3 +43,5 @@ C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\refint\TCP.App.dll
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.pdb
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.genruntimeconfig.cache
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\ref\TCP.App.dll
+C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\InfoView.g.cs
+C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\InfoView.baml

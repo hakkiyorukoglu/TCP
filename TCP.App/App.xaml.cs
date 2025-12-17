@@ -133,6 +133,28 @@ public partial class App : Application
             Route = "Info"
         });
         
+        // TCP-0.9.0: Register additional Info routes
+        registry.Register(new SearchItem
+        {
+            Title = "About TCP",
+            Keywords = new[] { "about", "tcp", "overview" },
+            Route = "Info"
+        });
+        
+        registry.Register(new SearchItem
+        {
+            Title = "Version History",
+            Keywords = new[] { "version", "history", "changelog", "versions" },
+            Route = "Info"
+        });
+        
+        registry.Register(new SearchItem
+        {
+            Title = "Architecture",
+            Keywords = new[] { "architecture", "mvvm", "wpf", "design" },
+            Route = "Info"
+        });
+        
         // TCP-0.6.0: Initialize BoardRegistry with hardcoded board data
         var boardRegistry = BoardRegistry.Instance;
         
