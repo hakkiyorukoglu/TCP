@@ -347,7 +347,7 @@
                             VerticalAlignment="Center"
                             Margin="0,0,10,0">
                     
-                        <!-- Settings icon (placeholder) -->
+                        <!-- Settings icon -->
                         <TextBlock Text="⚙"
                                    FontSize="{StaticResource Icon.Size.Medium}"
                                    FontFamily="{StaticResource Font.Primary}"
@@ -355,7 +355,18 @@
                                    VerticalAlignment="Center"
                                    Margin="0,0,8,0"
                                    Cursor="Hand"
-                                   ToolTip="Settings (coming soon)"/>
+                                   ToolTip="Settings"
+                                   MouseLeftButtonDown="SettingsIcon_MouseLeftButtonDown">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Primary}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                         
                         <!-- Info icon (placeholder) -->
                         <TextBlock Text="ℹ"

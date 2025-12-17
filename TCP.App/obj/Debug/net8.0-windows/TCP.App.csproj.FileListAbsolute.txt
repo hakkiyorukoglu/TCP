@@ -12,7 +12,6 @@ C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\UI\Components\KeyVal
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\EditorView.baml
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\HomeView.baml
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\InfoPanel.baml
-C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\SettingsView.baml
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\SimulationView.baml
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Shell\MainWindow.g.cs
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\UI\Components\BoardDetailCard.g.cs
@@ -31,6 +30,7 @@ C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App_MarkupCompil
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\App.baml
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Shell\MainWindow.baml
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\ElectronicsView.baml
+C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\SettingsView.baml
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.g.resources
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.AssemblyInfoInputs.cache

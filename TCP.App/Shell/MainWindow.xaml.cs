@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using TCP.App.Views;
 using TCP.App.Services;
 using TCP.App.ViewModels;
+using TCP.App.Models;
 
 namespace TCP.App;
 
@@ -11,6 +12,7 @@ namespace TCP.App;
 /// MainWindow.xaml.cs - Application Shell code-behind
 /// 
 /// TCP-0.4: Navigation Shell + Stable Startup
+/// TCP-0.8.1: Settings Persistence v1 (Local)
 /// 
 /// Bu dosya MainWindow'un davranışlarını yönetir:
 /// - Window butonları (minimize, maximize/restore, close)
@@ -25,8 +27,15 @@ namespace TCP.App;
 public partial class MainWindow : Window
 {
     /// <summary>
+    /// Mevcut route name (settings persistence için)
+    /// TCP-0.8.1: Settings Persistence v1 (Local)
+    /// </summary>
+    private string _currentRoute = "Home";
+    
+    /// <summary>
     /// Constructor - Pencere başlatma
     /// TCP-0.4: Startup stability için minimal logic
+    /// TCP-0.8.1: Settings Persistence v1 (Local)
     /// </summary>
     public MainWindow()
     {
@@ -40,13 +49,24 @@ public partial class MainWindow : Window
             description: "Introduced application shell with top navigation and stable startup."
         );
         
+        // TCP-0.8.0.1: Settings Navigation Enabled
+        changeTracker.RegisterChange(
+            category: "Navigation",
+            description: "Settings route was previously marked as Coming Soon and is now enabled."
+        );
+        
+        // TCP-0.8.1: Settings Persistence v1 (Local)
+        changeTracker.RegisterChange(
+            category: "Settings / Persistence",
+            description: "Introduced local settings persistence. Persisted: Theme, LastRoute, Panel widths. Location: %AppData%/TCP/settings.json"
+        );
+        
         // Pencere sürükleme için MouseDown event'i ekle
         // WindowStyle="None" olduğu için manuel sürükleme implementasyonu gerekli
         this.MouseDown += MainWindow_MouseDown;
         
-        // Default view: HomeView (zaten XAML'de set edilmiş)
-        // Navigation başlangıçta Home tab'ı aktif göster
-        SetActiveTab(HomeTab);
+        // TCP-0.8.1: Apply loaded settings (LastRoute navigation)
+        ApplyLoadedSettings();
         
         // TCP-0.5.1: Search navigation event handler
         if (DataContext is MainViewModel mainViewModel)
@@ -56,28 +76,80 @@ public partial class MainWindow : Window
     }
     
     /// <summary>
+    /// Loaded settings'i apply et
+    /// TCP-0.8.1: Settings Persistence v1 (Local)
+    /// - LastRoute'e navigate et
+    /// - Panel widths restore edilecek (gelecekte)
+    /// </summary>
+    private void ApplyLoadedSettings()
+    {
+        var settings = App.LoadedSettings;
+        if (settings == null)
+        {
+            // Settings yoksa default: Home
+            NavigateToView(new HomeView(), "Home");
+            SetActiveTab(HomeTab);
+            return;
+        }
+        
+        // LastRoute'e navigate et
+        var lastRoute = settings.LastRoute ?? "Home";
+        _currentRoute = lastRoute;
+        
+        switch (lastRoute)
+        {
+            case "Home":
+                NavigateToView(new HomeView(), "Home");
+                SetActiveTab(HomeTab);
+                break;
+            case "Electronics":
+                NavigateToView(new ElectronicsView(), "Electronics");
+                SetActiveTab(ElectronicsTab);
+                break;
+            case "Simulation":
+                NavigateToView(new SimulationView(), "Simulation");
+                SetActiveTab(SimulationTab);
+                break;
+            case "Editor":
+                NavigateToView(new EditorView(), "Editor");
+                SetActiveTab(EditorTab);
+                break;
+            case "Settings":
+                NavigateToView(new SettingsView(), "Settings");
+                // Settings tab yok, SetActiveTab çağrılmaz
+                break;
+            default:
+                // Unknown route → default: Home
+                NavigateToView(new HomeView(), "Home");
+                SetActiveTab(HomeTab);
+                break;
+        }
+    }
+    
+    /// <summary>
     /// Search navigation handler - route'a göre navigate et
     /// TCP-0.5.1: Top-Right Search UI
+    /// TCP-0.8.1: Settings Persistence v1 (Local) - Route save edilir
     /// </summary>
     private void MainViewModel_NavigateRequested(string route)
     {
         switch (route)
         {
             case "Home":
-                NavigateToView(new HomeView());
+                NavigateToView(new HomeView(), "Home");
                 SetActiveTab(HomeTab);
                 break;
             case "Electronics":
-                NavigateToView(new ElectronicsView());
+                NavigateToView(new ElectronicsView(), "Electronics");
                 SetActiveTab(ElectronicsTab);
                 break;
             case "Simulation":
-                NavigateToView(new SimulationView());
+                NavigateToView(new SimulationView(), "Simulation");
                 SetActiveTab(SimulationTab);
                 break;
             case "Settings":
-                // Settings view henüz yok, placeholder
-                // NavigateToView(new SettingsView());
+                NavigateToView(new SettingsView(), "Settings");
+                // Note: Settings tab is not in TopBar navigation tabs, so no SetActiveTab call
                 break;
             case "Info":
                 // Info view henüz yok, placeholder
@@ -134,46 +206,92 @@ public partial class MainWindow : Window
     
     /// <summary>
     /// Navigation: Home tab click handler
+    /// TCP-0.8.1: Settings Persistence v1 (Local) - Route save edilir
     /// </summary>
     private void HomeTab_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        NavigateToView(new HomeView());
+        NavigateToView(new HomeView(), "Home");
         SetActiveTab(HomeTab);
     }
     
     /// <summary>
     /// Navigation: Electronics tab click handler
+    /// TCP-0.8.1: Settings Persistence v1 (Local) - Route save edilir
     /// </summary>
     private void ElectronicsTab_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        NavigateToView(new ElectronicsView());
+        NavigateToView(new ElectronicsView(), "Electronics");
         SetActiveTab(ElectronicsTab);
     }
     
     /// <summary>
     /// Navigation: Simulation tab click handler
+    /// TCP-0.8.1: Settings Persistence v1 (Local) - Route save edilir
     /// </summary>
     private void SimulationTab_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        NavigateToView(new SimulationView());
+        NavigateToView(new SimulationView(), "Simulation");
         SetActiveTab(SimulationTab);
     }
     
     /// <summary>
     /// Navigation: Editor tab click handler
+    /// TCP-0.8.1: Settings Persistence v1 (Local) - Route save edilir
     /// </summary>
     private void EditorTab_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        NavigateToView(new EditorView());
+        NavigateToView(new EditorView(), "Editor");
         SetActiveTab(EditorTab);
     }
     
     /// <summary>
-    /// View'e navigate et (basit ContentControl switching)
+    /// Navigation: Settings icon click handler
+    /// TCP-0.8.0.1: Settings Navigation Enabled
+    /// TCP-0.8.1: Settings Persistence v1 (Local) - Route save edilir
     /// </summary>
-    private void NavigateToView(UserControl view)
+    private void SettingsIcon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        NavigateToView(new SettingsView(), "Settings");
+        // Note: Settings is not in TopBar navigation tabs, so no SetActiveTab call
+    }
+    
+    /// <summary>
+    /// View'e navigate et (basit ContentControl switching)
+    /// TCP-0.8.1: Settings Persistence v1 (Local) - Route save edilir
+    /// </summary>
+    private void NavigateToView(UserControl view, string routeName)
     {
         ContentArea.Content = view;
+        
+        // Route değiştiyse save et
+        if (_currentRoute != routeName)
+        {
+            _currentRoute = routeName;
+            SaveCurrentRoute();
+        }
+    }
+    
+    /// <summary>
+    /// Mevcut route'u settings'e kaydet
+    /// TCP-0.8.1: Settings Persistence v1 (Local)
+    /// </summary>
+    private void SaveCurrentRoute()
+    {
+        try
+        {
+            var settings = App.LoadedSettings ?? new AppSettings();
+            settings.LastRoute = _currentRoute;
+            
+            App.SettingsService.Save(settings);
+            
+            // App.LoadedSettings cache'ini güncelle
+            App.UpdateLoadedSettings(settings);
+        }
+        catch
+        {
+            // Save başarısız olursa sessizce fail eder
+            // UI'ya exception throw edilmez
+        }
     }
     
     /// <summary>

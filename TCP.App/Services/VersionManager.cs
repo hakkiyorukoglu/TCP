@@ -15,11 +15,11 @@ public static class VersionManager
     /// <summary>
     /// Mevcut versiyon
     /// Semantic versioning formatında: TCP-Major.Minor.Patch
-    /// TCP-0.8.0: Settings System v1
+    /// TCP-0.8.1: Settings Persistence v1 (Local)
     /// 
     /// IMPORTANT: Bu değer tek yerden güncellenir - tüm UI otomatik güncellenir
     /// </summary>
-    public static string CurrentVersion => "TCP-0.8.0";
+    public static string CurrentVersion => "TCP-0.8.1";
     
     /// <summary>
     /// Build time
@@ -31,7 +31,7 @@ public static class VersionManager
     /// Stage adı
     /// Mevcut geliştirme aşaması
     /// </summary>
-    public static string StageName => "Settings System v1";
+    public static string StageName => "Settings Persistence v1 (Local)";
     
     /// <summary>
     /// Display versiyon

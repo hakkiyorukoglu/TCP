@@ -3,6 +3,7 @@ using System.Data;
 using System.Windows;
 using TCP.App.Services;
 using TCP.App.ViewModels;
+using TCP.App.Models;
 using System.Collections.Generic;
 
 namespace TCP.App;
@@ -11,12 +12,57 @@ namespace TCP.App;
 /// Interaction logic for App.xaml
 /// 
 /// TCP-0.5.2: Search Registry initialization
+/// TCP-0.8.1: Settings Persistence v1 (Local)
 /// </summary>
 public partial class App : Application
 {
     /// <summary>
-    /// Application startup - Initialize SearchRegistry
+    /// Settings persistence service instance
+    /// TCP-0.8.1: Settings Persistence v1 (Local)
+    /// </summary>
+    private static SettingsPersistenceService? _settingsService;
+    
+    /// <summary>
+    /// Loaded settings (cached)
+    /// TCP-0.8.1: Settings Persistence v1 (Local)
+    /// </summary>
+    private static AppSettings? _loadedSettings;
+    
+    /// <summary>
+    /// Get loaded settings (for use in MainWindow)
+    /// TCP-0.8.1: Settings Persistence v1 (Local)
+    /// </summary>
+    public static AppSettings? LoadedSettings => _loadedSettings;
+    
+    /// <summary>
+    /// Update loaded settings cache
+    /// TCP-0.8.1: Settings Persistence v1 (Local)
+    /// </summary>
+    public static void UpdateLoadedSettings(AppSettings settings)
+    {
+        _loadedSettings = settings;
+    }
+    
+    /// <summary>
+    /// Get settings service (for use in MainWindow)
+    /// TCP-0.8.1: Settings Persistence v1 (Local)
+    /// </summary>
+    public static SettingsPersistenceService SettingsService
+    {
+        get
+        {
+            if (_settingsService == null)
+            {
+                _settingsService = new SettingsPersistenceService();
+            }
+            return _settingsService;
+        }
+    }
+    
+    /// <summary>
+    /// Application startup - Initialize SearchRegistry and load settings
     /// TCP-0.5.2: Register all search suggestions
+    /// TCP-0.8.1: Settings Persistence v1 (Local)
     /// </summary>
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -24,6 +70,17 @@ public partial class App : Application
         this.DispatcherUnhandledException += App_DispatcherUnhandledException;
         
         base.OnStartup(e);
+        
+        // TCP-0.8.1: Load settings on startup
+        _settingsService = new SettingsPersistenceService();
+        _loadedSettings = _settingsService.Load();
+        
+        // Apply theme (şimdilik sadece Dark, Light theme switching UI yok)
+        // Theme değişikliği gelecekte implement edilecek
+        // Şimdilik sadece settings dosyasından okuyoruz
+        
+        // MainWindow açıldığında LastRoute'e navigate edilecek
+        // MainWindow constructor'ında ApplyLoadedSettings() çağrılacak
         
         // Initialize SearchRegistry with all page registrations
         var registry = SearchRegistry.Instance;
