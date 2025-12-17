@@ -348,7 +348,7 @@
                                    FontFamily="{StaticResource Font.Primary}"
                                    Foreground="{DynamicResource Brush.Text.Secondary}"
                                    VerticalAlignment="Center"
-                                   Margin="0,0,{StaticResource Icon.Padding.Medium},0"
+                                   Margin="0,0,8,0"
                                    Cursor="Hand"
                                    ToolTip="Settings (coming soon)"/>
                         
@@ -358,7 +358,7 @@
                                    FontFamily="{StaticResource Font.Primary}"
                                    Foreground="{DynamicResource Brush.Text.Secondary}"
                                    VerticalAlignment="Center"
-                                   Margin="0,0,{StaticResource Icon.Padding.Medium},0"
+                                   Margin="0,0,8,0"
                                    Cursor="Hand"
                                    ToolTip="Info (coming soon)"/>
                         
