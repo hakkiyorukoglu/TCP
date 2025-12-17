@@ -7,25 +7,25 @@
         <!--
             Application.Resources - Uygulama genelinde kullanılacak kaynaklar
             
-            Theme.Dark.xaml dosyasını buraya merge ediyoruz.
-            Bu sayede tüm pencereler ve kontroller tema renklerine erişebilir.
+            TCP-0.8.1 Hotfix-2: Startup Safe Resources
             
-            ResourceDictionary.MergedDictionaries kullanarak TCP.Theming projesindeki
-            tema dosyasını yüklüyoruz. Pack URI formatı kullanılıyor:
-            - pack://application:,,,/AssemblyName;component/Path/To/File.xaml
+            IMPORTANT: Theme dictionaries are NOT loaded here.
+            They are loaded AFTER MainWindow is shown (in Loaded event).
+            
+            This prevents StaticResource resolution failures at startup.
+            
+            Only safe base resources are defined here:
+            - System font (Segoe UI)
+            - Basic fallback colors
+            - No design tokens (FontFamily, Spacing, Radius, IconSize, etc.)
         -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <!--
-                    TCP-0.7.0: Theme Tokens v1 (Design Tokens)
-                    
-                    Design Token sistemi:
-                    - Theme.Dark.xaml tüm token dosyalarını merge eder
-                    - Colors, Brushes, Spacing, Radius, FontSizes
-                    - Default: Dark theme
-                    - Light theme mevcut ama UI toggle henüz yok
+                    TCP-0.8.1-HOTFIX: SafeDefaults MUST be loaded first
+                    This prevents StaticResource resolution failures at startup
                 -->
-                <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Variants/Theme.Dark.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/SafeDefaults.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

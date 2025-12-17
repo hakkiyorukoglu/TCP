@@ -67,9 +67,31 @@ public partial class MainWindow : Window
             description: "Fixed non-working theme selection in Settings > Appearance. Theme can now be selected and applied immediately without app restart."
         );
         
+        // TCP-0.8.1: Safe Theme Apply with Save Button
+        changeTracker.RegisterChange(
+            category: "Settings / Bugfix",
+            description: "Fixed StaticResource crash by introducing explicit Apply Theme workflow. Theme change now requires explicit Apply button click and is applied safely after SettingsView is closed."
+        );
+        
+        // TCP-0.8.1 Hotfix-2: Startup Safe Resources
+        changeTracker.RegisterChange(
+            category: "Startup / Bugfix",
+            description: "Fixed StaticResource resolution failure at startup. Theme dictionaries are now loaded AFTER MainWindow is shown (in Loaded event), preventing startup crashes."
+        );
+        
+        // TCP-0.8.1-HOTFIX: Fix StaticResource crash + make theme resources non-fatal
+        changeTracker.RegisterChange(
+            category: "Startup / Bugfix",
+            description: "Fixed StaticResourceExtension crash by: 1) Creating SafeDefaults.xaml with fallback resources, 2) Converting all theme token StaticResource to DynamicResource, 3) Loading SafeDefaults in App.xaml before theme dictionaries. Theme resources are now non-fatal."
+        );
+        
         // Pencere sürükleme için MouseDown event'i ekle
         // WindowStyle="None" olduğu için manuel sürükleme implementasyonu gerekli
         this.MouseDown += MainWindow_MouseDown;
+        
+        // TCP-0.8.1 Hotfix-2: Load theme AFTER window is loaded
+        // This prevents StaticResource resolution failures at startup
+        this.Loaded += MainWindow_Loaded;
         
         // TCP-0.8.1: Apply loaded settings (LastRoute navigation)
         ApplyLoadedSettings();
@@ -79,6 +101,19 @@ public partial class MainWindow : Window
         {
             mainViewModel.NavigateRequested += MainViewModel_NavigateRequested;
         }
+    }
+    
+    /// <summary>
+    /// MainWindow Loaded event handler
+    /// TCP-0.8.1 Hotfix-2: Startup Safe Resources
+    /// 
+    /// Theme'i window gösterildikten SONRA yükler.
+    /// Bu sayede StaticResource resolution failure'ı önlenir.
+    /// </summary>
+    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        // Theme'i güvenli bir şekilde yükle
+        ThemeService.LoadInitialTheme();
     }
     
     /// <summary>

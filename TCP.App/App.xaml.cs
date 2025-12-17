@@ -75,15 +75,9 @@ public partial class App : Application
         _settingsService = new SettingsPersistenceService();
         _loadedSettings = _settingsService.Load();
         
-        // TCP-0.8.1: Apply theme on startup
-        if (_loadedSettings != null && !string.IsNullOrWhiteSpace(_loadedSettings.Theme))
-        {
-            ThemeService.ApplyTheme(_loadedSettings.Theme);
-        }
-        else
-        {
-            ThemeService.ApplyTheme("Dark"); // Default
-        }
+        // TCP-0.8.1 Hotfix-2: Theme loading moved to MainWindow Loaded event
+        // This prevents StaticResource resolution failures at startup
+        // Theme will be loaded AFTER MainWindow is shown
         
         // MainWindow açıldığında LastRoute'e navigate edilecek
         // MainWindow constructor'ında ApplyLoadedSettings() çağrılacak

@@ -15,7 +15,7 @@ public static class VersionManager
     /// <summary>
     /// Mevcut versiyon
     /// Semantic versioning formatında: TCP-Major.Minor.Patch
-    /// TCP-0.8.1: Safe Theme Apply with Save Button
+    /// TCP-0.8.1-HOTFIX: Fix StaticResource crash + make theme resources non-fatal
     /// 
     /// IMPORTANT: Bu değer tek yerden güncellenir - tüm UI otomatik güncellenir
     /// </summary>
@@ -31,7 +31,7 @@ public static class VersionManager
     /// Stage adı
     /// Mevcut geliştirme aşaması
     /// </summary>
-    public static string StageName => "Safe Theme Apply with Save Button";
+    public static string StageName => "Fix StaticResource crash + make theme resources non-fatal";
     
     /// <summary>
     /// Display versiyon

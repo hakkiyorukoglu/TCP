@@ -35,7 +35,7 @@
         <TextBox x:Name="CodeEditorTextBox"
                  Grid.Row="0"
                  FontFamily="Consolas"
-                 FontSize="{StaticResource FontSizeNormal}"
+                 FontSize="{DynamicResource Font.Body}"
                  Foreground="{DynamicResource Brush.Text.Primary}"
                  Background="{DynamicResource Brush.Surface}"
                  BorderBrush="{DynamicResource Brush.Border}"

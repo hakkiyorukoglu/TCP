@@ -48,8 +48,8 @@
                 <!-- Header -->
                 <TextBlock Grid.Row="0"
                            Text="Settings"
-                           FontSize="{StaticResource Font.Heading.Medium}"
-                           FontFamily="{StaticResource Font.Primary}"
+                           FontSize="{DynamicResource Font.Heading.Medium}"
+                           FontFamily="{DynamicResource Font.Primary}"
                            FontWeight="SemiBold"
                            Foreground="{DynamicResource Brush.Text.Primary}"
                            Margin="16,16,16,12"/>
@@ -72,13 +72,13 @@
                                     Padding="12,10">
                                 <StackPanel>
                                     <TextBlock Text="{Binding Name}"
-                                               FontSize="{StaticResource Font.Body}"
-                                               FontFamily="{StaticResource Font.Primary}"
+                                               FontSize="{DynamicResource Font.Body}"
+                                               FontFamily="{DynamicResource Font.Primary}"
                                                FontWeight="SemiBold"
                                                Foreground="{DynamicResource Brush.Text.Primary}"/>
                                     <TextBlock Text="{Binding Description}"
-                                               FontSize="{StaticResource Font.Caption}"
-                                               FontFamily="{StaticResource Font.Primary}"
+                                               FontSize="{DynamicResource Font.Caption}"
+                                               FontFamily="{DynamicResource Font.Primary}"
                                                Foreground="{DynamicResource Brush.Text.Secondary}"
                                                Margin="0,4,0,0"
                                                TextWrapping="Wrap"/>
@@ -130,8 +130,8 @@
                 <StackPanel Margin="24">
                     <!-- Category Content based on SelectedCategory -->
                     <TextBlock Text="{Binding SelectedCategory.Name, FallbackValue='Select a category'}"
-                               FontSize="{StaticResource Font.Heading.Large}"
-                               FontFamily="{StaticResource Font.Primary}"
+                               FontSize="{DynamicResource Font.Heading.Large}"
+                               FontFamily="{DynamicResource Font.Primary}"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource Brush.Text.Primary}"
                                Margin="0,0,0,20"/>
@@ -149,8 +149,8 @@
                             </Style>
                         </StackPanel.Style>
                         <TextBlock Text="Theme"
-                                   FontSize="{StaticResource Font.Heading.Small}"
-                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontSize="{DynamicResource Font.Heading.Small}"
+                                   FontFamily="{DynamicResource Font.Primary}"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                    Margin="0,0,0,8"/>
@@ -166,8 +166,8 @@
                                     <Setter Property="BorderThickness" Value="1"/>
                                     <Setter Property="Padding" Value="12,8"/>
                                     <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}"/>
-                                    <Setter Property="FontSize" Value="{StaticResource Font.Body}"/>
-                                    <Setter Property="FontFamily" Value="{StaticResource Font.Primary}"/>
+                                    <Setter Property="FontSize" Value="{DynamicResource Font.Body}"/>
+                                    <Setter Property="FontFamily" Value="{DynamicResource Font.Primary}"/>
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="ComboBox">
@@ -244,8 +244,8 @@
                                 <Style TargetType="ComboBoxItem">
                                     <Setter Property="Padding" Value="12,8"/>
                                     <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}"/>
-                                    <Setter Property="FontSize" Value="{StaticResource Font.Body}"/>
-                                    <Setter Property="FontFamily" Value="{StaticResource Font.Primary}"/>
+                                    <Setter Property="FontSize" Value="{DynamicResource Font.Body}"/>
+                                    <Setter Property="FontFamily" Value="{DynamicResource Font.Primary}"/>
                                     <Style.Triggers>
                                         <Trigger Property="IsHighlighted" Value="True">
                                             <Setter Property="Background" Value="{DynamicResource Brush.Border}"/>
@@ -260,8 +260,8 @@
                                 Command="{Binding ApplyThemeCommand}"
                                 MinWidth="120"
                                 Padding="16,8"
-                                FontSize="{StaticResource Font.Body}"
-                                FontFamily="{StaticResource Font.Primary}"
+                                FontSize="{DynamicResource Font.Body}"
+                                FontFamily="{DynamicResource Font.Primary}"
                                 Background="{DynamicResource Brush.Accent.Primary}"
                                 Foreground="White"
                                 BorderThickness="0"
@@ -293,8 +293,8 @@
                         </StackPanel>
                         
                         <TextBlock Text="Accent Color"
-                                   FontSize="{StaticResource Font.Heading.Small}"
-                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontSize="{DynamicResource Font.Heading.Small}"
+                                   FontFamily="{DynamicResource Font.Primary}"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                    Margin="0,16,0,8"/>
@@ -305,8 +305,8 @@
                                 Padding="12,10"
                                 Margin="0,0,0,12">
                             <TextBlock Text="Default accent color"
-                                       FontSize="{StaticResource Font.Body}"
-                                       FontFamily="{StaticResource Font.Primary}"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
                                        Foreground="{DynamicResource Brush.Text.Secondary}"/>
                         </Border>
                     </StackPanel>
@@ -324,14 +324,14 @@
                             </Style>
                         </StackPanel.Style>
                         <TextBlock Text="Keyboard Shortcuts"
-                                   FontSize="{StaticResource Font.Heading.Small}"
-                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontSize="{DynamicResource Font.Heading.Small}"
+                                   FontFamily="{DynamicResource Font.Primary}"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                    Margin="0,0,0,8"/>
                         <TextBlock Text="Shortcut list will appear here in future versions."
-                                   FontSize="{StaticResource Font.Body}"
-                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontSize="{DynamicResource Font.Body}"
+                                   FontFamily="{DynamicResource Font.Primary}"
                                    Foreground="{DynamicResource Brush.Text.Secondary}"
                                    TextWrapping="Wrap"
                                    Margin="0,0,0,12"/>
@@ -350,8 +350,8 @@
                             </Style>
                         </StackPanel.Style>
                         <TextBlock Text="Default Paths"
-                                   FontSize="{StaticResource Font.Heading.Small}"
-                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontSize="{DynamicResource Font.Heading.Small}"
+                                   FontFamily="{DynamicResource Font.Primary}"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                    Margin="0,0,0,8"/>
@@ -362,8 +362,8 @@
                                 Padding="12,10"
                                 Margin="0,0,0,12">
                             <TextBlock Text="Default project path: (placeholder)"
-                                       FontSize="{StaticResource Font.Body}"
-                                       FontFamily="{StaticResource Font.Primary}"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
                                        Foreground="{DynamicResource Brush.Text.Secondary}"/>
                         </Border>
                     </StackPanel>
@@ -381,14 +381,14 @@
                             </Style>
                         </StackPanel.Style>
                         <TextBlock Text="Performance Options"
-                                   FontSize="{StaticResource Font.Heading.Small}"
-                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontSize="{DynamicResource Font.Heading.Small}"
+                                   FontFamily="{DynamicResource Font.Primary}"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                    Margin="0,0,0,8"/>
                         <TextBlock Text="Performance options placeholder"
-                                   FontSize="{StaticResource Font.Body}"
-                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontSize="{DynamicResource Font.Body}"
+                                   FontFamily="{DynamicResource Font.Primary}"
                                    Foreground="{DynamicResource Brush.Text.Secondary}"
                                    TextWrapping="Wrap"
                                    Margin="0,0,0,12"/>
@@ -407,40 +407,40 @@
                             </Style>
                         </StackPanel.Style>
                         <TextBlock Text="About"
-                                   FontSize="{StaticResource Font.Heading.Small}"
-                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontSize="{DynamicResource Font.Heading.Small}"
+                                   FontFamily="{DynamicResource Font.Primary}"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                    Margin="0,0,0,16"/>
                         <StackPanel Margin="0,0,0,12">
                             <TextBlock Text="Application Name"
-                                       FontSize="{StaticResource Font.Caption}"
-                                       FontFamily="{StaticResource Font.Primary}"
+                                       FontSize="{DynamicResource Font.Caption}"
+                                       FontFamily="{DynamicResource Font.Primary}"
                                        Foreground="{DynamicResource Brush.Text.Secondary}"
                                        Margin="0,0,0,4"/>
                             <TextBlock Text="TCP (Train Control Platform)"
-                                       FontSize="{StaticResource Font.Body}"
-                                       FontFamily="{StaticResource Font.Primary}"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
                                        Foreground="{DynamicResource Brush.Text.Primary}"
                                        Margin="0,0,0,16"/>
                         </StackPanel>
                         <StackPanel Margin="0,0,0,12">
                             <TextBlock Text="Version"
-                                       FontSize="{StaticResource Font.Caption}"
-                                       FontFamily="{StaticResource Font.Primary}"
+                                       FontSize="{DynamicResource Font.Caption}"
+                                       FontFamily="{DynamicResource Font.Primary}"
                                        Foreground="{DynamicResource Brush.Text.Secondary}"
                                        Margin="0,0,0,4"/>
                             <TextBlock Text="{x:Static services:VersionManager.DisplayVersion}"
-                                       FontSize="{StaticResource Font.Body}"
-                                       FontFamily="{StaticResource Font.Primary}"
+                                       FontSize="{DynamicResource Font.Body}"
+                                       FontFamily="{DynamicResource Font.Primary}"
                                        Foreground="{DynamicResource Brush.Text.Primary}"/>
                         </StackPanel>
                     </StackPanel>
                     
                     <!-- Fallback message when no category selected -->
                     <TextBlock Text="Select a category to view settings"
-                               FontSize="{StaticResource Font.Body}"
-                               FontFamily="{StaticResource Font.Primary}"
+                               FontSize="{DynamicResource Font.Body}"
+                               FontFamily="{DynamicResource Font.Primary}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
                                TextWrapping="Wrap"
                                Margin="0,16,0,0">

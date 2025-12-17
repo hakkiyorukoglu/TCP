@@ -143,4 +143,39 @@ public static class ThemeService
     {
         return _currentTheme;
     }
+    
+    /// <summary>
+    /// Initial theme loading (startup safe)
+    /// TCP-0.8.1 Hotfix-2: Startup Safe Resources
+    /// 
+    /// Bu metod MainWindow Loaded event'inde çağrılır.
+    /// Startup'ta StaticResource resolution failure'ı önler.
+    /// 
+    /// Behavior:
+    /// - Try load persisted theme from settings
+    /// - If fails → load Dark theme
+    /// - If still fails → continue without theme (NO CRASH)
+    /// </summary>
+    public static void LoadInitialTheme()
+    {
+        try
+        {
+            var settings = App.LoadedSettings;
+            string themeToLoad = "Dark"; // Default
+            
+            if (settings != null && !string.IsNullOrWhiteSpace(settings.Theme))
+            {
+                themeToLoad = settings.Theme;
+            }
+            
+            // Theme'i güvenli bir şekilde yükle
+            ApplyTheme(themeToLoad);
+        }
+        catch
+        {
+            // Exception durumunda sessizce fail eder
+            // App crash etmez
+            // Default styling ile devam eder
+        }
+    }
 }

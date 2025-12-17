@@ -1,0 +1,104 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!--
+        SafeDefaults.xaml - Safe Fallback Resources
+        
+        TCP-0.8.1-HOTFIX: Fix StaticResource crash + make theme resources non-fatal
+        
+        Bu dosya startup'ta yüklenen güvenli fallback resource'ları içerir.
+        Theme dictionary'leri yüklenmeden önce StaticResource hatası alınmasını önler.
+        
+        IMPORTANT: Bu dosya App.xaml'de theme dictionary'lerinden ÖNCE merge edilmelidir.
+    -->
+    
+    <!--
+        ========================================================================
+        FONT FAMILY FALLBACK
+        ========================================================================
+    -->
+    <FontFamily x:Key="Font.Primary">Segoe UI</FontFamily>
+    
+    <!--
+        ========================================================================
+        TYPOGRAPHY SCALE FALLBACK
+        ========================================================================
+    -->
+    <sys:Double x:Key="Font.Heading.Large">20</sys:Double>
+    <sys:Double x:Key="Font.Heading.Medium">16</sys:Double>
+    <sys:Double x:Key="Font.Heading.Small">13</sys:Double>
+    <sys:Double x:Key="Font.Body">13</sys:Double>
+    <sys:Double x:Key="Font.Caption">11</sys:Double>
+    
+    <!--
+        ========================================================================
+        COLOR FALLBACKS
+        ========================================================================
+    -->
+    <Color x:Key="Color.Background.Primary">#FF2B2B2B</Color>
+    <Color x:Key="Color.Background.Secondary">#FF1E1E1E</Color>
+    <Color x:Key="Color.Surface">#FF333333</Color>
+    <Color x:Key="Color.Border">#FF3F3F3F</Color>
+    <Color x:Key="Color.Accent.Primary">#FF4FC3F7</Color>
+    <Color x:Key="Color.Text.Primary">#FFE6E6E6</Color>
+    <Color x:Key="Color.Text.Secondary">#FFB0B0B0</Color>
+    
+    <!--
+        ========================================================================
+        BRUSH FALLBACKS
+        ========================================================================
+    -->
+    <SolidColorBrush x:Key="Brush.Background.Primary" Color="{StaticResource Color.Background.Primary}"/>
+    <SolidColorBrush x:Key="Brush.Background.Secondary" Color="{StaticResource Color.Background.Secondary}"/>
+    <SolidColorBrush x:Key="Brush.Surface" Color="{StaticResource Color.Surface}"/>
+    <SolidColorBrush x:Key="Brush.Border" Color="{StaticResource Color.Border}"/>
+    <SolidColorBrush x:Key="Brush.Accent.Primary" Color="{StaticResource Color.Accent.Primary}"/>
+    <SolidColorBrush x:Key="Brush.Text.Primary" Color="{StaticResource Color.Text.Primary}"/>
+    <SolidColorBrush x:Key="Brush.Text.Secondary" Color="{StaticResource Color.Text.Secondary}"/>
+    
+    <!--
+        ========================================================================
+        SPACING FALLBACKS
+        ========================================================================
+    -->
+    <sys:Double x:Key="Spacing.XS">4</sys:Double>
+    <sys:Double x:Key="Spacing.S">8</sys:Double>
+    <sys:Double x:Key="Spacing.M">12</sys:Double>
+    <sys:Double x:Key="Spacing.L">16</sys:Double>
+    <sys:Double x:Key="Spacing.XL">24</sys:Double>
+    
+    <!--
+        ========================================================================
+        RADIUS FALLBACKS
+        ========================================================================
+    -->
+    <sys:Double x:Key="Radius.S">2</sys:Double>
+    <sys:Double x:Key="Radius.M">4</sys:Double>
+    <sys:Double x:Key="Radius.L">8</sys:Double>
+    
+    <!--
+        ========================================================================
+        ICON SIZE FALLBACKS
+        ========================================================================
+    -->
+    <sys:Double x:Key="Icon.Size.Small">12</sys:Double>
+    <sys:Double x:Key="Icon.Size.Medium">16</sys:Double>
+    <sys:Double x:Key="Icon.Size.Large">20</sys:Double>
+    <sys:Double x:Key="Icon.Padding.Small">4</sys:Double>
+    <sys:Double x:Key="Icon.Padding.Medium">8</sys:Double>
+    <sys:Double x:Key="Icon.Padding.Large">12</sys:Double>
+    
+    <!--
+        ========================================================================
+        BACKWARD COMPATIBILITY ALIASES
+        ========================================================================
+        Eski token isimleri için backward compatibility
+    -->
+    <sys:Double x:Key="FontSizeXSmall">10</sys:Double>
+    <sys:Double x:Key="FontSizeSmall">11</sys:Double>
+    <sys:Double x:Key="FontSizeNormal">13</sys:Double>
+    <sys:Double x:Key="FontSizeLarge">16</sys:Double>
+    <sys:Double x:Key="FontSizeXLarge">20</sys:Double>
+    <sys:Double x:Key="FontSizeTitle">20</sys:Double>
+    
+</ResourceDictionary>

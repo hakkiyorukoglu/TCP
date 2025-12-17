@@ -66,7 +66,7 @@
                 <!-- Header -->
                 <TextBlock Grid.Row="0"
                            Text="Boards"
-                           FontSize="{StaticResource FontSizeLarge}"
+                           FontSize="{DynamicResource Font.Heading.Medium}"
                            FontWeight="SemiBold"
                            Foreground="{DynamicResource Brush.Text.Primary}"
                            Margin="15,15,15,10"/>
@@ -90,13 +90,13 @@
                                 <StackPanel Orientation="Horizontal">
                                     <!-- Icon placeholder -->
                                     <TextBlock Text="⚡"
-                                               FontSize="{StaticResource FontSizeLarge}"
+                                               FontSize="{DynamicResource Font.Heading.Medium}"
                                                Foreground="{DynamicResource Brush.Accent.Primary}"
                                                VerticalAlignment="Center"
                                                Margin="0,0,8,0"/>
                                     <!-- Board name -->
                                     <TextBlock Text="{Binding Name}"
-                                               FontSize="{StaticResource FontSizeNormal}"
+                                               FontSize="{DynamicResource Font.Body}"
                                                Foreground="{DynamicResource Brush.Text.Primary}"
                                                VerticalAlignment="Center"/>
                                 </StackPanel>
@@ -158,7 +158,7 @@
                 <StackPanel Margin="20">
                     <!-- Board Name -->
                     <TextBlock Text="{Binding SelectedBoard.Name, FallbackValue='No board selected'}"
-                               FontSize="{StaticResource FontSizeTitle}"
+                               FontSize="{DynamicResource Font.Heading.Large}"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource Brush.Text.Primary}"
                                Margin="0,0,0,16"/>
@@ -187,7 +187,7 @@
                     
                     <!-- Fallback message when no board selected -->
                     <TextBlock Text="Select a board to view details"
-                               FontSize="{StaticResource FontSizeNormal}"
+                               FontSize="{DynamicResource Font.Body}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
                                TextWrapping="Wrap"
                                Margin="0,16,0,0">

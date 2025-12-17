@@ -1,6 +1,7 @@
 C:\Users\nurul\Desktop\TCP\TCP.Theming\bin\Debug\net8.0-windows\TCP.Theming.deps.json
 C:\Users\nurul\Desktop\TCP\TCP.Theming\bin\Debug\net8.0-windows\TCP.Theming.dll
 C:\Users\nurul\Desktop\TCP\TCP.Theming\bin\Debug\net8.0-windows\TCP.Theming.pdb
+C:\Users\nurul\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\Themes\SafeDefaults.baml
 C:\Users\nurul\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\Themes\Tokens\ThemeBrushes.baml
 C:\Users\nurul\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\Themes\Tokens\ThemeColors.baml
 C:\Users\nurul\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\Themes\Tokens\ThemeFontSizes.baml

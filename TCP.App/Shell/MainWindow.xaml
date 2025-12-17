@@ -76,13 +76,13 @@
                             VerticalAlignment="Center"
                             Margin="15,0,20,0">
                     <TextBlock Text="TCP"
-                               FontSize="{StaticResource Font.Heading.Medium}"
-                               FontFamily="{StaticResource Font.Primary}"
+                               FontSize="{DynamicResource Font.Heading.Medium}"
+                               FontFamily="{DynamicResource Font.Primary}"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource Brush.Text.Primary}"/>
                     <TextBlock Text="Train Control Platform"
-                               FontSize="{StaticResource Font.Caption}"
-                               FontFamily="{StaticResource Font.Primary}"
+                               FontSize="{DynamicResource Font.Caption}"
+                               FontFamily="{DynamicResource Font.Primary}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
                                Margin="0,-2,0,0"/>
                 </StackPanel>
@@ -95,8 +95,8 @@
                     <!-- Home tab -->
                     <TextBlock x:Name="HomeTab"
                                Text="Home"
-                               FontSize="{StaticResource Font.Body}"
-                               FontFamily="{StaticResource Font.Primary}"
+                               FontSize="{DynamicResource Font.Body}"
+                               FontFamily="{DynamicResource Font.Primary}"
                                Foreground="{DynamicResource Brush.Text.Primary}"
                                VerticalAlignment="Center"
                                Margin="10,0"
@@ -117,8 +117,8 @@
                     <!-- Electronics tab -->
                     <TextBlock x:Name="ElectronicsTab"
                                Text="Electronics"
-                               FontSize="{StaticResource Font.Body}"
-                               FontFamily="{StaticResource Font.Primary}"
+                               FontSize="{DynamicResource Font.Body}"
+                               FontFamily="{DynamicResource Font.Primary}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
                                VerticalAlignment="Center"
                                Margin="10,0"
@@ -139,8 +139,8 @@
                     <!-- Simulation tab -->
                     <TextBlock x:Name="SimulationTab"
                                Text="Simulation"
-                               FontSize="{StaticResource Font.Body}"
-                               FontFamily="{StaticResource Font.Primary}"
+                               FontSize="{DynamicResource Font.Body}"
+                               FontFamily="{DynamicResource Font.Primary}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
                                VerticalAlignment="Center"
                                Margin="10,0"
@@ -161,8 +161,8 @@
                     <!-- Editor tab -->
                     <TextBlock x:Name="EditorTab"
                                Text="Editor"
-                               FontSize="{StaticResource Font.Body}"
-                               FontFamily="{StaticResource Font.Primary}"
+                               FontSize="{DynamicResource Font.Body}"
+                               FontFamily="{DynamicResource Font.Primary}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
                                VerticalAlignment="Center"
                                Margin="10,0"
@@ -215,8 +215,8 @@
                                              Background="Transparent"
                                              BorderThickness="0"
                                              Foreground="{DynamicResource Brush.Text.Primary}"
-                                             FontSize="{StaticResource Font.Caption}"
-                                             FontFamily="{StaticResource Font.Primary}"
+                                             FontSize="{DynamicResource Font.Caption}"
+                                             FontFamily="{DynamicResource Font.Primary}"
                                              VerticalContentAlignment="Center"
                                              Padding="0,0,5,0">
                                         <TextBox.Style>
@@ -244,8 +244,8 @@
                                     <!-- Magnifier icon -->
                                     <TextBlock Grid.Column="1"
                                                Text="🔍"
-                                               FontSize="{StaticResource Icon.Size.Small}"
-                                               FontFamily="{StaticResource Font.Primary}"
+                                               FontSize="{DynamicResource Icon.Size.Small}"
+                                               FontFamily="{DynamicResource Font.Primary}"
                                                Foreground="{DynamicResource Brush.Text.Secondary}"
                                                VerticalAlignment="Center"/>
                                 </Grid>
@@ -253,8 +253,8 @@
                             
                             <!-- Placeholder text (when empty) -->
                             <TextBlock Text="Search..."
-                                       FontSize="{StaticResource Font.Caption}"
-                                       FontFamily="{StaticResource Font.Primary}"
+                                       FontSize="{DynamicResource Font.Caption}"
+                                       FontFamily="{DynamicResource Font.Primary}"
                                        Foreground="{DynamicResource Brush.Text.Secondary}"
                            VerticalAlignment="Center"
                                        Margin="13,0,25,0"
@@ -303,8 +303,8 @@
                                                     Padding="10,8"
                                                     Margin="2">
                                                 <TextBlock Text="{Binding DisplayText}"
-                                                           FontSize="{StaticResource Font.Caption}"
-                                                           FontFamily="{StaticResource Font.Primary}"
+                                                           FontSize="{DynamicResource Font.Caption}"
+                                                           FontFamily="{DynamicResource Font.Primary}"
                                                            Foreground="{DynamicResource Brush.Text.Primary}"/>
                                             </Border>
                                         </DataTemplate>
@@ -349,8 +349,8 @@
                     
                         <!-- Settings icon -->
                         <TextBlock Text="⚙"
-                                   FontSize="{StaticResource Icon.Size.Medium}"
-                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontSize="{DynamicResource Icon.Size.Medium}"
+                                   FontFamily="{DynamicResource Font.Primary}"
                                    Foreground="{DynamicResource Brush.Text.Secondary}"
                                    VerticalAlignment="Center"
                                    Margin="0,0,8,0"
@@ -370,8 +370,8 @@
                         
                         <!-- Info icon (placeholder) -->
                         <TextBlock Text="ℹ"
-                                   FontSize="{StaticResource Icon.Size.Medium}"
-                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontSize="{DynamicResource Icon.Size.Medium}"
+                                   FontFamily="{DynamicResource Font.Primary}"
                                    Foreground="{DynamicResource Brush.Text.Secondary}"
                                    VerticalAlignment="Center"
                                    Margin="0,0,8,0"
@@ -380,8 +380,8 @@
                         
                     <!-- Versiyon bilgisi - TCP-0.7.1: Centralized version display -->
                     <TextBlock Text="{x:Static services:VersionManager.DisplayVersion}"
-                               FontSize="{StaticResource Font.Caption}"
-                               FontFamily="{StaticResource Font.Primary}"
+                               FontSize="{DynamicResource Font.Caption}"
+                               FontFamily="{DynamicResource Font.Primary}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
                                VerticalAlignment="Center"
                                Margin="0,0,15,0"/>
@@ -395,8 +395,8 @@
                                 Background="Transparent"
                                 BorderThickness="0"
                                 Foreground="{DynamicResource Brush.Text.Primary}"
-                                FontSize="{StaticResource Icon.Size.Medium}"
-                                FontFamily="{StaticResource Font.Primary}"
+                                FontSize="{DynamicResource Icon.Size.Medium}"
+                                FontFamily="{DynamicResource Font.Primary}"
                                 Click="MinimizeButton_Click"
                                 Cursor="Hand">
                             <Button.Style>
@@ -429,8 +429,8 @@
                                 Background="Transparent"
                                 BorderThickness="0"
                                 Foreground="{DynamicResource Brush.Text.Primary}"
-                                FontSize="{StaticResource Icon.Size.Medium}"
-                                FontFamily="{StaticResource Font.Primary}"
+                                FontSize="{DynamicResource Icon.Size.Medium}"
+                                FontFamily="{DynamicResource Font.Primary}"
                                 Click="MaximizeRestoreButton_Click"
                                 Cursor="Hand">
                             <Button.Style>
@@ -462,8 +462,8 @@
                                 Background="Transparent"
                                 BorderThickness="0"
                                 Foreground="{DynamicResource Brush.Text.Primary}"
-                                FontSize="{StaticResource Icon.Size.Large}"
-                                FontFamily="{StaticResource Font.Primary}"
+                                FontSize="{DynamicResource Icon.Size.Large}"
+                                FontFamily="{DynamicResource Font.Primary}"
                                 Click="CloseButton_Click"
                                 Cursor="Hand">
                             <Button.Style>
