@@ -32,6 +32,8 @@
         <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Tokens/ThemeSpacing.xaml"/>
         <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Tokens/ThemeRadius.xaml"/>
         <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Tokens/ThemeFontSizes.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Tokens/ThemeTypography.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Tokens/ThemeIcons.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     
     <!--

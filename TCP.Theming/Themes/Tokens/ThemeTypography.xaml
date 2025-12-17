@@ -1,0 +1,37 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!--
+        ThemeTypography.xaml - Typography Design Tokens
+        
+        TCP-0.7.1: Typography & Icon Rules
+        
+        Bu dosya typography token'larını içerir.
+        Typography scale: Heading (Large/Medium/Small), Body, Caption
+        
+        Rules:
+        - ONE font family for entire app
+        - No hardcoded FontSize values in Views
+        - All TextBlocks must use token-based FontSizes
+    -->
+    
+    <!--
+        ========================================================================
+        FONT FAMILY TOKEN
+        ========================================================================
+    -->
+    <sys:String x:Key="Font.Primary">Segoe UI, Inter, Roboto, sans-serif</sys:String>
+    
+    <!--
+        ========================================================================
+        TYPOGRAPHY SCALE - FONT SIZES
+        ========================================================================
+        Semantic typography tokens for consistent text sizing
+    -->
+    <sys:Double x:Key="Font.Heading.Large">20</sys:Double>
+    <sys:Double x:Key="Font.Heading.Medium">16</sys:Double>
+    <sys:Double x:Key="Font.Heading.Small">13</sys:Double>
+    <sys:Double x:Key="Font.Body">13</sys:Double>
+    <sys:Double x:Key="Font.Caption">11</sys:Double>
+    
+</ResourceDictionary>

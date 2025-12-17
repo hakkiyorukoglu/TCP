@@ -15,8 +15,11 @@ public static class VersionManager
     /// <summary>
     /// Mevcut versiyon
     /// Semantic versioning formatında: TCP-Major.Minor.Patch
+    /// TCP-0.7.1: Typography & Icon Rules
+    /// 
+    /// IMPORTANT: Bu değer tek yerden güncellenir - tüm UI otomatik güncellenir
     /// </summary>
-    public static string CurrentVersion => "TCP-0.4.0";
+    public static string CurrentVersion => "TCP-0.7.1";
     
     /// <summary>
     /// Build time
@@ -28,7 +31,7 @@ public static class VersionManager
     /// Stage adı
     /// Mevcut geliştirme aşaması
     /// </summary>
-    public static string StageName => "Navigation Shell";
+    public static string StageName => "Typography & Icon Rules";
     
     /// <summary>
     /// Display versiyon

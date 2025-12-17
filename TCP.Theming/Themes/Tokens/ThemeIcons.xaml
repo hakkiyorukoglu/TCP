@@ -1,0 +1,34 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!--
+        ThemeIcons.xaml - Icon Design Tokens
+        
+        TCP-0.7.1: Typography & Icon Rules
+        
+        Bu dosya icon size ve padding token'larını içerir.
+        
+        Rules:
+        - All icons must use these sizes only
+        - No custom Width/Height values in XAML
+        - Icons align visually with text baselines
+    -->
+    
+    <!--
+        ========================================================================
+        ICON SIZE TOKENS
+        ========================================================================
+    -->
+    <sys:Double x:Key="Icon.Size.Small">16</sys:Double>
+    <sys:Double x:Key="Icon.Size.Medium">20</sys:Double>
+    <sys:Double x:Key="Icon.Size.Large">24</sys:Double>
+    
+    <!--
+        ========================================================================
+        ICON PADDING TOKENS
+        ========================================================================
+    -->
+    <sys:Double x:Key="Icon.Padding.Small">4</sys:Double>
+    <sys:Double x:Key="Icon.Padding.Medium">8</sys:Double>
+    
+</ResourceDictionary>
