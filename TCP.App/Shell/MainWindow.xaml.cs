@@ -131,56 +131,19 @@ public partial class MainWindow : Window
     /// <summary>
     /// Loaded settings'i apply et
     /// TCP-0.8.1: Settings Persistence v1 (Local)
-    /// - LastRoute'e navigate et
-    /// - Panel widths restore edilecek (gelecekte)
+    /// TCP-0.9.0-fix1: Info access & startup route fix
+    /// 
+    /// Startup'ta her zaman Home'a navigate eder.
+    /// LastRoute artık startup'ta kullanılmıyor (UX fix).
+    /// Panel widths restore edilecek (gelecekte)
     /// </summary>
     private void ApplyLoadedSettings()
     {
-        var settings = App.LoadedSettings;
-        if (settings == null)
-        {
-            // Settings yoksa default: Home
-            NavigateToView(new HomeView(), "Home");
-            SetActiveTab(HomeTab);
-            return;
-        }
-        
-        // LastRoute'e navigate et
-        var lastRoute = settings.LastRoute ?? "Home";
-        _currentRoute = lastRoute;
-        
-        switch (lastRoute)
-        {
-            case "Home":
-                NavigateToView(new HomeView(), "Home");
-                SetActiveTab(HomeTab);
-                break;
-            case "Electronics":
-                NavigateToView(new ElectronicsView(), "Electronics");
-                SetActiveTab(ElectronicsTab);
-                break;
-            case "Simulation":
-                NavigateToView(new SimulationView(), "Simulation");
-                SetActiveTab(SimulationTab);
-                break;
-            case "Editor":
-                NavigateToView(new EditorView(), "Editor");
-                SetActiveTab(EditorTab);
-                break;
-            case "Settings":
-                NavigateToView(new SettingsView(), "Settings");
-                // Settings tab yok, SetActiveTab çağrılmaz
-                break;
-            case "Info":
-                NavigateToView(new InfoView(), "Info");
-                // Info tab yok, SetActiveTab çağrılmaz
-                break;
-            default:
-                // Unknown route → default: Home
-                NavigateToView(new HomeView(), "Home");
-                SetActiveTab(HomeTab);
-                break;
-        }
+        // TCP-0.9.0-fix1: Always start on Home page for consistent UX
+        // LastRoute is still saved on navigation changes, but not used at startup
+        _currentRoute = "Home";
+        NavigateToView(new HomeView(), "Home");
+        SetActiveTab(HomeTab);
     }
     
     /// <summary>
@@ -322,6 +285,18 @@ public partial class MainWindow : Window
     /// Opens Info page and selects Overview section
     /// </summary>
     private void VersionText_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        var infoView = new InfoView();
+        NavigateToView(infoView, "Info");
+        // Note: Info is not in TopBar navigation tabs, so no SetActiveTab call
+    }
+    
+    /// <summary>
+    /// Navigation: Info icon click handler
+    /// TCP-0.9.0-fix1: Info access & startup route fix
+    /// Opens Info page when Info icon is clicked
+    /// </summary>
+    private void InfoIcon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         var infoView = new InfoView();
         NavigateToView(infoView, "Info");

@@ -15,11 +15,11 @@ public static class VersionManager
     /// <summary>
     /// Mevcut versiyon
     /// Semantic versioning formatında: TCP-Major.Minor.Patch
-    /// TCP-0.9.0: Info Panel v1 + Version History UI
+    /// TCP-0.9.1b: Architecture section binding crash fix
     /// 
     /// IMPORTANT: Bu değer tek yerden güncellenir - tüm UI otomatik güncellenir
     /// </summary>
-    public static string CurrentVersion => "TCP-0.9.0";
+    public static string CurrentVersion => "TCP-0.9.1b";
     
     /// <summary>
     /// Build time
@@ -31,7 +31,7 @@ public static class VersionManager
     /// Stage adı
     /// Mevcut geliştirme aşaması
     /// </summary>
-    public static string StageName => "Info Panel v1 + Version History UI";
+    public static string StageName => "Architecture section binding crash fix";
     
     /// <summary>
     /// Display versiyon

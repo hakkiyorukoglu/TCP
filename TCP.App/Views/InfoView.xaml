@@ -21,9 +21,8 @@
         
         MVVM Pattern: Sadece UI, hiçbir mantık içermez.
     -->
-    <UserControl.DataContext>
-        <viewmodels:InfoViewModel/>
-    </UserControl.DataContext>
+    <!-- TCP-0.9.1a: DataContext is set in code-behind for safety -->
+    <!-- XAML DataContext removed - InfoView.xaml.cs handles it -->
     
     <Grid>
         <Grid.ColumnDefinitions>
@@ -55,10 +54,10 @@
                            Foreground="{DynamicResource Brush.Text.Primary}"
                            Margin="16,16,16,12"/>
                 
-                <!-- Section List -->
+                <!-- Section List - TCP-0.9.1b: Architecture section binding crash fix -->
                 <ListBox Grid.Row="1"
-                         ItemsSource="{Binding Sections}"
-                         SelectedItem="{Binding SelectedSection}"
+                         ItemsSource="{Binding Sections, Mode=OneWay}"
+                         SelectedItem="{Binding SelectedSection, Mode=TwoWay}"
                          BorderThickness="0"
                          Background="Transparent"
                          Margin="8,0,8,8">
@@ -71,7 +70,7 @@
                                     CornerRadius="4"
                                     Margin="0,4,0,0"
                                     Padding="12,10">
-                                <TextBlock Text="{Binding}"
+                                <TextBlock Text="{Binding Path=., Mode=OneWay}"
                                            FontSize="{DynamicResource Font.Body}"
                                            FontFamily="{DynamicResource Font.Primary}"
                                            FontWeight="SemiBold"
@@ -122,32 +121,42 @@
                           HorizontalScrollBarVisibility="Disabled">
                 <StackPanel Margin="24">
                     
-                    <!-- Overview Section -->
+                    <!-- Overview Section - TCP-0.9.1: Info panel & TXT export -->
+                    <!-- TCP-0.9.1a: Info panel DataContext fix - Visibility safety -->
                     <StackPanel Margin="0,0,0,24">
                         <StackPanel.Style>
                             <Style TargetType="StackPanel">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedSection}" Value="Overview">
+                                    <DataTrigger Binding="{Binding SelectedSection, Mode=OneWay}" Value="Overview">
                                         <Setter Property="Visibility" Value="Visible"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock Text="Overview"
-                                   FontSize="{DynamicResource Font.Heading.Large}"
-                                   FontFamily="{DynamicResource Font.Primary}"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource Brush.Text.Primary}"
-                                   Margin="0,0,0,16"/>
-                        <TextBlock Text="TCP (Train Control Platform) is a professional WPF application designed for train control and simulation. The application provides a modular architecture with support for electronics board management, code editing, simulation, and comprehensive settings management."
-                                   FontSize="{DynamicResource Font.Body}"
-                                   FontFamily="{DynamicResource Font.Primary}"
-                                   Foreground="{DynamicResource Brush.Text.Primary}"
-                                   TextWrapping="Wrap"
-                                   LineHeight="24"
-                                   Margin="0,0,0,12"/>
-                        <TextBlock Text="The platform is built with modern software engineering principles, emphasizing clean code, MVVM architecture, and a token-based theming system for consistent user experience."
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                            <TextBlock Text="Overview"
+                                       FontSize="{DynamicResource Font.Heading.Large}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text=" — "
+                                       FontSize="{DynamicResource Font.Heading.Large}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}"
+                                       VerticalAlignment="Center"
+                                       Margin="8,0,8,0"/>
+                            <TextBlock Text="{Binding CurrentVersion, Mode=OneWay}"
+                                       FontSize="{DynamicResource Font.Heading.Small}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Brush.Accent.Primary}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <!-- TCP-0.9.1a: OverviewText binding -->
+                        <!-- TCP-0.9.1b: Architecture section binding crash fix - Mode=OneWay -->
+                        <TextBlock Text="{Binding OverviewText, Mode=OneWay}"
                                    FontSize="{DynamicResource Font.Body}"
                                    FontFamily="{DynamicResource Font.Primary}"
                                    Foreground="{DynamicResource Brush.Text.Primary}"
@@ -155,7 +164,7 @@
                                    LineHeight="24"/>
                     </StackPanel>
                     
-                    <!-- Architecture Section -->
+                    <!-- Architecture Section - TCP-0.9.1: Info panel & TXT export -->
                     <StackPanel Margin="0,0,0,24">
                         <StackPanel.Style>
                             <Style TargetType="StackPanel">
@@ -173,36 +182,24 @@
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                    Margin="0,0,0,16"/>
-                        <StackPanel Margin="0,0,0,8">
-                            <TextBlock Text="• WPF (.NET 8)"
-                                       FontSize="{DynamicResource Font.Body}"
-                                       FontFamily="{DynamicResource Font.Primary}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}"
-                                       Margin="0,0,0,8"/>
-                            <TextBlock Text="• MVVM Pattern"
-                                       FontSize="{DynamicResource Font.Body}"
-                                       FontFamily="{DynamicResource Font.Primary}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}"
-                                       Margin="0,0,0,8"/>
-                            <TextBlock Text="• Token-based Theming"
-                                       FontSize="{DynamicResource Font.Body}"
-                                       FontFamily="{DynamicResource Font.Primary}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}"
-                                       Margin="0,0,0,8"/>
-                            <TextBlock Text="• Registry-driven Navigation &amp; Search"
-                                       FontSize="{DynamicResource Font.Body}"
-                                       FontFamily="{DynamicResource Font.Primary}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}"
-                                       Margin="0,0,0,8"/>
-                            <TextBlock Text="• Modular Electronics Model"
-                                       FontSize="{DynamicResource Font.Body}"
-                                       FontFamily="{DynamicResource Font.Primary}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}"
-                                       Margin="0,0,0,8"/>
-                        </StackPanel>
+                        <!-- TCP-0.9.1b: Architecture section binding crash fix - All bindings OneWay -->
+                        <ItemsControl ItemsSource="{Binding ArchitecturePoints, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontSize="{DynamicResource Font.Body}"
+                                               FontFamily="{DynamicResource Font.Primary}"
+                                               Foreground="{DynamicResource Brush.Text.Primary}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,0,0,8">
+                                        <Run Text="• "/>
+                                        <Run Text="{Binding Path=., Mode=OneWay}"/>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
                     
-                    <!-- Features Section -->
+                    <!-- Features Section - TCP-0.9.1: Info panel & TXT export -->
                     <StackPanel Margin="0,0,0,24">
                         <StackPanel.Style>
                             <Style TargetType="StackPanel">
@@ -220,41 +217,70 @@
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                    Margin="0,0,0,16"/>
-                        <StackPanel Margin="0,0,0,8">
-                            <TextBlock Text="• Electronics Registry"
-                                       FontSize="{DynamicResource Font.Body}"
-                                       FontFamily="{DynamicResource Font.Primary}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}"
-                                       Margin="0,0,0,8"/>
-                            <TextBlock Text="• Editor Placeholder"
-                                       FontSize="{DynamicResource Font.Body}"
-                                       FontFamily="{DynamicResource Font.Primary}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}"
-                                       Margin="0,0,0,8"/>
-                            <TextBlock Text="• Simulation Placeholder"
-                                       FontSize="{DynamicResource Font.Body}"
-                                       FontFamily="{DynamicResource Font.Primary}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}"
-                                       Margin="0,0,0,8"/>
-                            <TextBlock Text="• Settings System"
-                                       FontSize="{DynamicResource Font.Body}"
-                                       FontFamily="{DynamicResource Font.Primary}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}"
-                                       Margin="0,0,0,8"/>
-                            <TextBlock Text="• Global Search"
-                                       FontSize="{DynamicResource Font.Body}"
-                                       FontFamily="{DynamicResource Font.Primary}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}"
-                                       Margin="0,0,0,8"/>
-                            <TextBlock Text="• Versioning"
-                                       FontSize="{DynamicResource Font.Body}"
-                                       FontFamily="{DynamicResource Font.Primary}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}"
-                                       Margin="0,0,0,8"/>
-                        </StackPanel>
+                        <TextBlock Text="### Implemented"
+                                   FontSize="{DynamicResource Font.Heading.Small}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,0,0,12"/>
+                        <!-- TCP-0.9.1b: Architecture section binding crash fix - All bindings OneWay -->
+                        <ItemsControl ItemsSource="{Binding ImplementedFeatures, Mode=OneWay}" Margin="0,0,0,16">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontSize="{DynamicResource Font.Body}"
+                                               FontFamily="{DynamicResource Font.Primary}"
+                                               Foreground="{DynamicResource Brush.Text.Primary}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,0,0,8">
+                                        <Run Text="• "/>
+                                        <Run Text="{Binding Path=., Mode=OneWay}"/>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="### In Progress"
+                                   FontSize="{DynamicResource Font.Heading.Small}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,0,0,12"/>
+                        <ItemsControl ItemsSource="{Binding InProgressFeatures, Mode=OneWay}" Margin="0,0,0,16">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontSize="{DynamicResource Font.Body}"
+                                               FontFamily="{DynamicResource Font.Primary}"
+                                               Foreground="{DynamicResource Brush.Text.Primary}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,0,0,8">
+                                        <Run Text="• "/>
+                                        <Run Text="{Binding Path=., Mode=OneWay}"/>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="### Planned"
+                                   FontSize="{DynamicResource Font.Heading.Small}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,0,0,12"/>
+                        <ItemsControl ItemsSource="{Binding PlannedFeatures, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontSize="{DynamicResource Font.Body}"
+                                               FontFamily="{DynamicResource Font.Primary}"
+                                               Foreground="{DynamicResource Brush.Text.Primary}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,0,0,8">
+                                        <Run Text="• "/>
+                                        <Run Text="{Binding Path=., Mode=OneWay}"/>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
                     
-                    <!-- Version History Section -->
+                    <!-- Version History Section - TCP-0.9.1: Info panel & TXT export -->
                     <StackPanel Margin="0,0,0,24">
                         <StackPanel.Style>
                             <Style TargetType="StackPanel">
@@ -272,7 +298,8 @@
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                    Margin="0,0,0,16"/>
-                        <ItemsControl ItemsSource="{Binding VersionHistory}">
+                        <!-- TCP-0.9.1b: Architecture section binding crash fix - All bindings OneWay -->
+                        <ItemsControl ItemsSource="{Binding VersionHistory, Mode=OneWay}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Background="{DynamicResource Brush.Surface}"
@@ -283,19 +310,19 @@
                                             Margin="0,0,0,12">
                                         <StackPanel>
                                             <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                                <TextBlock Text="{Binding Version}"
+                                                <TextBlock Text="{Binding Version, Mode=OneWay}"
                                                            FontSize="{DynamicResource Font.Heading.Small}"
                                                            FontFamily="{DynamicResource Font.Primary}"
                                                            FontWeight="SemiBold"
                                                            Foreground="{DynamicResource Brush.Text.Primary}"
                                                            Margin="0,0,12,0"/>
-                                                <TextBlock Text="{Binding Title}"
+                                                <TextBlock Text="{Binding Title, Mode=OneWay}"
                                                            FontSize="{DynamicResource Font.Heading.Small}"
                                                            FontFamily="{DynamicResource Font.Primary}"
                                                            FontWeight="SemiBold"
                                                            Foreground="{DynamicResource Brush.Accent.Primary}"/>
                                             </StackPanel>
-                                            <TextBlock Text="{Binding Description}"
+                                            <TextBlock Text="{Binding Description, Mode=OneWay}"
                                                        FontSize="{DynamicResource Font.Body}"
                                                        FontFamily="{DynamicResource Font.Primary}"
                                                        Foreground="{DynamicResource Brush.Text.Secondary}"
@@ -307,6 +334,96 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </StackPanel>
+                    
+                    <!-- Roadmap Section - TCP-0.9.1: Info panel & TXT export -->
+                    <StackPanel Margin="0,0,0,24">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedSection}" Value="Roadmap">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="Roadmap"
+                                   FontSize="{DynamicResource Font.Heading.Large}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,0,0,16"/>
+                        <!-- TCP-0.9.1b: Architecture section binding crash fix - All bindings OneWay -->
+                        <ItemsControl ItemsSource="{Binding RoadmapItems, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontSize="{DynamicResource Font.Body}"
+                                               FontFamily="{DynamicResource Font.Primary}"
+                                               Foreground="{DynamicResource Brush.Text.Primary}"
+                                               TextWrapping="Wrap"
+                                               Margin="0,0,0,8">
+                                        <Run Text="• "/>
+                                        <Run Text="{Binding Path=., Mode=OneWay}"/>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                    
+                    <!-- Export TXT Button - TCP-0.9.1: Info panel & TXT export -->
+                    <Border Background="{DynamicResource Brush.Surface}"
+                            BorderBrush="{DynamicResource Brush.Border}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="16,12"
+                            Margin="0,24,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Export Documentation"
+                                       FontSize="{DynamicResource Font.Heading.Small}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       Margin="0,0,0,8"/>
+                            <TextBlock Text="Export all project information to a TXT file for offline reference."
+                                       FontSize="{DynamicResource Font.Caption}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}"
+                                       TextWrapping="Wrap"
+                                       Margin="0,0,0,12"/>
+                            <!-- TCP-0.9.1b: Architecture section binding crash fix - Command binding OneWay -->
+                            <Button Content="Export TXT"
+                                    Command="{Binding ExportTxtCommand, Mode=OneWay}"
+                                    HorizontalAlignment="Left"
+                                    Padding="16,8"
+                                    MinWidth="120"
+                                    Background="{DynamicResource Brush.Accent.Primary}"
+                                    Foreground="{DynamicResource Brush.Text.Primary}"
+                                    BorderThickness="0"
+                                    Cursor="Hand">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border Background="{TemplateBinding Background}"
+                                                            CornerRadius="4"
+                                                            Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter HorizontalAlignment="Center"
+                                                                          VerticalAlignment="Center"/>
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="{DynamicResource Brush.Accent.Secondary}"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </StackPanel>
+                    </Border>
                     
                 </StackPanel>
             </ScrollViewer>
