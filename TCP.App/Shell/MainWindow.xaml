@@ -6,12 +6,20 @@
         xmlns:local="clr-namespace:TCP.App"
         xmlns:views="clr-namespace:TCP.App.Views"
         xmlns:services="clr-namespace:TCP.App.Services"
+        xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
         mc:Ignorable="d"
         Title="TCP" Height="600" Width="1000"
         Background="{DynamicResource BackgroundPrimaryBrush}"
         WindowStyle="None"
         AllowsTransparency="True"
         ResizeMode="CanResize">
+    <Window.DataContext>
+        <viewmodels:MainViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <local:IsNullOrEmptyConverter x:Key="IsNullOrEmptyConverter"/>
+    </Window.Resources>
     <!--
         MainWindow.xaml - Application Shell
         
@@ -160,49 +168,194 @@
                     </TextBlock>
                 </StackPanel>
                 
-                <!-- Sağ: Icons + Version + Window buttons -->
-                <StackPanel Grid.Column="2"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
-                            Margin="0,0,10,0">
+                <!-- Sağ: Search + Icons + Version + Window buttons -->
+                <Grid Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <!-- Search box -->
+                        <ColumnDefinition Width="Auto"/>
+                        <!-- Icons + Version -->
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
                     
-                    <!-- Search icon (placeholder, no logic) -->
-                    <TextBlock Text="🔍"
-                               FontSize="14"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
-                               VerticalAlignment="Center"
-                               Margin="0,0,12,0"
-                               Cursor="Hand"
-                               ToolTip="Search (coming soon)"/>
+                    <!-- Search Box with Dropdown -->
+                    <Grid Grid.Column="0"
+                          Margin="0,0,15,0"
+                          VerticalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!-- Search TextBox -->
+                        <Grid Grid.Row="0">
+                            <Border Background="{DynamicResource SurfaceBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="8,5">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <!-- Search input -->
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="Transparent"
+                                             BorderThickness="0"
+                                             Foreground="{DynamicResource TextPrimaryBrush}"
+                                             FontSize="12"
+                                             VerticalContentAlignment="Center"
+                                             Padding="0,0,5,0">
+                                        <TextBox.Style>
+                                            <Style TargetType="TextBox">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="TextBox">
+                                                            <Border Background="{TemplateBinding Background}"
+                                                                    BorderThickness="0">
+                                                                <ScrollViewer x:Name="PART_ContentHost"
+                                                                              Margin="{TemplateBinding Padding}"/>
+                                                            </Border>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </TextBox.Style>
+                                        <TextBox.Resources>
+                                            <Style TargetType="Border">
+                                                <Setter Property="CornerRadius" Value="0"/>
+                                            </Style>
+                                        </TextBox.Resources>
+                                    </TextBox>
+                                    
+                                    <!-- Magnifier icon -->
+                                    <TextBlock Grid.Column="1"
+                                               Text="🔍"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                            
+                            <!-- Placeholder text (when empty) -->
+                            <TextBlock Text="Search..."
+                                       FontSize="12"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       VerticalAlignment="Center"
+                                       Margin="13,0,25,0"
+                                       IsHitTestVisible="False">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding SearchText, Converter={StaticResource IsNullOrEmptyConverter}}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding SearchText, Converter={StaticResource IsNullOrEmptyConverter}}" Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                        
+                        <!-- Dropdown Autocomplete Panel -->
+                        <Border Grid.Row="1"
+                                Width="250"
+                                Background="{DynamicResource SurfaceBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Margin="0,2,0,0"
+                                MaxHeight="200"
+                                Visibility="{Binding IsDropdownVisible, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <ListBox ItemsSource="{Binding FilteredSuggestions}"
+                                     SelectedItem="{Binding SelectedSearchItem}"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     MaxHeight="200"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                     MouseLeftButtonUp="SearchListBox_MouseLeftButtonUp"
+                                     KeyDown="SearchListBox_KeyDown">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{DynamicResource BackgroundPrimaryBrush}"
+                                                BorderThickness="0"
+                                                Padding="10,8"
+                                                Margin="2">
+                                            <TextBlock Text="{Binding DisplayText}"
+                                                       FontSize="12"
+                                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Padding" Value="0"/>
+                                        <Setter Property="Margin" Value="0"/>
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListBoxItem">
+                                                    <Border Background="{TemplateBinding Background}"
+                                                            BorderThickness="0"
+                                                            Padding="{TemplateBinding Padding}">
+                                                        <ContentPresenter/>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsSelected" Value="True">
+                                                            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                            </ListBox>
+                        </Border>
+                    </Grid>
                     
-                    <!-- Settings icon (placeholder) -->
-                    <TextBlock Text="⚙"
-                               FontSize="14"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
-                               VerticalAlignment="Center"
-                               Margin="0,0,12,0"
-                               Cursor="Hand"
-                               ToolTip="Settings (coming soon)"/>
-                    
-                    <!-- Info icon (placeholder) -->
-                    <TextBlock Text="ℹ"
-                               FontSize="14"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
-                               VerticalAlignment="Center"
-                               Margin="0,0,12,0"
-                               Cursor="Hand"
-                               ToolTip="Info (coming soon)"/>
-                    
-                    <!-- Versiyon bilgisi -->
-                    <TextBlock Text="{x:Static services:VersionManager.DisplayVersion}"
-                               FontSize="11"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
-                               VerticalAlignment="Center"
-                               Margin="0,0,15,0"/>
-                    
-                    <!-- Window butonları: Minimize, Maximize/Restore, Close -->
-                    <StackPanel Orientation="Horizontal">
+                    <!-- Icons + Version -->
+                    <StackPanel Grid.Column="1"
+                                Grid.Row="0"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
+                                Margin="0,0,10,0">
+                        
+                        <!-- Settings icon (placeholder) -->
+                        <TextBlock Text="⚙"
+                                   FontSize="14"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,12,0"
+                                   Cursor="Hand"
+                                   ToolTip="Settings (coming soon)"/>
+                        
+                        <!-- Info icon (placeholder) -->
+                        <TextBlock Text="ℹ"
+                                   FontSize="14"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,12,0"
+                                   Cursor="Hand"
+                                   ToolTip="Info (coming soon)"/>
+                        
+                        <!-- Versiyon bilgisi -->
+                        <TextBlock Text="{x:Static services:VersionManager.DisplayVersion}"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,15,0"/>
+                        
+                        <!-- Window butonları: Minimize, Maximize/Restore, Close -->
+                        <StackPanel Orientation="Horizontal">
                         <!-- Minimize butonu -->
                         <Button Content="−"
                                 Width="40"
@@ -300,8 +453,9 @@
                                 </Style>
                             </Button.Style>
                         </Button>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
+                </Grid>
             </Grid>
         </Border>
         
