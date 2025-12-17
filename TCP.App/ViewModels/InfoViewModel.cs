@@ -141,6 +141,41 @@ public class InfoViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand ExportTxtCommand { get; }
     
     /// <summary>
+    /// Export Cursor Context TXT command
+    /// TCP-1.0.0: UI FOUNDATION RELEASE
+    /// </summary>
+    public ICommand ExportCursorContextCommand { get; }
+    
+    /// <summary>
+    /// Cursor context metni backing field
+    /// TCP-1.0.0: UI FOUNDATION RELEASE
+    /// </summary>
+    private string? _cursorContextText;
+    
+    /// <summary>
+    /// Cursor context metni
+    /// TCP-1.0.0: UI FOUNDATION RELEASE
+    /// </summary>
+    public string CursorContextText
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(_cursorContextText))
+            {
+                try
+                {
+                    _cursorContextText = InfoContentProvider.GetCursorContext();
+                }
+                catch
+                {
+                    _cursorContextText = "Cursor context failed to load. Please check InfoContentProvider.";
+                }
+            }
+            return _cursorContextText ?? string.Empty;
+        }
+    }
+    
+    /// <summary>
     /// Constructor - Initialize sections and content from InfoContentProvider
     /// TCP-0.9.1: Info panel & TXT export
     /// TCP-0.9.1a: Info panel DataContext fix - Force immediate initialization
@@ -163,7 +198,8 @@ public class InfoViewModel : ViewModelBase, INotifyPropertyChanged
             "Architecture",
             "Features",
             "Version History",
-            "Roadmap"
+            "Roadmap",
+            "Cursor"
         };
         
         // TCP-0.9.1: Initialize content from InfoContentProvider (single source of truth)
@@ -190,6 +226,19 @@ public class InfoViewModel : ViewModelBase, INotifyPropertyChanged
         
         // TCP-0.9.1: Export TXT command
         ExportTxtCommand = new RelayCommand<object>(_ => ExportTxt());
+        
+        // TCP-1.0.0: Export Cursor Context TXT command
+        ExportCursorContextCommand = new RelayCommand<object>(_ => ExportCursorContext());
+        
+        // TCP-1.0.0: Initialize Cursor context text immediately
+        try
+        {
+            _cursorContextText = InfoContentProvider.GetCursorContext();
+        }
+        catch
+        {
+            _cursorContextText = "Cursor context failed to load. Please check InfoContentProvider.";
+        }
         
         // Default selection: Overview
         SelectedSection = "Overview";
@@ -243,6 +292,48 @@ public class InfoViewModel : ViewModelBase, INotifyPropertyChanged
         {
             // TCP-0.9.2: Notifications / Toasts v1 - Error notification
             // Dialog açılırken veya başka bir hata oluştu
+            NotificationService.Instance.ShowError("Export Failed", ex.Message);
+        }
+    }
+    
+    /// <summary>
+    /// Cursor Context TXT export işlemi
+    /// TCP-1.0.0: UI FOUNDATION RELEASE
+    /// </summary>
+    private void ExportCursorContext()
+    {
+        try
+        {
+            var saveDialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*",
+                FileName = $"TCP_Cursor_Context_{VersionManager.CurrentVersion}.txt",
+                DefaultExt = "txt"
+            };
+            
+            var dialogResult = saveDialog.ShowDialog();
+            
+            if (dialogResult == true)
+            {
+                try
+                {
+                    var content = InfoContentProvider.GenerateCursorContextTxt();
+                    System.IO.File.WriteAllText(saveDialog.FileName, content);
+                    
+                    NotificationService.Instance.ShowSuccess("Export Completed", "Cursor context was exported as TXT.");
+                }
+                catch (Exception ex)
+                {
+                    NotificationService.Instance.ShowError("Export Failed", ex.Message);
+                }
+            }
+            else
+            {
+                NotificationService.Instance.ShowWarning("Export Canceled", "Cursor context export was canceled by the user.");
+            }
+        }
+        catch (Exception ex)
+        {
             NotificationService.Instance.ShowError("Export Failed", ex.Message);
         }
     }

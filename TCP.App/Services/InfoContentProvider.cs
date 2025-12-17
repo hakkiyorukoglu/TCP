@@ -232,4 +232,298 @@ public static class InfoContentProvider
         
         return string.Join("\r\n", lines);
     }
+    
+    /// <summary>
+    /// Cursor Context - AI reviewer için proje durumu
+    /// TCP-1.0.0: UI FOUNDATION RELEASE
+    /// 
+    /// Bu metod AI (Cursor) için projenin tam durumunu açıklar.
+    /// Teknik, net, ve gelecek yön için beklentileri içerir.
+    /// </summary>
+    public static string GetCursorContext()
+    {
+        return @"====================================
+TCP (Train Control Platform) — Cursor Context
+====================================
+
+This document provides a comprehensive overview of the TCP project state as of TCP-1.0.0 (UI FOUNDATION RELEASE).
+It is written for AI reviewers (like Cursor) to understand the project architecture, constraints, and future direction.
+
+====================================
+1. PROJECT OVERVIEW
+====================================
+
+What TCP Is:
+TCP is a professional WPF desktop application designed for train control and simulation. The application provides a unified platform for managing rail layout designs, simulating train movements, and monitoring electronics boards.
+
+Why It Exists:
+TCP solves the problem of managing complex rail layout designs, simulating train movements, and monitoring electronics boards in a unified, professional desktop application. It bridges the gap between design, simulation, and real hardware control.
+
+Target Usage:
+- Editor: Visual rail layout design and configuration
+- Simulation: Train movement simulation with physics
+- Real Hardware: Integration with Arduino, RFID readers, Servo controllers for live train control
+
+====================================
+2. CURRENT ARCHITECTURE
+====================================
+
+Application Type:
+- WPF (.NET 8) desktop application
+- MVVM pattern strictly enforced
+- No code-behind logic (except UI wiring)
+- No business logic in Views
+
+Shell Layout:
+- MainWindow.xaml is the application shell
+- Fixed TopBar (48px height) with navigation tabs, search, settings, info icons
+- Main Content area (star height) for view switching
+- StatusBar slot (28px height, currently empty)
+- Toast notification overlay (top-right, non-blocking)
+
+Navigation System:
+- Simple view-switching using ContentControl
+- Route-based navigation (string routes: ""Home"", ""Electronics"", ""Settings"", ""Info"", etc.)
+- Navigation handled in MainWindow.xaml.cs via event handlers
+- LastRoute persistence (saved to settings.json, but startup always goes to Home)
+
+Search System:
+- Global top-right search box with autocomplete dropdown
+- SearchRegistry singleton service (single source of truth for search suggestions)
+- Each page registers itself with Title, Keywords[], Route
+- Filtering: case-insensitive contains check on Title or Keywords
+- Selecting suggestion navigates to route
+
+Services vs ViewModels Responsibility:
+- Services: Singleton services for centralized data management
+  - VersionManager: Version metadata
+  - SearchRegistry: Search suggestions
+  - BoardRegistry: Electronics board definitions
+  - SettingsPersistenceService: Local JSON persistence
+  - ThemeService: Theme loading/application
+  - ShortcutsRegistry: Keyboard shortcuts definitions
+  - InfoContentProvider: Info panel content (static methods)
+  - NotificationService: Toast notifications
+  - AppLogger: Error logging
+- ViewModels: View-specific state and commands
+  - MainViewModel: Search state, navigation commands
+  - ElectronicsViewModel: Board selection, board details
+  - SettingsViewModel: Settings categories, theme selection
+  - InfoViewModel: Info sections, content display
+- Views: Zero logic, only UI binding
+
+Theme System:
+- Token-based design system
+- Separate token files: ThemeColors.xaml, ThemeBrushes.xaml, ThemeSpacing.xaml, ThemeRadius.xaml, ThemeFontSizes.xaml, ThemeTypography.xaml, ThemeIcons.xaml
+- Theme variants: Theme.Dark.xaml (Light theme exists but is disabled in TCP-0.8.2+)
+- SafeDefaults.xaml: Fallback resources loaded first to prevent StaticResource crashes
+- All theme token bindings use DynamicResource (not StaticResource) for runtime safety
+- No hardcoded colors anywhere in UI
+
+Error Guardrails Approach:
+- Global exception handlers: DispatcherUnhandledException, AppDomain_UnhandledException, TaskScheduler_UnobservedTaskException
+- All exceptions are logged to %AppData%/TCP/logs/app.log via AppLogger
+- Exceptions trigger non-blocking error toast notifications
+- Application NEVER crashes due to unhandled exceptions (all marked as handled)
+- No MessageBox dialogs for errors (toast only)
+
+====================================
+3. IMPLEMENTED FEATURES (as of TCP-1.0.0)
+====================================
+
+Navigation:
+- Shell layout with TopBar, Content area, StatusBar slot
+- View switching: Home, Electronics, Simulation (placeholder), Editor (placeholder), Settings, Info
+- Route-based navigation with persistence
+- TopBar navigation tabs with visual feedback
+
+Search Registry:
+- Centralized SearchRegistry singleton
+- Autocomplete dropdown with keyboard navigation
+- Route navigation on selection
+- Case-insensitive filtering
+
+Electronics Page:
+- Left panel: Board list (Arduino Mega, Nano, RFID Reader, Servo Controller)
+- Right panel: Board detail cards (reusable BoardDetailCard component)
+- KeyValueRow component for key-value pairs
+- Code editor placeholder panel (UI only, no compilation)
+- BoardRegistry singleton for board definitions
+
+Settings System:
+- Category-based navigation (Appearance, Shortcuts, Paths, Performance, About)
+- Two-column layout: fixed-width category list + scrollable content area
+- Local JSON persistence (%AppData%/TCP/settings.json)
+- Persisted: Theme (Dark only), LastRoute, LeftPanelWidth, SettingsCategoryWidth
+- Shortcuts map UI (keyboard shortcuts list)
+
+Info System:
+- Info panel with section navigation (Overview, Architecture, Features, Version History, Roadmap, Cursor)
+- InfoContentProvider: Single source of truth for all Info content
+- Version history display
+- Version display in TopBar (clickable, navigates to Info)
+
+TXT Export:
+- Export full project info as TXT file
+- Export Cursor context as separate TXT file
+- SaveFileDialog with default filenames
+- Toast notifications on success/error/cancel
+
+Toast Notifications:
+- Global NotificationService singleton
+- Non-blocking toast overlay (top-right)
+- Auto-dismiss after 4 seconds
+- Maximum 3 visible toasts
+- Types: Success, Warning, Error
+- ToastNotification reusable component
+
+Versioning UX:
+- VersionManager singleton exposes CurrentVersion, StageName, DisplayVersion
+- Version visible in TopBar
+- Clicking version navigates to Info panel
+- Version history in Info panel
+
+====================================
+4. TECHNOLOGY STACK
+====================================
+
+.NET Version:
+- .NET 8 (latest LTS)
+
+WPF:
+- Windows Presentation Foundation for desktop UI
+- XAML for UI markup
+- Data binding (OneWay by default, TwoWay only where needed)
+
+MVVM:
+- Strict MVVM pattern
+- ViewModels inherit ViewModelBase (INotifyPropertyChanged)
+- RelayCommand for ICommand implementation
+- No code-behind logic (except UI event wiring)
+
+Local JSON Persistence:
+- System.Text.Json (no Newtonsoft)
+- Settings saved to %AppData%/TCP/settings.json
+- Error handling: graceful fallback if file corrupted or missing
+
+No External Frameworks:
+- No MVVM framework (custom ViewModelBase, RelayCommand)
+- No dependency injection container
+- No external logging framework (custom AppLogger)
+- No external UI libraries (pure WPF)
+
+====================================
+5. KNOWN LIMITATIONS
+====================================
+
+UI-Only Features:
+- Electronics page: Board list and details are UI-only (no serial/network communication)
+- Code editor: Placeholder TextBox (no syntax highlighting, no compilation)
+- Simulation page: Empty placeholder
+- Editor page: Empty placeholder
+
+Placeholder Features:
+- Board status: Always shows ""Offline"" (hardcoded)
+- Board connection info: Placeholder values (COM3, IP addresses)
+- Code editor: Multiline TextBox with placeholder text
+
+Intentionally Deferred:
+- Real hardware integration (Arduino, RFID, Servo controllers)
+- Simulation logic and physics engine
+- Code compilation and validation
+- Network communication protocols
+- Multi-board coordination
+- Advanced simulation features
+
+====================================
+6. DESIGN RULES FOLLOWED
+====================================
+
+Binding Rules:
+- OneWay binding is the default
+- TwoWay binding ONLY for user input (SelectedItem, TextBox.Text with user editing)
+- All bindings explicitly specify Mode (no implicit TwoWay)
+- FallbackValue used where appropriate (e.g., ""No board selected"")
+
+Token-Based Theming:
+- NO hardcoded colors in XAML
+- NO hardcoded font sizes
+- NO hardcoded spacing/margins (use tokens)
+- All styling comes from theme tokens
+- DynamicResource for theme tokens (StaticResource only for converters, non-theme resources)
+
+Single Source of Truth:
+- InfoContentProvider: All Info panel content
+- SearchRegistry: All search suggestions
+- BoardRegistry: All board definitions
+- VersionManager: Version metadata
+- SettingsPersistenceService: Settings persistence
+
+No Hardcoded UI Strings in Logic:
+- All UI strings come from InfoContentProvider or ViewModels
+- No magic strings in code-behind
+- Route names are consistent strings (""Home"", ""Electronics"", etc.)
+
+Error Handling:
+- All file I/O wrapped in try-catch
+- All service calls have fallback behavior
+- No exceptions bubble to UI
+- Toast notifications for user feedback
+
+====================================
+7. WHAT CURSOR (AI) NEEDS TO KNOW
+====================================
+
+Assumptions:
+- User expects incremental, non-breaking changes
+- User prefers explicit, detailed comments in Turkish
+- User follows clean code principles (SOLID, especially Single Responsibility)
+- User wants minimal refactoring (only what's explicitly requested)
+- User wants stable builds (no compilation errors)
+
+Constraints:
+- DO NOT refactor unrelated code
+- DO NOT remove unused-looking code unless explicitly requested
+- DO NOT change architecture without permission
+- DO NOT modify formatting/imports outside scope
+- DO NOT add features not explicitly requested
+- DO NOT use external frameworks unless already in use
+- DO NOT break existing functionality
+
+Future Direction Expectations:
+- Next major milestone: Simulation Core (TCP-2.0.0)
+- Hardware Bridge: Real Arduino/RFID/Servo integration
+- Code Editor: Syntax highlighting, compilation, validation
+- Advanced Features: Multi-board coordination, network protocols
+- All future features must follow existing MVVM pattern
+- All future features must use theme tokens
+- All future features must have error guardrails
+
+Code Style:
+- Turkish comments (detailed, educational)
+- Clean code principles
+- SOLID (especially Single Responsibility)
+- MVVM strict separation
+- No code-behind logic (except UI wiring)
+
+Versioning:
+- Semantic versioning: TCP-Major.Minor.Patch
+- Major: Architectural changes
+- Minor: New features
+- Patch: Bugfixes/polish
+- VersionManager is single source of truth
+
+====================================
+END OF CURSOR CONTEXT
+====================================";
+    }
+    
+    /// <summary>
+    /// Cursor Context TXT export için formatlanmış içerik
+    /// TCP-1.0.0: UI FOUNDATION RELEASE
+    /// </summary>
+    public static string GenerateCursorContextTxt()
+    {
+        return GetCursorContext();
+    }
 }

@@ -370,6 +370,76 @@
                         </ItemsControl>
                     </StackPanel>
                     
+                    <!-- Cursor Section - TCP-1.0.0: UI FOUNDATION RELEASE -->
+                    <StackPanel Margin="0,0,0,24">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedSection}" Value="Cursor">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="Cursor"
+                                   FontSize="{DynamicResource Font.Heading.Large}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,0,0,16"/>
+                        <!-- TCP-1.0.0: Cursor context text display -->
+                        <Border Background="{DynamicResource Brush.Surface}"
+                                BorderBrush="{DynamicResource Brush.Border}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="16,12"
+                                Margin="0,0,0,16">
+                            <ScrollViewer MaxHeight="400"
+                                          VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Auto">
+                                <TextBlock Text="{Binding CursorContextText, Mode=OneWay}"
+                                           FontSize="{DynamicResource Font.Body}"
+                                           FontFamily="Consolas"
+                                           Foreground="{DynamicResource Brush.Text.Primary}"
+                                           TextWrapping="Wrap"
+                                           LineHeight="20"/>
+                            </ScrollViewer>
+                        </Border>
+                        <!-- TCP-1.0.0: Export Cursor Context button -->
+                        <Button Content="Export Cursor Context (TXT)"
+                                Command="{Binding ExportCursorContextCommand, Mode=OneWay}"
+                                HorizontalAlignment="Left"
+                                Padding="16,8"
+                                MinWidth="200"
+                                Background="{DynamicResource Brush.Accent.Primary}"
+                                Foreground="{DynamicResource Brush.Text.Primary}"
+                                BorderThickness="0"
+                                Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        CornerRadius="4"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center"
+                                                                      VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource Brush.Accent.Secondary}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                    
                     <!-- Export TXT Button - TCP-0.9.1: Info panel & TXT export -->
                     <Border Background="{DynamicResource Brush.Surface}"
                             BorderBrush="{DynamicResource Brush.Border}"
