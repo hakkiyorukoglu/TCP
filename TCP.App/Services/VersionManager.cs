@@ -15,7 +15,7 @@ public static class VersionManager
     /// <summary>
     /// Mevcut versiyon
     /// Semantic versioning formatında: TCP-Major.Minor.Patch
-    /// TCP-0.8.1: Settings Persistence v1 (Local)
+    /// TCP-0.8.1: Theme Selection Fix
     /// 
     /// IMPORTANT: Bu değer tek yerden güncellenir - tüm UI otomatik güncellenir
     /// </summary>
@@ -31,7 +31,7 @@ public static class VersionManager
     /// Stage adı
     /// Mevcut geliştirme aşaması
     /// </summary>
-    public static string StageName => "Settings Persistence v1 (Local)";
+    public static string StageName => "Theme Selection Fix";
     
     /// <summary>
     /// Display versiyon

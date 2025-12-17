@@ -75,9 +75,15 @@ public partial class App : Application
         _settingsService = new SettingsPersistenceService();
         _loadedSettings = _settingsService.Load();
         
-        // Apply theme (şimdilik sadece Dark, Light theme switching UI yok)
-        // Theme değişikliği gelecekte implement edilecek
-        // Şimdilik sadece settings dosyasından okuyoruz
+        // TCP-0.8.1: Apply theme on startup
+        if (_loadedSettings != null && !string.IsNullOrWhiteSpace(_loadedSettings.Theme))
+        {
+            ThemeService.ApplyTheme(_loadedSettings.Theme);
+        }
+        else
+        {
+            ThemeService.ApplyTheme("Dark"); // Default
+        }
         
         // MainWindow açıldığında LastRoute'e navigate edilecek
         // MainWindow constructor'ında ApplyLoadedSettings() çağrılacak

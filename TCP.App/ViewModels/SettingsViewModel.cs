@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using TCP.App.Services;
+using TCP.App.Models;
 
 namespace TCP.App.ViewModels;
 
@@ -9,6 +10,7 @@ namespace TCP.App.ViewModels;
 /// SettingsViewModel - Settings modülü ViewModel'i
 /// 
 /// TCP-0.8.0: Settings System v1
+/// TCP-0.8.1: Theme Selection Fix
 /// 
 /// Bu ViewModel SettingsView'un data context'idir.
 /// Settings modülü state'ini ve iş mantığını yönetir.
@@ -41,6 +43,12 @@ public class SettingsViewModel : ViewModelBase, INotifyPropertyChanged
     public ObservableCollection<SettingsCategory> Categories { get; }
     
     /// <summary>
+    /// Mevcut temalar listesi
+    /// TCP-0.8.1: Theme Selection Fix
+    /// </summary>
+    public ObservableCollection<string> AvailableThemes { get; }
+    
+    /// <summary>
     /// Seçili kategori
     /// TCP-0.8.0: Settings System v1
     /// </summary>
@@ -59,8 +67,49 @@ public class SettingsViewModel : ViewModelBase, INotifyPropertyChanged
     }
     
     /// <summary>
-    /// Constructor - Initialize categories
+    /// Seçili tema
+    /// TCP-0.8.1: Theme Selection Fix
+    /// 
+    /// Setter'da:
+    /// - ThemeService.ApplyTheme() çağrılır (immediate apply)
+    /// - SettingsPersistenceService.Save() çağrılır (persist)
+    /// </summary>
+    private string _selectedTheme = "Dark";
+    public string SelectedTheme
+    {
+        get => _selectedTheme;
+        set
+        {
+            if (_selectedTheme != value && !string.IsNullOrWhiteSpace(value))
+            {
+                _selectedTheme = value;
+                OnPropertyChanged();
+                
+                // TCP-0.8.1: Theme Selection Fix
+                // Theme'i hemen uygula
+                try
+                {
+                    ThemeService.ApplyTheme(value);
+                    
+                    // Settings'i kaydet
+                    var settings = App.LoadedSettings ?? new AppSettings();
+                    settings.Theme = value;
+                    App.SettingsService.Save(settings);
+                    App.UpdateLoadedSettings(settings);
+                }
+                catch
+                {
+                    // Exception durumunda sessizce fail eder
+                    // App crash etmez
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Constructor - Initialize categories and load theme
     /// TCP-0.8.0: Settings System v1
+    /// TCP-0.8.1: Theme Selection Fix
     /// </summary>
     public SettingsViewModel()
     {
@@ -73,8 +122,22 @@ public class SettingsViewModel : ViewModelBase, INotifyPropertyChanged
             new SettingsCategory { Name = "About", Description = "Application information" }
         };
         
+        // TCP-0.8.1: Initialize available themes
+        AvailableThemes = new ObservableCollection<string> { "Dark", "Light" };
+        
         // Default selection: İlk kategori
         SelectedCategory = Categories.Count > 0 ? Categories[0] : null;
+        
+        // TCP-0.8.1: Load theme from settings
+        var settings = App.LoadedSettings;
+        if (settings != null && !string.IsNullOrWhiteSpace(settings.Theme))
+        {
+            _selectedTheme = settings.Theme;
+        }
+        else
+        {
+            _selectedTheme = "Dark"; // Default
+        }
     }
 }
 

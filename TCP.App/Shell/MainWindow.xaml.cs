@@ -61,6 +61,12 @@ public partial class MainWindow : Window
             description: "Introduced local settings persistence. Persisted: Theme, LastRoute, Panel widths. Location: %AppData%/TCP/settings.json"
         );
         
+        // TCP-0.8.1: Theme Selection Fix
+        changeTracker.RegisterChange(
+            category: "Settings / UI",
+            description: "Fixed non-working theme selection in Settings > Appearance. Theme can now be selected and applied immediately without app restart."
+        );
+        
         // Pencere sürükleme için MouseDown event'i ekle
         // WindowStyle="None" olduğu için manuel sürükleme implementasyonu gerekli
         this.MouseDown += MainWindow_MouseDown;

@@ -10,13 +10,15 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("TCP.Core")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("TCP.App")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+612b0ba81cab0f32ff5319a963656f0b6ce40899")]
-[assembly: System.Reflection.AssemblyProductAttribute("TCP.Core")]
-[assembly: System.Reflection.AssemblyTitleAttribute("TCP.Core")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+181a570f2c4e80b61485cf4cb46a126f4826187d")]
+[assembly: System.Reflection.AssemblyProductAttribute("TCP.App")]
+[assembly: System.Reflection.AssemblyTitleAttribute("TCP.App")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
+[assembly: System.Runtime.Versioning.TargetPlatformAttribute("Windows7.0")]
+[assembly: System.Runtime.Versioning.SupportedOSPlatformAttribute("Windows7.0")]
 
 // MSBuild WriteCodeFragment sınıfı tarafından oluşturuldu.
 
