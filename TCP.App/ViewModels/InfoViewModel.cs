@@ -213,6 +213,9 @@ public class InfoViewModel : ViewModelBase, INotifyPropertyChanged
             {
                 var content = InfoContentProvider.GenerateTxtContent();
                 System.IO.File.WriteAllText(saveDialog.FileName, content);
+                
+                // TCP-0.9.2: Notifications / Toasts v1 - Show success notification
+                NotificationService.Instance.ShowSuccess("Exported", "TXT file saved successfully");
             }
         }
         catch

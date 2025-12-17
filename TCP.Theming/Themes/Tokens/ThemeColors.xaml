@@ -60,5 +60,7 @@
     <Color x:Key="Color.Accent.Secondary">#81D4FA</Color>
     <Color x:Key="Color.Accent.Danger">#E81123</Color>
     <Color x:Key="Color.Accent.Success">#4CAF50</Color>
+    <Color x:Key="Color.Accent.Warning">#FF9800</Color>
+    <Color x:Key="Color.Accent.Error">#F44336</Color>
     
 </ResourceDictionary>

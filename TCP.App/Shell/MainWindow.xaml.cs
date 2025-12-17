@@ -334,6 +334,9 @@ public partial class MainWindow : Window
             
             // App.LoadedSettings cache'ini güncelle
             App.UpdateLoadedSettings(settings);
+            
+            // TCP-0.9.2: Notifications / Toasts v1 - Show success notification
+            NotificationService.Instance.ShowSuccess("Saved", "Settings updated");
         }
         catch
         {
