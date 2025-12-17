@@ -29,9 +29,11 @@
         BACKWARD COMPATIBILITY ALIASES
         ========================================================================
     -->
+    <StaticResource ResourceKey="FontSize.XS" x:Key="FontSizeXSmall"/>
     <StaticResource ResourceKey="FontSize.S" x:Key="FontSizeSmall"/>
     <StaticResource ResourceKey="FontSize.M" x:Key="FontSizeNormal"/>
     <StaticResource ResourceKey="FontSize.L" x:Key="FontSizeLarge"/>
+    <StaticResource ResourceKey="FontSize.XL" x:Key="FontSizeXLarge"/>
     <StaticResource ResourceKey="FontSize.Title" x:Key="FontSizeTitle"/>
     
 </ResourceDictionary>

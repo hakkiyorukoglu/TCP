@@ -71,11 +71,11 @@
                             VerticalAlignment="Center"
                             Margin="15,0,20,0">
                     <TextBlock Text="TCP"
-                               FontSize="{StaticResource FontSize.L}"
+                               FontSize="{StaticResource FontSizeLarge}"
                            FontWeight="SemiBold"
                                Foreground="{DynamicResource Brush.Text.Primary}"/>
                     <TextBlock Text="Train Control Platform"
-                               FontSize="{StaticResource FontSize.XS}"
+                               FontSize="{StaticResource FontSizeXSmall}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
                                Margin="0,-2,0,0"/>
                 </StackPanel>
