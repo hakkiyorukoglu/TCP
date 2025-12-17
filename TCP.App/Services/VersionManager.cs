@@ -15,11 +15,11 @@ public static class VersionManager
     /// <summary>
     /// Mevcut versiyon
     /// Semantic versioning formatında: TCP-Major.Minor.Patch
-    /// TCP-0.9.2: Notifications / Toasts v1 (Export Notifications Fix)
+    /// TCP-0.9.3: Error Guardrails (No-crash policy)
     /// 
     /// IMPORTANT: Bu değer tek yerden güncellenir - tüm UI otomatik güncellenir
     /// </summary>
-    public static string CurrentVersion => "TCP-0.9.2";
+    public static string CurrentVersion => "TCP-0.9.3";
     
     /// <summary>
     /// Build time
@@ -31,7 +31,7 @@ public static class VersionManager
     /// Stage adı
     /// Mevcut geliştirme aşaması
     /// </summary>
-    public static string StageName => "Notifications / Toasts v1 (Export Notifications Fix)";
+    public static string StageName => "Error Guardrails (No-crash policy)";
     
     /// <summary>
     /// Display versiyon

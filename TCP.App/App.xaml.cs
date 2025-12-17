@@ -1,3 +1,4 @@
+using System;
 using System.Configuration;
 using System.Data;
 using System.Windows;
@@ -63,11 +64,14 @@ public partial class App : Application
     /// Application startup - Initialize SearchRegistry and load settings
     /// TCP-0.5.2: Register all search suggestions
     /// TCP-0.8.1: Settings Persistence v1 (Local)
+    /// TCP-0.9.3: Error Guardrails (No-crash policy) - Global exception handling
     /// </summary>
     protected override void OnStartup(StartupEventArgs e)
     {
-        // Exception handling for debugging
+        // TCP-0.9.3: Error Guardrails (No-crash policy) - Global exception handlers
         this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += AppDomain_UnhandledException;
+        System.Threading.Tasks.TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         
         base.OnStartup(e);
         
@@ -216,18 +220,89 @@ public partial class App : Application
     }
     
     /// <summary>
-    /// Unhandled exception handler - Debug için
+    /// Global exception handler - UI thread exceptions
+    /// TCP-0.9.3: Error Guardrails (No-crash policy)
+    /// 
+    /// UI thread'de oluşan exception'ları yakalar.
+    /// Exception'ı handle eder, loglar ve toast gösterir.
+    /// App crash etmez.
     /// </summary>
     private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
     {
-        // Hata mesajını göster
-        MessageBox.Show($"Hata: {e.Exception.Message}\n\nStack Trace:\n{e.Exception.StackTrace}", 
-                       "TCP - Unhandled Exception", 
-                       MessageBoxButton.OK, 
-                       MessageBoxImage.Error);
+        // TCP-0.9.3: Error Guardrails (No-crash policy)
+        // Exception'ı logla
+        AppLogger.LogException(e.Exception, "DispatcherUnhandledException");
         
-        // Uygulamanın kapanmasını engelle (debug için)
+        // Exception'ı handle et (app crash etmesin)
         e.Handled = true;
+        
+        // TCP-0.9.3: Error Guardrails (No-crash policy) - Show error toast
+        try
+        {
+            NotificationService.Instance.ShowError("Unexpected Error", "An internal error occurred. The application recovered safely.");
+        }
+        catch
+        {
+            // Toast gösterilemezse sessizce fail eder
+        }
+    }
+    
+    /// <summary>
+    /// AppDomain unhandled exception handler
+    /// TCP-0.9.3: Error Guardrails (No-crash policy)
+    /// 
+    /// Non-UI thread'de oluşan exception'ları yakalar.
+    /// Exception'ı loglar ve toast gösterir.
+    /// </summary>
+    private void AppDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        // TCP-0.9.3: Error Guardrails (No-crash policy)
+        if (e.ExceptionObject is Exception ex)
+        {
+            AppLogger.LogException(ex, "AppDomain_UnhandledException");
+            
+            // UI thread'de toast göster
+            try
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    NotificationService.Instance.ShowError("Unexpected Error", "An internal error occurred. The application recovered safely.");
+                });
+            }
+            catch
+            {
+                // Toast gösterilemezse sessizce fail eder
+            }
+        }
+    }
+    
+    /// <summary>
+    /// TaskScheduler unobserved task exception handler
+    /// TCP-0.9.3: Error Guardrails (No-crash policy)
+    /// 
+    /// Task exception'larını yakalar.
+    /// Exception'ı loglar.
+    /// </summary>
+    private void TaskScheduler_UnobservedTaskException(object? sender, System.Threading.Tasks.UnobservedTaskExceptionEventArgs e)
+    {
+        // TCP-0.9.3: Error Guardrails (No-crash policy)
+        AppLogger.LogException(e.Exception, "TaskScheduler_UnobservedTaskException");
+        
+        // Exception'ı observed olarak işaretle (app crash etmesin)
+        e.SetObserved();
+        
+        // UI thread'de toast göster
+        try
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                NotificationService.Instance.ShowError("Unexpected Error", "An internal error occurred. The application recovered safely.");
+            });
+        }
+        catch
+        {
+            // Toast gösterilemezse sessizce fail eder
+        }
     }
 }
 
