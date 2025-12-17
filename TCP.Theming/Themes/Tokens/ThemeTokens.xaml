@@ -1,0 +1,46 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!--
+        ThemeTokens.xaml - Tema token'ları (temel değerler)
+        
+        Bu dosya tüm tema değerlerinin merkezi tanımlandığı yerdir.
+        Autodesk AutoCAD Dark Theme'den ilham alınmıştır.
+        
+        Burada tanımlanan değerler:
+        - Renkler (Color olarak)
+        - Font aileleri
+        - Corner radius değerleri
+        
+        Bu token'lar daha sonra Variants klasöründeki tema dosyalarında
+        Brush'lara dönüştürülür ve UI'da kullanılır.
+        
+        ÖNEMLİ: UI'da hardcoded renk kullanılmamalı, tüm renkler buradan gelmelidir.
+    -->
+    
+    <!--
+        Renk Tanımları (Color olarak)
+        Autodesk AutoCAD Dark Theme renk paletinden uyarlanmıştır.
+    -->
+    <Color x:Key="BackgroundColor">#2B2B2B</Color>
+    <Color x:Key="PanelBackgroundColor">#3A3A3A</Color>
+    <Color x:Key="BorderColor">#4A4A4A</Color>
+    <Color x:Key="PrimaryTextColor">#E0E0E0</Color>
+    <Color x:Key="SecondaryTextColor">#9E9E9E</Color>
+    <Color x:Key="AccentColor">#4FC3F7</Color>
+    
+    <!--
+        Font Ailesi
+        Varsayılan font ailesi - Segoe UI modern ve okunabilir bir fonttur.
+    -->
+    <sys:String x:Key="DefaultFontFamily">Segoe UI</sys:String>
+    
+    <!--
+        Corner Radius Değerleri
+        Küçük ve orta boyutlu köşe yuvarlaklığı değerleri.
+        UI elementlerinde tutarlı görünüm için kullanılır.
+    -->
+    <sys:Double x:Key="CornerRadiusSmall">2</sys:Double>
+    <sys:Double x:Key="CornerRadiusMedium">4</sys:Double>
+    
+</ResourceDictionary>

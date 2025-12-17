@@ -4,31 +4,214 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TCP.App"
+        xmlns:services="clr-namespace:TCP.App.Services"
         mc:Ignorable="d"
-        Title="TCP" Height="450" Width="800"
-        Background="{DynamicResource BackgroundBrush}">
+        Title="TCP" Height="600" Width="1000"
+        Background="{DynamicResource BackgroundBrush}"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ResizeMode="CanResize">
     <!--
-        MainWindow.xaml - Ana pencere
+        MainWindow.xaml - Ana pencere shell
         
-        Bu pencere uygulamanın shell'idir. Şu an için sadece temel yapı mevcut:
-        - Tema renklerini kullanıyor (BackgroundBrush)
-        - Merkezi bir TextBlock ile "TCP" yazısı gösteriyor
-        - Gelecekte buraya navigation, editor, simulation vb. eklenecek
+        Bu pencere uygulamanın ana shell'idir. İki ana bölümden oluşur:
+        1. TopBar: Sabit yükseklikte üst çubuk (başlık, versiyon, ikonlar, window butonları)
+        2. Content Area: Ana içerik alanı (şu an boş, gelecekte editor/simulation buraya eklenecek)
         
-        ÖNEMLİ: Hardcoded renk kullanılmıyor, tüm renkler ThemeTokens'tan geliyor.
+        ÖNEMLİ: 
+        - Hardcoded renk kullanılmıyor, tüm renkler ThemeTokens'tan geliyor
+        - WindowStyle="None" ile custom chrome kullanıyoruz
+        - AllowsTransparency="True" ile şeffaf arka plan desteği
     -->
     <Grid>
+        <Grid.RowDefinitions>
+            <!-- TopBar için sabit yükseklik -->
+            <RowDefinition Height="40"/>
+            <!-- Content area için kalan alan -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
         <!--
-            Grid - Ana layout container
-            
-            Merkezi hizalama için HorizontalAlignment ve VerticalAlignment kullanılıyor.
-            TextBlock, Grid'in ortasında konumlanacak.
+            TopBar - Üst çubuk
+            Sol: Uygulama başlığı "TCP"
+            Orta: Boş (gelecekte navigasyon eklenecek)
+            Sağ: Versiyon bilgisi, Info icon, Settings icon, Window butonları
         -->
-        <TextBlock Text="TCP"
-                   FontSize="48"
-                   FontWeight="Light"
-                   Foreground="{DynamicResource TextPrimaryBrush}"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
+        <Border Grid.Row="0" 
+                Background="{DynamicResource PanelBackgroundBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <!-- Sol: Başlık -->
+                    <ColumnDefinition Width="Auto"/>
+                    <!-- Orta: Boş (gelecekte navigasyon) -->
+                    <ColumnDefinition Width="*"/>
+                    <!-- Sağ: Versiyon ve ikonlar -->
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Sol: Uygulama başlığı -->
+                <TextBlock Grid.Column="0"
+                           Text="TCP"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextBrush}"
+                           VerticalAlignment="Center"
+                           Margin="15,0,0,0"/>
+                
+                <!-- Sağ: Versiyon ve ikonlar -->
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Margin="0,0,10,0">
+                    
+                    <!-- Versiyon bilgisi -->
+                    <TextBlock Text="{x:Static services:VersionInfo.DisplayVersion}"
+                               FontSize="12"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,15,0"/>
+                    
+                    <!-- Info icon (şu an için sadece görsel, davranış yok) -->
+                    <TextBlock Text="ℹ"
+                               FontSize="16"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,15,0"
+                               Cursor="Hand">
+                        <!-- Gelecekte Click event handler eklenecek -->
+                    </TextBlock>
+                    
+                    <!-- Settings icon (şu an için sadece görsel, davranış yok) -->
+                    <TextBlock Text="⚙"
+                               FontSize="16"
+                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,15,0"
+                               Cursor="Hand">
+                        <!-- Gelecekte Click event handler eklenecek -->
+                    </TextBlock>
+                    
+                    <!-- Window butonları: Minimize, Maximize/Restore, Close -->
+                    <StackPanel Orientation="Horizontal">
+                        <!-- Minimize butonu -->
+                        <Button Content="−"
+                                Width="40"
+                                Height="30"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Foreground="{DynamicResource TextBrush}"
+                                FontSize="14"
+                                Click="MinimizeButton_Click"
+                                Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        CornerRadius="0">
+                                                    <ContentPresenter HorizontalAlignment="Center"
+                                                                      VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        
+                        <!-- Maximize/Restore butonu -->
+                        <Button x:Name="MaximizeRestoreButton"
+                                Content="□"
+                                Width="40"
+                                Height="30"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Foreground="{DynamicResource TextBrush}"
+                                FontSize="14"
+                                Click="MaximizeRestoreButton_Click"
+                                Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        CornerRadius="0">
+                                                    <ContentPresenter HorizontalAlignment="Center"
+                                                                      VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        
+                        <!-- Close butonu -->
+                        <Button Content="×"
+                                Width="40"
+                                Height="30"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                Foreground="{DynamicResource TextBrush}"
+                                FontSize="18"
+                                Click="CloseButton_Click"
+                                Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        CornerRadius="0">
+                                                    <ContentPresenter HorizontalAlignment="Center"
+                                                                      VerticalAlignment="Center"/>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="#E81123"/>
+                                            <Setter Property="Foreground" Value="White"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!--
+            Content Area - Ana içerik alanı
+            Şu an boş, gelecekte editor, simulation, electronics modülleri buraya eklenecek
+        -->
+        <Border Grid.Row="1"
+                Background="{DynamicResource BackgroundBrush}">
+            <!--
+                İçerik alanı şu an boş bırakıldı.
+                Gelecekte buraya:
+                - Editor modülü
+                - Simulation modülü
+                - Electronics modülü
+                eklenecek.
+            -->
+        </Border>
     </Grid>
 </Window>

@@ -16,7 +16,11 @@
         -->
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Theme.Dark.xaml"/>
+                <!--
+                    Koyu tema dosyasını yükle
+                    Yeni yapı: Themes/Variants/Theme.Dark.xaml
+                -->
+                <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Variants/Theme.Dark.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

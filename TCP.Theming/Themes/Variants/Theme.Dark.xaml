@@ -1,0 +1,48 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--
+        Theme.Dark.xaml - Koyu tema variant'ı
+        
+        Bu dosya koyu tema için UI'da kullanılacak Brush'ları tanımlar.
+        ThemeTokens.xaml'deki Color değerlerini SolidColorBrush'lara dönüştürür.
+        
+        Bu yapı sayesinde:
+        - Token'lar merkezi bir yerde tanımlanır
+        - Tema variant'ları token'ları kullanarak brush'ları oluşturur
+        - UI'da sadece brush'lar kullanılır (semantik isimlerle)
+        
+        Brush İsimlendirme:
+        - BackgroundBrush: Ana pencere arka planı
+        - PanelBackgroundBrush: Panel/yüzey arka planı
+        - BorderBrush: Kenarlık rengi
+        - TextBrush: Birincil metin rengi
+        - SecondaryTextBrush: İkincil metin rengi
+        - AccentBrush: Vurgu/odak rengi
+    -->
+    
+    <ResourceDictionary.MergedDictionaries>
+        <!-- Önce token'ları yükle (renkler, font, corner radius vb.) -->
+        <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Tokens/ThemeTokens.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+    
+    <!--
+        Brush Tanımları
+        ThemeTokens'taki Color değerlerini SolidColorBrush'lara dönüştürüyoruz.
+        Bu brush'lar UI'da DynamicResource olarak kullanılacak.
+    -->
+    
+    <!-- Arka plan brush'ları -->
+    <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+    <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource PanelBackgroundColor}"/>
+    
+    <!-- Kenarlık brush'ı -->
+    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
+    
+    <!-- Metin brush'ları -->
+    <SolidColorBrush x:Key="TextBrush" Color="{StaticResource PrimaryTextColor}"/>
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="{StaticResource SecondaryTextColor}"/>
+    
+    <!-- Vurgu brush'ı -->
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>
+    
+</ResourceDictionary>
