@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -197,6 +198,7 @@ public class InfoViewModel : ViewModelBase, INotifyPropertyChanged
     /// <summary>
     /// TXT export işlemi
     /// TCP-0.9.1: Info panel & TXT export
+    /// TCP-0.9.2: Notifications / Toasts v1 - Export notifications fix
     /// </summary>
     private void ExportTxt()
     {
@@ -209,19 +211,39 @@ public class InfoViewModel : ViewModelBase, INotifyPropertyChanged
                 DefaultExt = "txt"
             };
             
-            if (saveDialog.ShowDialog() == true)
+            // TCP-0.9.2: Notifications / Toasts v1 - Export notifications fix
+            // Dialog aç ve kullanıcı seçimini kontrol et
+            var dialogResult = saveDialog.ShowDialog();
+            
+            if (dialogResult == true)
             {
-                var content = InfoContentProvider.GenerateTxtContent();
-                System.IO.File.WriteAllText(saveDialog.FileName, content);
-                
-                // TCP-0.9.2: Notifications / Toasts v1 - Show success notification
-                NotificationService.Instance.ShowSuccess("Exported", "TXT file saved successfully");
+                // Kullanıcı dosya seçti ve OK'a tıkladı
+                try
+                {
+                    var content = InfoContentProvider.GenerateTxtContent();
+                    System.IO.File.WriteAllText(saveDialog.FileName, content);
+                    
+                    // TCP-0.9.2: Notifications / Toasts v1 - Success notification
+                    NotificationService.Instance.ShowSuccess("Export Completed", "Project information was exported as TXT.");
+                }
+                catch (Exception ex)
+                {
+                    // TCP-0.9.2: Notifications / Toasts v1 - Error notification
+                    NotificationService.Instance.ShowError("Export Failed", ex.Message);
+                }
+            }
+            else
+            {
+                // TCP-0.9.2: Notifications / Toasts v1 - Cancel notification (optional but clean)
+                // Kullanıcı dialog'u iptal etti
+                NotificationService.Instance.ShowWarning("Export Canceled", "TXT export was canceled by the user.");
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Export başarısız olursa sessizce fail eder
-            // Gelecekte user notification eklenebilir
+            // TCP-0.9.2: Notifications / Toasts v1 - Error notification
+            // Dialog açılırken veya başka bir hata oluştu
+            NotificationService.Instance.ShowError("Export Failed", ex.Message);
         }
     }
 }
