@@ -20,6 +20,9 @@ public partial class App : Application
     /// </summary>
     protected override void OnStartup(StartupEventArgs e)
     {
+        // Exception handling for debugging
+        this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+        
         base.OnStartup(e);
         
         // Initialize SearchRegistry with all page registrations
@@ -123,6 +126,21 @@ public partial class App : Application
                 { "Status", "Offline" }
             }
         });
+    }
+    
+    /// <summary>
+    /// Unhandled exception handler - Debug için
+    /// </summary>
+    private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+    {
+        // Hata mesajını göster
+        MessageBox.Show($"Hata: {e.Exception.Message}\n\nStack Trace:\n{e.Exception.StackTrace}", 
+                       "TCP - Unhandled Exception", 
+                       MessageBoxButton.OK, 
+                       MessageBoxImage.Error);
+        
+        // Uygulamanın kapanmasını engelle (debug için)
+        e.Handled = true;
     }
 }
 

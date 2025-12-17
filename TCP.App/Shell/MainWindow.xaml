@@ -72,7 +72,7 @@
                             Margin="15,0,20,0">
                     <TextBlock Text="TCP"
                                FontSize="{StaticResource FontSize.L}"
-                               FontWeight="SemiBold"
+                           FontWeight="SemiBold"
                                Foreground="{DynamicResource Brush.Text.Primary}"/>
                     <TextBlock Text="Train Control Platform"
                                FontSize="{StaticResource FontSize.XS}"
@@ -242,7 +242,7 @@
                             <TextBlock Text="Search..."
                                        FontSize="12"
                                        Foreground="{DynamicResource Brush.Text.Secondary}"
-                                       VerticalAlignment="Center"
+                           VerticalAlignment="Center"
                                        Margin="13,0,25,0"
                                        IsHitTestVisible="False">
                                 <TextBlock.Style>
@@ -327,11 +327,11 @@
                     <!-- Icons + Version -->
                     <StackPanel Grid.Column="1"
                                 Grid.Row="0"
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Center"
-                                Margin="0,0,10,0">
-                        
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Margin="0,0,10,0">
+                    
                         <!-- Settings icon (placeholder) -->
                         <TextBlock Text="⚙"
                                    FontSize="14"
@@ -350,15 +350,15 @@
                                    Cursor="Hand"
                                    ToolTip="Info (coming soon)"/>
                         
-                        <!-- Versiyon bilgisi -->
-                        <TextBlock Text="{x:Static services:VersionManager.DisplayVersion}"
+                    <!-- Versiyon bilgisi -->
+                    <TextBlock Text="{x:Static services:VersionManager.DisplayVersion}"
                                    FontSize="11"
                                    Foreground="{DynamicResource Brush.Text.Secondary}"
-                                   VerticalAlignment="Center"
-                                   Margin="0,0,15,0"/>
-                        
-                        <!-- Window butonları: Minimize, Maximize/Restore, Close -->
-                        <StackPanel Orientation="Horizontal">
+                               VerticalAlignment="Center"
+                               Margin="0,0,15,0"/>
+                    
+                    <!-- Window butonları: Minimize, Maximize/Restore, Close -->
+                    <StackPanel Orientation="Horizontal">
                         <!-- Minimize butonu -->
                         <Button Content="−"
                                 Width="40"
@@ -456,8 +456,8 @@
                                 </Style>
                             </Button.Style>
                         </Button>
-                        </StackPanel>
                     </StackPanel>
+                </StackPanel>
                 </Grid>
             </Grid>
         </Border>

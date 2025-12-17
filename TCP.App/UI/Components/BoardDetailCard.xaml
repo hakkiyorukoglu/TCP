@@ -41,7 +41,7 @@
             
             <!-- Content Area -->
             <!-- Content comes from UserControl.Content (inherited from ContentControl) -->
-            <ContentPresenter Content="{Binding Content, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+            <ContentPresenter/>
         </StackPanel>
     </Border>
 </UserControl>
