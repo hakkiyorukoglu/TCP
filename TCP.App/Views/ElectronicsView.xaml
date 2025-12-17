@@ -4,9 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
+             xmlns:local="clr-namespace:TCP.App"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              Background="{DynamicResource BackgroundPrimaryBrush}">
+    <UserControl.Resources>
+        <local:IsNullToVisibilityConverter x:Key="IsNullToVisibilityConverter"/>
+    </UserControl.Resources>
     <!--
         ElectronicsView.xaml - Electronics modülü view
         
@@ -138,8 +142,8 @@
         </Border>
         
         <!--
-            RIGHT TOP PANEL - Board Details
-            Card-style UI showing selected board details
+            RIGHT TOP PANEL - Board Summary Cards
+            TCP-0.6.0: Summary cards showing board connection details
         -->
         <Border Grid.Column="1"
                 Grid.Row="0"
@@ -154,30 +158,63 @@
                                FontSize="20"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}"
-                               Margin="0,0,0,15"/>
-                    
-                    <!-- Description -->
-                    <TextBlock Text="Description"
-                               FontSize="12"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
-                               Margin="0,0,0,5"/>
-                    <TextBlock Text="{Binding SelectedBoard.Description, FallbackValue='Select a board to view details'}"
-                               FontSize="13"
-                               Foreground="{DynamicResource TextPrimaryBrush}"
-                               TextWrapping="Wrap"
                                Margin="0,0,0,20"/>
                     
-                    <!-- Status -->
-                    <TextBlock Text="Status"
-                               FontSize="12"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
-                               Margin="0,0,0,5"/>
-                    <TextBlock Text="{Binding SelectedBoard.Status, FallbackValue='Offline'}"
+                    <!-- Summary Cards -->
+                    <ItemsControl ItemsSource="{Binding SelectedBoardSummaryData}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <!-- Summary Card -->
+                                <Border Background="{DynamicResource BackgroundPrimaryBrush}"
+                                        BorderBrush="{DynamicResource BorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="15,12"
+                                        Margin="0,0,0,10">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <!-- Key -->
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding Key, StringFormat='{}{0}:'}"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,10,0"/>
+                                        
+                                        <!-- Value -->
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Value}"
+                                                   FontSize="12"
+                                                   Foreground="{DynamicResource TextPrimaryBrush}"
+                                                   VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    
+                    <!-- Fallback message when no board selected -->
+                    <TextBlock Text="Select a board to view details"
                                FontSize="13"
                                Foreground="{DynamicResource TextSecondaryBrush}"
-                               Margin="0,0,0,0"/>
+                               TextWrapping="Wrap"
+                               Margin="0,20,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedBoard}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </StackPanel>
             </ScrollViewer>
         </Border>

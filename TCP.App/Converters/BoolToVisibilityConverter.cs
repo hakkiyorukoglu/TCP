@@ -53,3 +53,22 @@ public class IsNullOrEmptyConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+
+/// <summary>
+/// IsNullToVisibilityConverter - Null check to Visibility converter
+/// TCP-0.6.0: Electronics Board Registry
+/// </summary>
+public class IsNullToVisibilityConverter : IValueConverter
+{
+    public static readonly IsNullToVisibilityConverter Instance = new();
+    
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return value == null ? Visibility.Visible : Visibility.Collapsed;
+    }
+    
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}

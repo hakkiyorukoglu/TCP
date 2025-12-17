@@ -178,17 +178,14 @@
                     </Grid.ColumnDefinitions>
                     
                     <!-- Search Box with Dropdown -->
+                    <!-- TCP-0.6.0: Popup overlay - does NOT affect layout -->
                     <Grid Grid.Column="0"
                           Margin="0,0,15,0"
                           VerticalAlignment="Center">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-                        
                         <!-- Search TextBox -->
-                        <Grid Grid.Row="0">
-                            <Border Background="{DynamicResource SurfaceBrush}"
+                        <Grid>
+                            <Border x:Name="SearchTextBoxBorder"
+                                    Background="{DynamicResource SurfaceBrush}"
                                     BorderBrush="{DynamicResource BorderBrush}"
                                     BorderThickness="1"
                                     CornerRadius="4"
@@ -262,63 +259,67 @@
                             </TextBlock>
                         </Grid>
                         
-                        <!-- Dropdown Autocomplete Panel -->
-                        <Border Grid.Row="1"
-                                Width="250"
-                                Background="{DynamicResource SurfaceBrush}"
-                                BorderBrush="{DynamicResource BorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Margin="0,2,0,0"
-                                MaxHeight="200"
-                                Visibility="{Binding IsDropdownVisible, Converter={StaticResource BoolToVisibilityConverter}}">
-                            <ListBox ItemsSource="{Binding FilteredSuggestions}"
-                                     SelectedItem="{Binding SelectedSearchItem}"
-                                     BorderThickness="0"
-                                     Background="Transparent"
-                                     MaxHeight="200"
-                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                     MouseLeftButtonUp="SearchListBox_MouseLeftButtonUp"
-                                     KeyDown="SearchListBox_KeyDown">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="{DynamicResource BackgroundPrimaryBrush}"
-                                                BorderThickness="0"
-                                                Padding="10,8"
-                                                Margin="2">
-                                            <TextBlock Text="{Binding DisplayText}"
-                                                       FontSize="12"
-                                                       Foreground="{DynamicResource TextPrimaryBrush}"/>
-                                        </Border>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                                <ListBox.ItemContainerStyle>
-                                    <Style TargetType="ListBoxItem">
-                                        <Setter Property="Padding" Value="0"/>
-                                        <Setter Property="Margin" Value="0"/>
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="ListBoxItem">
-                                                    <Border Background="{TemplateBinding Background}"
-                                                            BorderThickness="0"
-                                                            Padding="{TemplateBinding Padding}">
-                                                        <ContentPresenter/>
-                                                    </Border>
-                                                    <ControlTemplate.Triggers>
-                                                        <Trigger Property="IsMouseOver" Value="True">
-                                                            <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
-                                                        </Trigger>
-                                                        <Trigger Property="IsSelected" Value="True">
-                                                            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}"/>
-                                                        </Trigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </ListBox.ItemContainerStyle>
-                            </ListBox>
-                        </Border>
+                        <!-- Dropdown Autocomplete Panel (Popup - Overlay) -->
+                        <!-- TCP-0.6.0: Popup overlay - does NOT affect layout -->
+                        <Popup x:Name="SearchDropdownPopup"
+                               Placement="Bottom"
+                               PlacementTarget="{Binding ElementName=SearchTextBoxBorder}"
+                               StaysOpen="False"
+                               IsOpen="{Binding IsDropdownVisible}">
+                            <Border Width="250"
+                                    Background="{DynamicResource SurfaceBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    MaxHeight="200">
+                                <ListBox ItemsSource="{Binding FilteredSuggestions}"
+                                         SelectedItem="{Binding SelectedSearchItem}"
+                                         BorderThickness="0"
+                                         Background="Transparent"
+                                         MaxHeight="200"
+                                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                         MouseLeftButtonUp="SearchListBox_MouseLeftButtonUp"
+                                         KeyDown="SearchListBox_KeyDown">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{DynamicResource BackgroundPrimaryBrush}"
+                                                    BorderThickness="0"
+                                                    Padding="10,8"
+                                                    Margin="2">
+                                                <TextBlock Text="{Binding DisplayText}"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                    <ListBox.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem">
+                                            <Setter Property="Padding" Value="0"/>
+                                            <Setter Property="Margin" Value="0"/>
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="ListBoxItem">
+                                                        <Border Background="{TemplateBinding Background}"
+                                                                BorderThickness="0"
+                                                                Padding="{TemplateBinding Padding}">
+                                                            <ContentPresenter/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsSelected" Value="True">
+                                                                <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                </ListBox>
+                            </Border>
+                        </Popup>
                     </Grid>
                     
                     <!-- Icons + Version -->

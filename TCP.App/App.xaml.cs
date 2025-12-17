@@ -3,6 +3,7 @@ using System.Data;
 using System.Windows;
 using TCP.App.Services;
 using TCP.App.ViewModels;
+using System.Collections.Generic;
 
 namespace TCP.App;
 
@@ -62,6 +63,65 @@ public partial class App : Application
             Title = "Info",
             Keywords = new[] { "info", "about", "version", "changelog" },
             Route = "Info"
+        });
+        
+        // TCP-0.6.0: Initialize BoardRegistry with hardcoded board data
+        var boardRegistry = BoardRegistry.Instance;
+        
+        // Register Arduino Mega
+        boardRegistry.Register(new BoardItem
+        {
+            Name = "Arduino Mega",
+            Description = "ATmega2560 microcontroller board with 54 digital I/O pins",
+            Status = "Offline",
+            SummaryData = new Dictionary<string, string>
+            {
+                { "Port", "COM3" },
+                { "IP Address", "192.168.0.10" },
+                { "Status", "Offline" }
+            }
+        });
+        
+        // Register Arduino Nano
+        boardRegistry.Register(new BoardItem
+        {
+            Name = "Arduino Nano",
+            Description = "Compact ATmega328P board with 14 digital I/O pins",
+            Status = "Offline",
+            SummaryData = new Dictionary<string, string>
+            {
+                { "Port", "COM5" },
+                { "IP Address", "192.168.0.11" },
+                { "Status", "Offline" }
+            }
+        });
+        
+        // Register RFID Reader
+        boardRegistry.Register(new BoardItem
+        {
+            Name = "RFID Reader",
+            Description = "RFID reader/writer module for card detection",
+            Status = "Offline",
+            SummaryData = new Dictionary<string, string>
+            {
+                { "Port", "ETH0" },
+                { "IP Address", "192.168.0.20" },
+                { "Status", "Unknown" }
+            }
+        });
+        
+        // Register Servo Controller
+        boardRegistry.Register(new BoardItem
+        {
+            Name = "Servo Controller",
+            Description = "Multi-channel servo motor controller board",
+            Status = "Offline",
+            SummaryData = new Dictionary<string, string>
+            {
+                { "Port", "COM7" },
+                { "IP Address", "192.168.0.30" },
+                { "Status", "Offline" }
+            }
         });
     }
 }

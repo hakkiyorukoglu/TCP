@@ -52,24 +52,48 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
             {
                 _selectedBoard = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(SelectedBoardSummaryData)); // Summary data'yı da güncelle
             }
         }
     }
     
     /// <summary>
-    /// Constructor - Hardcoded data ile başlatma
-    /// TCP-0.5: Placeholder data for UI testing
+    /// Selected board summary data as KeyValuePair list for ItemsControl binding
+    /// TCP-0.6.0: Summary cards support
+    /// </summary>
+    public ObservableCollection<KeyValuePair<string, string>> SelectedBoardSummaryData
+    {
+        get
+        {
+            var collection = new ObservableCollection<KeyValuePair<string, string>>();
+            if (SelectedBoard?.SummaryData != null)
+            {
+                foreach (var kvp in SelectedBoard.SummaryData)
+                {
+                    collection.Add(kvp);
+                }
+            }
+            return collection;
+        }
+    }
+    
+    /// <summary>
+    /// Board registry - Single source of truth for board definitions
+    /// TCP-0.6.0: Electronics Board Registry
+    /// </summary>
+    private readonly IBoardRegistry _boardRegistry;
+    
+    /// <summary>
+    /// Constructor - Initialize boards from registry
+    /// TCP-0.6.0: Board Registry (Single Source of Truth)
     /// </summary>
     public ElectronicsViewModel()
     {
-        // Hardcoded board listesi (placeholder data)
-        Boards = new ObservableCollection<BoardItem>
-        {
-            new BoardItem { Name = "Arduino Mega", Description = "ATmega2560 microcontroller board with 54 digital I/O pins", Status = "Offline" },
-            new BoardItem { Name = "Arduino Nano", Description = "Compact ATmega328P board with 14 digital I/O pins", Status = "Offline" },
-            new BoardItem { Name = "RFID Module", Description = "RFID reader/writer module for card detection", Status = "Offline" },
-            new BoardItem { Name = "Servo Controller", Description = "Multi-channel servo motor controller board", Status = "Offline" }
-        };
+        // Get board registry instance
+        _boardRegistry = BoardRegistry.Instance;
+        
+        // Load boards from registry
+        Boards = new ObservableCollection<BoardItem>(_boardRegistry.GetAll());
         
         // Default selection: İlk board
         SelectedBoard = Boards.Count > 0 ? Boards[0] : null;
@@ -79,7 +103,8 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
 /// <summary>
 /// BoardItem - Board model class
 /// 
-/// TCP-0.5: Simple model for board data
+/// TCP-0.6.0: Electronics Board Registry
+/// Extended with summary card data
 /// </summary>
 public class BoardItem
 {
@@ -97,4 +122,10 @@ public class BoardItem
     /// Board durumu (Offline/Online)
     /// </summary>
     public string Status { get; set; } = "Offline";
+    
+    /// <summary>
+    /// Summary card data - Key/Value pairs for summary cards
+    /// TCP-0.6.0: Summary cards support
+    /// </summary>
+    public Dictionary<string, string> SummaryData { get; set; } = new();
 }
