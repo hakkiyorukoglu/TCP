@@ -14,9 +14,56 @@ namespace TCP.App.Architecture;
 /// 
 /// Bu sınıf sadece dokümantasyon amaçlıdır, kod içermez.
 /// Tüm mimari kararlar ve prensipler burada açıklanır.
+/// 
+/// TCP-0.2: Architecture Baseline & GitHub Safety
+/// - MVVM pattern tam olarak uygulandı
+/// - View/ViewModel/Services yapısı kuruldu
+/// - NavigationService eklendi
+/// - VersionManager eklendi
 /// </summary>
 public static class ArchitectureOverview
 {
+    /*
+     * ========================================================================
+     * TCP PROJESİ AMACI
+     * ========================================================================
+     * 
+     * TCP (Train Control Platform) - Tren kontrol sistemleri için
+     * görsel tasarım, simülasyon ve elektronik modül yönetim platformu.
+     * 
+     * Ana Hedefler:
+     * - Görsel editor ile train control sistemleri tasarlama
+     * - Tasarılan sistemlerin simülasyonunu çalıştırma
+     * - Elektronik component'lerin yönetimi
+     * - Modern, temiz ve genişletilebilir mimari
+     */
+    
+    /*
+     * ========================================================================
+     * KATMAN YAPISI (High-Level Layers)
+     * ========================================================================
+     * 
+     * TCP projesi üç ana katmandan oluşur:
+     * 
+     * 1. UI LAYER (TCP.App)
+     *    - Views: XAML dosyaları, sadece UI gösterir
+     *    - ViewModels: UI mantığı, state yönetimi
+     *    - Services: Uygulama servisleri (Navigation, Version, ChangeTracker)
+     *    - Shell: Ana pencere yapısı
+     * 
+     * 2. THEMING LAYER (TCP.Theming)
+     *    - Tokens: Tema token'ları (renkler, fontlar, değerler)
+     *    - Variants: Tema variant'ları (Dark, Light)
+     * 
+     * 3. CORE LAYER (TCP.Core) - Gelecekte
+     *    - Editor: Editor modülü iş mantığı
+     *    - Simulation: Simulation modülü iş mantığı
+     *    - Electronics: Electronics modülü iş mantığı
+     * 
+     * Dependency Direction:
+     * UI → Theming → Core
+     */
+    
     /*
      * ========================================================================
      * MVVM PATTERN (Model-View-ViewModel)
@@ -35,10 +82,16 @@ public static class ArchitectureOverview
      * - Yeniden kullanılabilirlik
      * - Data binding ile otomatik UI güncellemeleri
      * 
-     * Gelecek Yapı:
-     * - TCP.App/ViewModels/ klasörü oluşturulacak
-     * - Her View için bir ViewModel olacak
-     * - Commands ve Properties ViewModel'de tanımlanacak
+     * TCP-0.2 Yapısı:
+     * - TCP.App/ViewModels/ klasörü oluşturuldu
+     * - Her View için bir ViewModel mevcut
+     * - Commands ve Properties ViewModel'de tanımlanacak (gelecek aşamalarda)
+     * 
+     * MVVM Kuralları (KATI):
+     * - Views ZERO logic içerir (sadece UI)
+     * - ViewModels ZERO UI code içerir (sadece mantık)
+     * - Services ZERO UI reference içerir (sadece servis mantığı)
+     * - Navigation SADECE NavigationService üzerinden yapılır
      */
     
     /*
@@ -50,8 +103,9 @@ public static class ArchitectureOverview
      * 
      * Örnekler:
      * - Tema renkleri: ThemeTokens.xaml (tek kaynak)
-     * - Versiyon bilgisi: VersionInfo.cs (tek kaynak)
-     * - Uygulama state'i: Gelecekte bir StateManager veya ViewModel
+     * - Versiyon bilgisi: VersionManager.cs (tek kaynak, TCP-0.2'de güncellendi)
+     * - Navigation state: NavigationService (tek kaynak)
+     * - Uygulama state'i: ViewModel'ler (her modül kendi state'ini yönetir)
      * 
      * Bu prensip:
      * - Veri tutarsızlıklarını önler
@@ -119,16 +173,17 @@ public static class ArchitectureOverview
      * 
      * TCP/
      * ├─ TCP.App/              WPF Application (UI Layer)
-     * │  ├─ Views/             XAML view dosyaları
-     * │  ├─ ViewModels/        ViewModel'ler (gelecekte)
-     * │  ├─ Services/          Uygulama servisleri
+     * │  ├─ Shell/             MainWindow (ana pencere)
+     * │  ├─ Views/             XAML view dosyaları (HomeView, EditorView, vb.)
+     * │  ├─ ViewModels/        ViewModel'ler (MainViewModel, HomeViewModel, vb.)
+     * │  ├─ Services/          Uygulama servisleri (NavigationService, VersionManager, ChangeTracker)
      * │  ├─ Architecture/      Mimari dokümantasyon
-     * │  └─ ...
+     * │  └─ App.xaml           Uygulama entry point
      * │
      * ├─ TCP.Theming/          Tema sistemi
      * │  └─ Themes/            Tema dosyaları
-     * │     ├─ Tokens/         Tema token'ları
-     * │     └─ Variants/       Tema variant'ları
+     * │     ├─ Tokens/         Tema token'ları (ThemeTokens.xaml)
+     * │     └─ Variants/        Tema variant'ları (Theme.Dark.xaml, Theme.Light.xaml)
      * │
      * └─ TCP.Core/             Core business logic (gelecekte)
      *    ├─ Editor/            Editor modülü
@@ -165,7 +220,8 @@ public static class ArchitectureOverview
      * 
      * 1. Single Responsibility Principle (SRP)
      *    - Her sınıf tek bir sorumluluğa sahip olmalı
-     *    - Örnek: VersionInfo sadece versiyon bilgisi yönetir
+     *    - Örnek: VersionManager sadece versiyon bilgisi yönetir
+     *    - Örnek: NavigationService sadece navigation yönetir
      * 
      * 2. Open/Closed Principle (OCP)
      *    - Açık genişlemeye, kapalı değişikliğe

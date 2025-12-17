@@ -4,43 +4,103 @@
     <!--
         ThemeTokens.xaml - Tema token'ları (temel değerler)
         
-        Bu dosya tüm tema değerlerinin merkezi tanımlandığı yerdir.
-        Autodesk AutoCAD Dark Theme'den ilham alınmıştır.
+        Bu dosya PROFESSIONAL, TOKEN-BASED tema sisteminin merkezidir.
+        Tüm UI değerleri burada token olarak tanımlanır.
         
-        Burada tanımlanan değerler:
-        - Renkler (Color olarak)
-        - Font aileleri
-        - Corner radius değerleri
+        Token-Based Design System:
+        - Her değer semantik bir isimle tanımlanır
+        - Tema variant'ları bu token'ları kullanır
+        - UI'da hardcoded değer kullanılmaz
+        - Scalable ve maintainable yapı
         
-        Bu token'lar daha sonra Variants klasöründeki tema dosyalarında
-        Brush'lara dönüştürülür ve UI'da kullanılır.
-        
-        ÖNEMLİ: UI'da hardcoded renk kullanılmamalı, tüm renkler buradan gelmelidir.
+        Autodesk / IDE dark theme'lerden ilham alınmıştır.
     -->
     
     <!--
-        Renk Tanımları (Color olarak)
-        Autodesk AutoCAD Dark Theme renk paletinden uyarlanmıştır.
+        ========================================================================
+        COLOR TOKENS
+        ========================================================================
+        Renk token'ları - Tüm renkler burada tanımlanır.
+        Tema variant'ları bu token'ları kullanarak brush'ları oluşturur.
     -->
-    <Color x:Key="BackgroundColor">#2B2B2B</Color>
-    <Color x:Key="PanelBackgroundColor">#3A3A3A</Color>
-    <Color x:Key="BorderColor">#4A4A4A</Color>
-    <Color x:Key="PrimaryTextColor">#E0E0E0</Color>
-    <Color x:Key="SecondaryTextColor">#9E9E9E</Color>
-    <Color x:Key="AccentColor">#4FC3F7</Color>
+    
+    <!-- Arka plan renkleri -->
+    <Color x:Key="BackgroundPrimary">#2B2B2B</Color>
+    <Color x:Key="BackgroundSecondary">#1E1E1E</Color>
+    <Color x:Key="Surface">#333333</Color>
+    
+    <!-- Kenarlık rengi -->
+    <Color x:Key="Border">#3F3F3F</Color>
+    
+    <!-- Vurgu renkleri -->
+    <Color x:Key="AccentPrimary">#4FC3F7</Color>
+    <Color x:Key="AccentSecondary">#81D4FA</Color>
+    
+    <!-- Metin renkleri -->
+    <Color x:Key="TextPrimary">#E6E6E6</Color>
+    <Color x:Key="TextSecondary">#B0B0B0</Color>
+    <Color x:Key="TextDisabled">#666666</Color>
     
     <!--
-        Font Ailesi
-        Varsayılan font ailesi - Segoe UI modern ve okunabilir bir fonttur.
+        ========================================================================
+        BRUSH TOKENS
+        ========================================================================
+        Brush token'ları - UI'da kullanılacak brush'lar.
+        Bu brush'lar tema variant'larında Color token'larına bağlanır.
     -->
-    <sys:String x:Key="DefaultFontFamily">Segoe UI</sys:String>
+    
+    <!-- Arka plan brush'ları -->
+    <SolidColorBrush x:Key="BackgroundPrimaryBrush" Color="{StaticResource BackgroundPrimary}"/>
+    <SolidColorBrush x:Key="BackgroundSecondaryBrush" Color="{StaticResource BackgroundSecondary}"/>
+    <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource Surface}"/>
+    
+    <!-- Kenarlık brush'ı -->
+    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource Border}"/>
+    
+    <!-- Vurgu brush'ları -->
+    <SolidColorBrush x:Key="AccentPrimaryBrush" Color="{StaticResource AccentPrimary}"/>
+    
+    <!-- Metin brush'ları -->
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimary}"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondary}"/>
     
     <!--
-        Corner Radius Değerleri
-        Küçük ve orta boyutlu köşe yuvarlaklığı değerleri.
-        UI elementlerinde tutarlı görünüm için kullanılır.
+        ========================================================================
+        TYPOGRAPHY TOKENS
+        ========================================================================
+        Tipografi token'ları - Font ailesi ve boyutları.
     -->
+    
+    <!-- Font ailesi - Segoe UI modern ve okunabilir, Inter fallback -->
+    <sys:String x:Key="FontFamilyPrimary">Segoe UI, Inter</sys:String>
+    
+    <!-- Font boyutları -->
+    <sys:Double x:Key="FontSizeSmall">11</sys:Double>
+    <sys:Double x:Key="FontSizeNormal">13</sys:Double>
+    <sys:Double x:Key="FontSizeLarge">16</sys:Double>
+    <sys:Double x:Key="FontSizeTitle">20</sys:Double>
+    
+    <!--
+        ========================================================================
+        SPACING TOKENS
+        ========================================================================
+        Spacing token'ları - UI elementleri arası boşluklar.
+        Tutarlı spacing için kullanılır.
+    -->
+    
+    <sys:Double x:Key="SpacingXS">4</sys:Double>
+    <sys:Double x:Key="SpacingS">8</sys:Double>
+    <sys:Double x:Key="SpacingM">12</sys:Double>
+    <sys:Double x:Key="SpacingL">16</sys:Double>
+    
+    <!--
+        ========================================================================
+        CORNER RADIUS TOKENS
+        ========================================================================
+        Köşe yuvarlaklığı token'ları - UI elementlerinde tutarlı görünüm.
+    -->
+    
     <sys:Double x:Key="CornerRadiusSmall">2</sys:Double>
-    <sys:Double x:Key="CornerRadiusMedium">4</sys:Double>
+    <sys:Double x:Key="CornerRadiusNormal">4</sys:Double>
     
 </ResourceDictionary>

@@ -1,48 +1,47 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <!--
-        Theme.Dark.xaml - Koyu tema variant'ı
+        Theme.Dark.xaml - Koyu tema variant'ı (Autodesk-inspired)
         
-        Bu dosya koyu tema için UI'da kullanılacak Brush'ları tanımlar.
-        ThemeTokens.xaml'deki Color değerlerini SolidColorBrush'lara dönüştürür.
+        Bu dosya koyu tema için UI'da kullanılacak brush'ları tanımlar.
+        ThemeTokens.xaml'deki token'ları kullanarak brush'ları oluşturur.
         
-        Bu yapı sayesinde:
-        - Token'lar merkezi bir yerde tanımlanır
-        - Tema variant'ları token'ları kullanarak brush'ları oluşturur
-        - UI'da sadece brush'lar kullanılır (semantik isimlerle)
+        Autodesk Dark Theme Palette:
+        - BackgroundPrimary: #2B2B2B (Ana arka plan)
+        - BackgroundSecondary: #1E1E1E (İkincil arka plan)
+        - Surface: #333333 (Yüzey/panel arka planı)
+        - Border: #3F3F3F (Kenarlık)
+        - AccentPrimary: #4FC3F7 (Birincil vurgu)
+        - TextPrimary: #E6E6E6 (Birincil metin)
+        - TextSecondary: #B0B0B0 (İkincil metin)
         
-        Brush İsimlendirme:
-        - BackgroundBrush: Ana pencere arka planı
-        - PanelBackgroundBrush: Panel/yüzey arka planı
-        - BorderBrush: Kenarlık rengi
-        - TextBrush: Birincil metin rengi
-        - SecondaryTextBrush: İkincil metin rengi
-        - AccentBrush: Vurgu/odak rengi
+        Token-Based System:
+        - Tüm brush'lar ThemeTokens'taki Color token'larına bağlanır
+        - UI'da sadece brush token'ları kullanılır
+        - Hardcoded renk YOK
     -->
     
     <ResourceDictionary.MergedDictionaries>
-        <!-- Önce token'ları yükle (renkler, font, corner radius vb.) -->
+        <!-- Önce token'ları yükle (renkler, brush'lar, typography, spacing, corner radius) -->
         <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Tokens/ThemeTokens.xaml"/>
     </ResourceDictionary.MergedDictionaries>
     
     <!--
-        Brush Tanımları
-        ThemeTokens'taki Color değerlerini SolidColorBrush'lara dönüştürüyoruz.
-        Bu brush'lar UI'da DynamicResource olarak kullanılacak.
+        ========================================================================
+        DARK THEME BRUSH OVERRIDES
+        ========================================================================
+        Koyu tema için brush override'ları.
+        ThemeTokens'taki brush'lar zaten doğru renkleri içeriyor,
+        burada sadece tema-specific override'lar yapılabilir.
+        
+        Şu an için override gerekmiyor çünkü token'lar zaten dark theme için tanımlı.
+        Gelecekte light theme eklendiğinde burada override'lar yapılabilir.
     -->
     
-    <!-- Arka plan brush'ları -->
-    <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
-    <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource PanelBackgroundColor}"/>
-    
-    <!-- Kenarlık brush'ı -->
-    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
-    
-    <!-- Metin brush'ları -->
-    <SolidColorBrush x:Key="TextBrush" Color="{StaticResource PrimaryTextColor}"/>
-    <SolidColorBrush x:Key="SecondaryTextBrush" Color="{StaticResource SecondaryTextColor}"/>
-    
-    <!-- Vurgu brush'ı -->
-    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>
+    <!--
+        Not: ThemeTokens.xaml'deki brush'lar zaten dark theme için doğru renkleri içeriyor.
+        Bu yüzden burada ekstra override'a gerek yok.
+        Brush'lar doğrudan ThemeTokens'tan kullanılacak.
+    -->
     
 </ResourceDictionary>

@@ -5,12 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TCP.App"
         xmlns:services="clr-namespace:TCP.App.Services"
+        xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
         mc:Ignorable="d"
         Title="TCP" Height="600" Width="1000"
-        Background="{DynamicResource BackgroundBrush}"
+        Background="{DynamicResource BackgroundPrimaryBrush}"
         WindowStyle="None"
         AllowsTransparency="True"
         ResizeMode="CanResize">
+    <Window.DataContext>
+        <!-- MainViewModel'i DataContext olarak ayarla -->
+        <viewmodels:MainViewModel/>
+    </Window.DataContext>
     <!--
         MainWindow.xaml - Ana pencere shell
         
@@ -38,7 +43,7 @@
             Sağ: Versiyon bilgisi, Info icon, Settings icon, Window butonları
         -->
         <Border Grid.Row="0" 
-                Background="{DynamicResource PanelBackgroundBrush}"
+                Background="{DynamicResource SurfaceBrush}"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="0,0,0,1">
             <Grid>
@@ -56,7 +61,7 @@
                            Text="TCP"
                            FontSize="16"
                            FontWeight="SemiBold"
-                           Foreground="{DynamicResource TextBrush}"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
                            VerticalAlignment="Center"
                            Margin="15,0,0,0"/>
                 
@@ -68,16 +73,16 @@
                             Margin="0,0,10,0">
                     
                     <!-- Versiyon bilgisi -->
-                    <TextBlock Text="{x:Static services:VersionInfo.DisplayVersion}"
+                    <TextBlock Text="{x:Static services:VersionManager.DisplayVersion}"
                                FontSize="12"
-                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
                                VerticalAlignment="Center"
                                Margin="0,0,15,0"/>
                     
                     <!-- Info icon (şu an için sadece görsel, davranış yok) -->
                     <TextBlock Text="ℹ"
                                FontSize="16"
-                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
                                VerticalAlignment="Center"
                                Margin="0,0,15,0"
                                Cursor="Hand">
@@ -87,7 +92,7 @@
                     <!-- Settings icon (şu an için sadece görsel, davranış yok) -->
                     <TextBlock Text="⚙"
                                FontSize="16"
-                               Foreground="{DynamicResource SecondaryTextBrush}"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
                                VerticalAlignment="Center"
                                Margin="0,0,15,0"
                                Cursor="Hand">
@@ -102,7 +107,7 @@
                                 Height="30"
                                 Background="Transparent"
                                 BorderThickness="0"
-                                Foreground="{DynamicResource TextBrush}"
+                                Foreground="{DynamicResource TextPrimaryBrush}"
                                 FontSize="14"
                                 Click="MinimizeButton_Click"
                                 Cursor="Hand">
@@ -135,7 +140,7 @@
                                 Height="30"
                                 Background="Transparent"
                                 BorderThickness="0"
-                                Foreground="{DynamicResource TextBrush}"
+                                Foreground="{DynamicResource TextPrimaryBrush}"
                                 FontSize="14"
                                 Click="MaximizeRestoreButton_Click"
                                 Cursor="Hand">
@@ -167,7 +172,7 @@
                                 Height="30"
                                 Background="Transparent"
                                 BorderThickness="0"
-                                Foreground="{DynamicResource TextBrush}"
+                                Foreground="{DynamicResource TextPrimaryBrush}"
                                 FontSize="18"
                                 Click="CloseButton_Click"
                                 Cursor="Hand">
@@ -186,7 +191,8 @@
                                     </Setter>
                                     <Style.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#E81123"/>
+                                            <!-- Close butonu hover rengi - AccentPrimaryBrush kullanılıyor -->
+                                            <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}"/>
                                             <Setter Property="Foreground" Value="White"/>
                                         </Trigger>
                                     </Style.Triggers>
@@ -203,7 +209,7 @@
             Şu an boş, gelecekte editor, simulation, electronics modülleri buraya eklenecek
         -->
         <Border Grid.Row="1"
-                Background="{DynamicResource BackgroundBrush}">
+                Background="{DynamicResource BackgroundPrimaryBrush}">
             <!--
                 İçerik alanı şu an boş bırakıldı.
                 Gelecekte buraya:
