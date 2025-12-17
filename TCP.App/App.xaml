@@ -1,0 +1,23 @@
+<Application x:Class="TCP.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:TCP.App"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!--
+            Application.Resources - Uygulama genelinde kullanılacak kaynaklar
+            
+            Theme.Dark.xaml dosyasını buraya merge ediyoruz.
+            Bu sayede tüm pencereler ve kontroller tema renklerine erişebilir.
+            
+            ResourceDictionary.MergedDictionaries kullanarak TCP.Theming projesindeki
+            tema dosyasını yüklüyoruz. Pack URI formatı kullanılıyor:
+            - pack://application:,,,/AssemblyName;component/Path/To/File.xaml
+        -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Theme.Dark.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

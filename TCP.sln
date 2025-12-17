@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCP.App", "TCP.App\TCP.App.csproj", "{A2D425B3-1CE0-435E-ABFB-76ECBD0289BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCP.Theming", "TCP.Theming\TCP.Theming.csproj", "{AA15CEAA-2A25-424B-B469-4F83F09DF073}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCP.Core", "TCP.Core\TCP.Core.csproj", "{55DFCA69-7E66-495F-82A5-ABBE889CDBFE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A2D425B3-1CE0-435E-ABFB-76ECBD0289BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2D425B3-1CE0-435E-ABFB-76ECBD0289BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2D425B3-1CE0-435E-ABFB-76ECBD0289BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2D425B3-1CE0-435E-ABFB-76ECBD0289BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA15CEAA-2A25-424B-B469-4F83F09DF073}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA15CEAA-2A25-424B-B469-4F83F09DF073}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA15CEAA-2A25-424B-B469-4F83F09DF073}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA15CEAA-2A25-424B-B469-4F83F09DF073}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55DFCA69-7E66-495F-82A5-ABBE889CDBFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55DFCA69-7E66-495F-82A5-ABBE889CDBFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55DFCA69-7E66-495F-82A5-ABBE889CDBFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55DFCA69-7E66-495F-82A5-ABBE889CDBFE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

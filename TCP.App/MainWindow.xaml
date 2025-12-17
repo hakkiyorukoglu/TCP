@@ -1,0 +1,34 @@
+<Window x:Class="TCP.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TCP.App"
+        mc:Ignorable="d"
+        Title="TCP" Height="450" Width="800"
+        Background="{DynamicResource BackgroundBrush}">
+    <!--
+        MainWindow.xaml - Ana pencere
+        
+        Bu pencere uygulamanın shell'idir. Şu an için sadece temel yapı mevcut:
+        - Tema renklerini kullanıyor (BackgroundBrush)
+        - Merkezi bir TextBlock ile "TCP" yazısı gösteriyor
+        - Gelecekte buraya navigation, editor, simulation vb. eklenecek
+        
+        ÖNEMLİ: Hardcoded renk kullanılmıyor, tüm renkler ThemeTokens'tan geliyor.
+    -->
+    <Grid>
+        <!--
+            Grid - Ana layout container
+            
+            Merkezi hizalama için HorizontalAlignment ve VerticalAlignment kullanılıyor.
+            TextBlock, Grid'in ortasında konumlanacak.
+        -->
+        <TextBlock Text="TCP"
+                   FontSize="48"
+                   FontWeight="Light"
+                   Foreground="{DynamicResource TextPrimaryBrush}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
+    </Grid>
+</Window>
