@@ -28,12 +28,13 @@
         ========================================================================
         BACKWARD COMPATIBILITY ALIASES
         ========================================================================
+        Alias'lar direkt değer olarak tanımlanıyor (StaticResource circular dependency önlemek için)
     -->
-    <StaticResource ResourceKey="FontSize.XS" x:Key="FontSizeXSmall"/>
-    <StaticResource ResourceKey="FontSize.S" x:Key="FontSizeSmall"/>
-    <StaticResource ResourceKey="FontSize.M" x:Key="FontSizeNormal"/>
-    <StaticResource ResourceKey="FontSize.L" x:Key="FontSizeLarge"/>
-    <StaticResource ResourceKey="FontSize.XL" x:Key="FontSizeXLarge"/>
-    <StaticResource ResourceKey="FontSize.Title" x:Key="FontSizeTitle"/>
+    <sys:Double x:Key="FontSizeXSmall">10</sys:Double>
+    <sys:Double x:Key="FontSizeSmall">11</sys:Double>
+    <sys:Double x:Key="FontSizeNormal">13</sys:Double>
+    <sys:Double x:Key="FontSizeLarge">16</sys:Double>
+    <sys:Double x:Key="FontSizeXLarge">20</sys:Double>
+    <sys:Double x:Key="FontSizeTitle">20</sys:Double>
     
 </ResourceDictionary>
