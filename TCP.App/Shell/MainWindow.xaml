@@ -4,43 +4,42 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TCP.App"
+        xmlns:views="clr-namespace:TCP.App.Views"
         xmlns:services="clr-namespace:TCP.App.Services"
-        xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
         mc:Ignorable="d"
         Title="TCP" Height="600" Width="1000"
         Background="{DynamicResource BackgroundPrimaryBrush}"
         WindowStyle="None"
         AllowsTransparency="True"
         ResizeMode="CanResize">
-    <Window.DataContext>
-        <!-- MainViewModel'i DataContext olarak ayarla -->
-        <viewmodels:MainViewModel/>
-    </Window.DataContext>
     <!--
-        MainWindow.xaml - Ana pencere shell
+        MainWindow.xaml - Application Shell
         
-        Bu pencere uygulamanın ana shell'idir. İki ana bölümden oluşur:
-        1. TopBar: Sabit yükseklikte üst çubuk (başlık, versiyon, ikonlar, window butonları)
-        2. Content Area: Ana içerik alanı (şu an boş, gelecekte editor/simulation buraya eklenecek)
+        TCP-0.4: Navigation Shell + Stable Startup
+        Bu pencere uygulamanın ana shell'idir.
+        
+        Layout:
+        1. TopBar: Sabit yükseklikte üst çubuk (navigation, icons, window buttons)
+        2. ContentArea: Ana içerik alanı (View switching için ContentControl)
         
         ÖNEMLİ: 
         - Hardcoded renk kullanılmıyor, tüm renkler ThemeTokens'tan geliyor
         - WindowStyle="None" ile custom chrome kullanıyoruz
-        - AllowsTransparency="True" ile şeffaf arka plan desteği
+        - Navigation basit ve stable (NO complex router)
     -->
     <Grid>
         <Grid.RowDefinitions>
             <!-- TopBar için sabit yükseklik -->
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="50"/>
             <!-- Content area için kalan alan -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
         <!--
-            TopBar - Üst çubuk
-            Sol: Uygulama başlığı "TCP"
-            Orta: Boş (gelecekte navigasyon eklenecek)
-            Sağ: Versiyon bilgisi, Info icon, Settings icon, Window butonları
+            TopBar - Üst navigasyon çubuğu
+            Sol: Uygulama adı + subtitle
+            Orta: Navigation tabs (Home, Electronics, Simulation, Editor)
+            Sağ: Search icon, Settings icon, Info icon, Version, Window buttons
         -->
         <Border Grid.Row="0" 
                 Background="{DynamicResource SurfaceBrush}"
@@ -48,56 +47,159 @@
                 BorderThickness="0,0,0,1">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <!-- Sol: Başlık -->
+                    <!-- Sol: App name + subtitle -->
                     <ColumnDefinition Width="Auto"/>
-                    <!-- Orta: Boş (gelecekte navigasyon) -->
+                    <!-- Orta: Navigation tabs -->
                     <ColumnDefinition Width="*"/>
-                    <!-- Sağ: Versiyon ve ikonlar -->
+                    <!-- Sağ: Icons + Version + Window buttons -->
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 
-                <!-- Sol: Uygulama başlığı -->
-                <TextBlock Grid.Column="0"
-                           Text="TCP"
-                           FontSize="16"
-                           FontWeight="SemiBold"
-                           Foreground="{DynamicResource TextPrimaryBrush}"
-                           VerticalAlignment="Center"
-                           Margin="15,0,0,0"/>
+                <!-- Sol: Uygulama adı ve subtitle -->
+                <StackPanel Grid.Column="0"
+                            Orientation="Vertical"
+                            VerticalAlignment="Center"
+                            Margin="15,0,20,0">
+                    <TextBlock Text="TCP"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                    <TextBlock Text="Train Control Platform"
+                               FontSize="10"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Margin="0,-2,0,0"/>
+                </StackPanel>
                 
-                <!-- Sağ: Versiyon ve ikonlar -->
+                <!-- Orta: Navigation tabs -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                    <!-- Home tab -->
+                    <TextBlock x:Name="HomeTab"
+                               Text="Home"
+                               FontSize="13"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="10,0"
+                               Padding="8,4"
+                               Cursor="Hand"
+                               MouseLeftButtonDown="HomeTab_MouseLeftButtonDown">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    
+                    <!-- Electronics tab -->
+                    <TextBlock x:Name="ElectronicsTab"
+                               Text="Electronics"
+                               FontSize="13"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="10,0"
+                               Padding="8,4"
+                               Cursor="Hand"
+                               MouseLeftButtonDown="ElectronicsTab_MouseLeftButtonDown">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    
+                    <!-- Simulation tab -->
+                    <TextBlock x:Name="SimulationTab"
+                               Text="Simulation"
+                               FontSize="13"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="10,0"
+                               Padding="8,4"
+                               Cursor="Hand"
+                               MouseLeftButtonDown="SimulationTab_MouseLeftButtonDown">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    
+                    <!-- Editor tab -->
+                    <TextBlock x:Name="EditorTab"
+                               Text="Editor"
+                               FontSize="13"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="10,0"
+                               Padding="8,4"
+                               Cursor="Hand"
+                               MouseLeftButtonDown="EditorTab_MouseLeftButtonDown">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+                
+                <!-- Sağ: Icons + Version + Window buttons -->
                 <StackPanel Grid.Column="2"
                             Orientation="Horizontal"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
                             Margin="0,0,10,0">
                     
+                    <!-- Search icon (placeholder, no logic) -->
+                    <TextBlock Text="🔍"
+                               FontSize="14"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0"
+                               Cursor="Hand"
+                               ToolTip="Search (coming soon)"/>
+                    
+                    <!-- Settings icon (placeholder) -->
+                    <TextBlock Text="⚙"
+                               FontSize="14"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0"
+                               Cursor="Hand"
+                               ToolTip="Settings (coming soon)"/>
+                    
+                    <!-- Info icon (placeholder) -->
+                    <TextBlock Text="ℹ"
+                               FontSize="14"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,12,0"
+                               Cursor="Hand"
+                               ToolTip="Info (coming soon)"/>
+                    
                     <!-- Versiyon bilgisi -->
                     <TextBlock Text="{x:Static services:VersionManager.DisplayVersion}"
-                               FontSize="12"
+                               FontSize="11"
                                Foreground="{DynamicResource TextSecondaryBrush}"
                                VerticalAlignment="Center"
                                Margin="0,0,15,0"/>
-                    
-                    <!-- Info icon (şu an için sadece görsel, davranış yok) -->
-                    <TextBlock Text="ℹ"
-                               FontSize="16"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
-                               VerticalAlignment="Center"
-                               Margin="0,0,15,0"
-                               Cursor="Hand">
-                        <!-- Gelecekte Click event handler eklenecek -->
-                    </TextBlock>
-                    
-                    <!-- Settings icon (şu an için sadece görsel, davranış yok) -->
-                    <TextBlock Text="⚙"
-                               FontSize="16"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
-                               VerticalAlignment="Center"
-                               Margin="0,0,15,0"
-                               Cursor="Hand">
-                        <!-- Gelecekte Click event handler eklenecek -->
-                    </TextBlock>
                     
                     <!-- Window butonları: Minimize, Maximize/Restore, Close -->
                     <StackPanel Orientation="Horizontal">
@@ -191,7 +293,6 @@
                                     </Setter>
                                     <Style.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <!-- Close butonu hover rengi - AccentPrimaryBrush kullanılıyor -->
                                             <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}"/>
                                             <Setter Property="Foreground" Value="White"/>
                                         </Trigger>
@@ -205,19 +306,14 @@
         </Border>
         
         <!--
-            Content Area - Ana içerik alanı
-            Şu an boş, gelecekte editor, simulation, electronics modülleri buraya eklenecek
+            ContentArea - Ana içerik alanı (View switching)
+            ContentControl ile View'ler arası geçiş yapılır
         -->
-        <Border Grid.Row="1"
-                Background="{DynamicResource BackgroundPrimaryBrush}">
-            <!--
-                İçerik alanı şu an boş bırakıldı.
-                Gelecekte buraya:
-                - Editor modülü
-                - Simulation modülü
-                - Electronics modülü
-                eklenecek.
-            -->
-        </Border>
+        <ContentControl x:Name="ContentArea"
+                        Grid.Row="1"
+                        Background="{DynamicResource BackgroundPrimaryBrush}">
+            <!-- Default view: HomeView -->
+            <views:HomeView/>
+        </ContentControl>
     </Grid>
 </Window>

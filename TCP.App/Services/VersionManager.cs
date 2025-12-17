@@ -16,7 +16,7 @@ public static class VersionManager
     /// Mevcut versiyon
     /// Semantic versioning formatında: TCP-Major.Minor.Patch
     /// </summary>
-    public static string CurrentVersion => "TCP-0.3.0";
+    public static string CurrentVersion => "TCP-0.4.0";
     
     /// <summary>
     /// Build time
@@ -28,7 +28,7 @@ public static class VersionManager
     /// Stage adı
     /// Mevcut geliştirme aşaması
     /// </summary>
-    public static string StageName => "Theme System v1 (Dark Base)";
+    public static string StageName => "Navigation Shell";
     
     /// <summary>
     /// Display versiyon

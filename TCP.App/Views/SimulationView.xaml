@@ -5,16 +5,20 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="{DynamicResource BackgroundBrush}">
+             Background="{DynamicResource BackgroundPrimaryBrush}">
     <!--
         SimulationView.xaml - Simulation modülü view
         
+        TCP-0.4: Navigation Shell
         Bu view simulation modülü içeriğini gösterir.
         MVVM Pattern: Sadece UI, hiçbir mantık içermez.
-        
-        Gelecekte buraya simulation modülü içeriği eklenecek.
     -->
     <Grid>
-        <!-- Şu an boş - gelecekte içerik eklenecek -->
+        <TextBlock Text="Simulation"
+                   FontSize="24"
+                   FontWeight="Light"
+                   Foreground="{DynamicResource TextPrimaryBrush}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
     </Grid>
 </UserControl>

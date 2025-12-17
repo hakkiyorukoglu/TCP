@@ -5,16 +5,20 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="{DynamicResource BackgroundBrush}">
+             Background="{DynamicResource BackgroundPrimaryBrush}">
     <!--
         ElectronicsView.xaml - Electronics modülü view
         
+        TCP-0.4: Navigation Shell
         Bu view electronics modülü içeriğini gösterir.
         MVVM Pattern: Sadece UI, hiçbir mantık içermez.
-        
-        Gelecekte buraya electronics modülü içeriği eklenecek.
     -->
     <Grid>
-        <!-- Şu an boş - gelecekte içerik eklenecek -->
+        <TextBlock Text="Electronics"
+                   FontSize="24"
+                   FontWeight="Light"
+                   Foreground="{DynamicResource TextPrimaryBrush}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"/>
     </Grid>
 </UserControl>
