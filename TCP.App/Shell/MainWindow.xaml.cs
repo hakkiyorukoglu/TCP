@@ -182,13 +182,13 @@ public partial class MainWindow : Window
     private void SetActiveTab(TextBlock activeTab)
     {
         // Tüm tab'ları secondary color'a set et
-        HomeTab.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
-        ElectronicsTab.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
-        SimulationTab.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
-        EditorTab.SetResourceReference(TextBlock.ForegroundProperty, "TextSecondaryBrush");
+        HomeTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
+        ElectronicsTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
+        SimulationTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
+        EditorTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
         
         // Aktif tab'ı primary color'a set et
-        activeTab.SetResourceReference(TextBlock.ForegroundProperty, "TextPrimaryBrush");
+        activeTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Primary");
     }
     
     /// <summary>

@@ -40,13 +40,18 @@
     <Grid>
         <Grid.RowDefinitions>
             <!-- TopBar için sabit yükseklik -->
-            <RowDefinition Height="50"/>
+            <!-- TCP-0.7.2: Fixed height to prevent layout jumps -->
+            <RowDefinition Height="48"/>
             <!-- Content area için kalan alan -->
+            <!-- TCP-0.7.2: Star height for flexible content -->
             <RowDefinition Height="*"/>
+            <!-- StatusBar SLOT - TCP-0.7.2: Reserved for future status bar -->
+            <RowDefinition Height="28"/>
         </Grid.RowDefinitions>
         
         <!--
             TopBar - Üst navigasyon çubuğu
+            TCP-0.7.2: Fixed height (48px) to prevent layout jumps
             Sol: Uygulama adı + subtitle
             Orta: Navigation tabs (Home, Electronics, Simulation, Editor)
             Sağ: Search icon, Settings icon, Info icon, Version, Window buttons
@@ -102,7 +107,7 @@
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Primary}"/>
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
@@ -124,7 +129,7 @@
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Primary}"/>
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
@@ -146,7 +151,7 @@
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Primary}"/>
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
@@ -168,7 +173,7 @@
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource AccentPrimaryBrush}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Primary}"/>
                                     </Trigger>
                                 </Style.Triggers>
                             </Style>
@@ -293,7 +298,7 @@
                                          KeyDown="SearchListBox_KeyDown">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="{DynamicResource BackgroundPrimaryBrush}"
+                                            <Border Background="{DynamicResource Brush.Background.Primary}"
                                                     BorderThickness="0"
                                                     Padding="10,8"
                                                     Margin="2">
@@ -318,10 +323,10 @@
                                                         </Border>
                                                         <ControlTemplate.Triggers>
                                                             <Trigger Property="IsMouseOver" Value="True">
-                                                                <Setter Property="Background" Value="{DynamicResource BorderBrush}"/>
+                                                                <Setter Property="Background" Value="{DynamicResource Brush.Border}"/>
                                                             </Trigger>
                                                             <Trigger Property="IsSelected" Value="True">
-                                                                <Setter Property="Background" Value="{DynamicResource AccentPrimaryBrush}"/>
+                                                                <Setter Property="Background" Value="{DynamicResource Brush.Accent.Primary}"/>
                                                             </Trigger>
                                                         </ControlTemplate.Triggers>
                                                     </ControlTemplate>
@@ -480,7 +485,8 @@
         
         <!--
             ContentArea - Ana içerik alanı (View switching)
-            ContentControl ile View'ler arası geçiş yapılır
+            TCP-0.4: Navigation Shell
+            TCP-0.7.2: Layout Standardization - ContentControl for stable layout
         -->
         <ContentControl x:Name="ContentArea"
                         Grid.Row="1"
@@ -488,5 +494,17 @@
             <!-- Default view: HomeView -->
             <views:HomeView/>
         </ContentControl>
+        
+        <!--
+            StatusBar SLOT - TCP-0.7.2: Reserved placeholder for future status bar
+            Fixed height (28px), empty for now
+        -->
+        <Border Grid.Row="2"
+                Background="{DynamicResource Brush.Surface}"
+                BorderBrush="{DynamicResource Brush.Border}"
+                BorderThickness="0,1,0,0"
+                Height="28">
+            <!-- Empty placeholder - future status bar content will go here -->
+        </Border>
     </Grid>
 </Window>
