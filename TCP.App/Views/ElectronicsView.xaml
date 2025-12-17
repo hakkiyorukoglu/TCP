@@ -3,22 +3,253 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              Background="{DynamicResource BackgroundPrimaryBrush}">
     <!--
         ElectronicsView.xaml - Electronics modülü view
         
-        TCP-0.4: Navigation Shell
-        Bu view electronics modülü içeriğini gösterir.
+        TCP-0.5: Electronics Page Skeleton
+        
+        Layout: 3 panel horizontal split
+        1. LEFT: Board List (fixed width ~240px)
+        2. RIGHT TOP: Board Details (Card-style)
+        3. RIGHT BOTTOM: Code Editor Placeholder
+        
         MVVM Pattern: Sadece UI, hiçbir mantık içermez.
+        Tüm data ViewModel'den gelir.
     -->
+    <UserControl.DataContext>
+        <viewmodels:ElectronicsViewModel/>
+    </UserControl.DataContext>
+    
     <Grid>
-        <TextBlock Text="Electronics"
-                   FontSize="24"
-                   FontWeight="Light"
-                   Foreground="{DynamicResource TextPrimaryBrush}"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
+        <Grid.ColumnDefinitions>
+            <!-- LEFT: Board List (fixed width) -->
+            <ColumnDefinition Width="240"/>
+            <!-- RIGHT: Board Details + Code Editor (split vertically) -->
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <Grid.RowDefinitions>
+            <!-- RIGHT TOP: Board Details -->
+            <RowDefinition Height="*"/>
+            <!-- RIGHT BOTTOM: Code Editor -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!--
+            LEFT PANEL - Board List
+            Fixed width vertical list of electronics boards
+        -->
+        <Border Grid.Column="0"
+                Grid.RowSpan="2"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,1,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <!-- Header -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Board List -->
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Header -->
+                <TextBlock Grid.Row="0"
+                           Text="Boards"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           Margin="15,15,15,10"/>
+                
+                <!-- Board List -->
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding Boards}"
+                         SelectedItem="{Binding SelectedBoard}"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         Margin="10,0,10,10">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="ItemBorder"
+                                    Background="{DynamicResource BackgroundPrimaryBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Margin="0,5,0,0"
+                                    Padding="10,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <!-- Icon placeholder -->
+                                    <TextBlock Text="⚡"
+                                               FontSize="18"
+                                               Foreground="{DynamicResource AccentPrimaryBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,10,0"/>
+                                    <!-- Board name -->
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="13"
+                                               Foreground="{DynamicResource TextPrimaryBrush}"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                    <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource AccentPrimaryBrush}"/>
+                                    <Setter TargetName="ItemBorder" Property="BorderThickness" Value="2"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="0"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </Grid>
+        </Border>
+        
+        <!--
+            RIGHT TOP PANEL - Board Details
+            Card-style UI showing selected board details
+        -->
+        <Border Grid.Column="1"
+                Grid.Row="0"
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,0,1"
+                Margin="10,10,10,5">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="20">
+                    <!-- Board Name -->
+                    <TextBlock Text="{Binding SelectedBoard.Name, FallbackValue='No board selected'}"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               Margin="0,0,0,15"/>
+                    
+                    <!-- Description -->
+                    <TextBlock Text="Description"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Margin="0,0,0,5"/>
+                    <TextBlock Text="{Binding SelectedBoard.Description, FallbackValue='Select a board to view details'}"
+                               FontSize="13"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,20"/>
+                    
+                    <!-- Status -->
+                    <TextBlock Text="Status"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Margin="0,0,0,5"/>
+                    <TextBlock Text="{Binding SelectedBoard.Status, FallbackValue='Offline'}"
+                               FontSize="13"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Margin="0,0,0,0"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+        
+        <!--
+            RIGHT BOTTOM PANEL - Code Editor Placeholder
+            Empty editor container with placeholder text
+        -->
+        <Border Grid.Column="1"
+                Grid.Row="1"
+                Background="{DynamicResource BackgroundPrimaryBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0"
+                Margin="10,5,10,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <!-- Editor area -->
+                    <RowDefinition Height="*"/>
+                    <!-- Save button -->
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Code Editor Placeholder -->
+                <TextBox Grid.Row="0"
+                         Text="// Code editor will be available in later versions"
+                         FontFamily="Consolas"
+                         FontSize="12"
+                         Foreground="{DynamicResource TextSecondaryBrush}"
+                         Background="{DynamicResource SurfaceBrush}"
+                         BorderBrush="{DynamicResource BorderBrush}"
+                         BorderThickness="1"
+                         IsReadOnly="True"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto"
+                         Margin="0,0,0,10"/>
+                
+                <!-- Save Button (placeholder, does nothing) -->
+                <Button Grid.Row="1"
+                        Content="Save"
+                        Width="80"
+                        Height="30"
+                        HorizontalAlignment="Right"
+                        Background="{DynamicResource AccentPrimaryBrush}"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Cursor="Hand"
+                        IsEnabled="False"
+                        ToolTip="Save functionality will be available in later versions">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border Background="{TemplateBinding Background}"
+                                                CornerRadius="2"
+                                                Padding="10,5">
+                                            <ContentPresenter HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>
