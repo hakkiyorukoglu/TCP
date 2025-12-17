@@ -3,23 +3,31 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
+             xmlns:services="clr-namespace:TCP.App.Services"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              Background="{DynamicResource Brush.Background.Primary}">
     <!--
         SettingsView.xaml - Settings modülü view
         
-        TCP-0.7.2: Layout Standardization
-        - Fixed-width category list (left)
-        - ScrollViewer inside content container (right)
+        TCP-0.8.0: Settings System v1
+        
+        Layout:
+        - Fixed-width category list (left, 220px)
+        - Content area with ScrollViewer (right, star width)
         - Layout NEVER jumps or resizes
         
         MVVM Pattern: Sadece UI, hiçbir mantık içermez.
     -->
+    <UserControl.DataContext>
+        <viewmodels:SettingsViewModel/>
+    </UserControl.DataContext>
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <!-- Category List - Fixed width to prevent layout jumps -->
-            <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="220"/>
             <!-- Content Container - Star width with ScrollViewer inside -->
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
@@ -29,7 +37,88 @@
                 Background="{DynamicResource Brush.Surface}"
                 BorderBrush="{DynamicResource Brush.Border}"
                 BorderThickness="0,0,1,0">
-            <!-- Empty for now - future category list will go here -->
+            <Grid>
+                <Grid.RowDefinitions>
+                    <!-- Header -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Category List -->
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Header -->
+                <TextBlock Grid.Row="0"
+                           Text="Settings"
+                           FontSize="{StaticResource Font.Heading.Medium}"
+                           FontFamily="{StaticResource Font.Primary}"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource Brush.Text.Primary}"
+                           Margin="16,16,16,12"/>
+                
+                <!-- Category List -->
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding Categories}"
+                         SelectedItem="{Binding SelectedCategory}"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         Margin="8,0,8,8">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="CategoryItemBorder"
+                                    Background="{DynamicResource Brush.Background.Primary}"
+                                    BorderBrush="{DynamicResource Brush.Border}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Margin="0,4,0,0"
+                                    Padding="12,10">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="{StaticResource Font.Body}"
+                                               FontFamily="{StaticResource Font.Primary}"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource Brush.Text.Primary}"/>
+                                    <TextBlock Text="{Binding Description}"
+                                               FontSize="{StaticResource Font.Caption}"
+                                               FontFamily="{StaticResource Font.Primary}"
+                                               Foreground="{DynamicResource Brush.Text.Secondary}"
+                                               Margin="0,4,0,0"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                    <Setter TargetName="CategoryItemBorder" Property="BorderBrush" Value="{DynamicResource Brush.Accent.Primary}"/>
+                                    <Setter TargetName="CategoryItemBorder" Property="BorderThickness" Value="2"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderThickness="0"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                            </Trigger>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="Transparent"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </Grid>
         </Border>
         
         <!-- Content Container (Right Panel) -->
@@ -38,19 +127,208 @@
             <!-- ScrollViewer INSIDE content area only -->
             <ScrollViewer VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled">
-                <StackPanel Margin="20">
-                    <!-- Placeholder content - future settings content will go here -->
-                    <TextBlock Text="Settings"
+                <StackPanel Margin="24">
+                    <!-- Category Content based on SelectedCategory -->
+                    <TextBlock Text="{Binding SelectedCategory.Name, FallbackValue='Select a category'}"
                                FontSize="{StaticResource Font.Heading.Large}"
                                FontFamily="{StaticResource Font.Primary}"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource Brush.Text.Primary}"
-                               Margin="0,0,0,16"/>
-                    <TextBlock Text="Settings panel content will be available in future versions."
+                               Margin="0,0,0,20"/>
+                    
+                    <!-- Appearance Category Content -->
+                    <StackPanel Margin="0,0,0,24">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedCategory.Name}" Value="Appearance">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="Theme"
+                                   FontSize="{StaticResource Font.Heading.Small}"
+                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,0,0,8"/>
+                        <Border Background="{DynamicResource Brush.Surface}"
+                                BorderBrush="{DynamicResource Brush.Border}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="12,10"
+                                Margin="0,0,0,12">
+                            <TextBlock Text="Dark (Current)"
+                                       FontSize="{StaticResource Font.Body}"
+                                       FontFamily="{StaticResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                        </Border>
+                        
+                        <TextBlock Text="Accent Color"
+                                   FontSize="{StaticResource Font.Heading.Small}"
+                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,16,0,8"/>
+                        <Border Background="{DynamicResource Brush.Surface}"
+                                BorderBrush="{DynamicResource Brush.Border}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="12,10"
+                                Margin="0,0,0,12">
+                            <TextBlock Text="Default accent color"
+                                       FontSize="{StaticResource Font.Body}"
+                                       FontFamily="{StaticResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                        </Border>
+                    </StackPanel>
+                    
+                    <!-- Shortcuts Category Content -->
+                    <StackPanel Margin="0,0,0,24">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedCategory.Name}" Value="Shortcuts">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="Keyboard Shortcuts"
+                                   FontSize="{StaticResource Font.Heading.Small}"
+                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,0,0,8"/>
+                        <TextBlock Text="Shortcut list will appear here in future versions."
+                                   FontSize="{StaticResource Font.Body}"
+                                   FontFamily="{StaticResource Font.Primary}"
+                                   Foreground="{DynamicResource Brush.Text.Secondary}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12"/>
+                    </StackPanel>
+                    
+                    <!-- Paths Category Content -->
+                    <StackPanel Margin="0,0,0,24">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedCategory.Name}" Value="Paths">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="Default Paths"
+                                   FontSize="{StaticResource Font.Heading.Small}"
+                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,0,0,8"/>
+                        <Border Background="{DynamicResource Brush.Surface}"
+                                BorderBrush="{DynamicResource Brush.Border}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="12,10"
+                                Margin="0,0,0,12">
+                            <TextBlock Text="Default project path: (placeholder)"
+                                       FontSize="{StaticResource Font.Body}"
+                                       FontFamily="{StaticResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                        </Border>
+                    </StackPanel>
+                    
+                    <!-- Performance Category Content -->
+                    <StackPanel Margin="0,0,0,24">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedCategory.Name}" Value="Performance">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="Performance Options"
+                                   FontSize="{StaticResource Font.Heading.Small}"
+                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,0,0,8"/>
+                        <TextBlock Text="Performance options placeholder"
+                                   FontSize="{StaticResource Font.Body}"
+                                   FontFamily="{StaticResource Font.Primary}"
+                                   Foreground="{DynamicResource Brush.Text.Secondary}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,12"/>
+                    </StackPanel>
+                    
+                    <!-- About Category Content -->
+                    <StackPanel Margin="0,0,0,24">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedCategory.Name}" Value="About">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="About"
+                                   FontSize="{StaticResource Font.Heading.Small}"
+                                   FontFamily="{StaticResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,0,0,16"/>
+                        <StackPanel Margin="0,0,0,12">
+                            <TextBlock Text="Application Name"
+                                       FontSize="{StaticResource Font.Caption}"
+                                       FontFamily="{StaticResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}"
+                                       Margin="0,0,0,4"/>
+                            <TextBlock Text="TCP (Train Control Platform)"
+                                       FontSize="{StaticResource Font.Body}"
+                                       FontFamily="{StaticResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                       Margin="0,0,0,16"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,0,12">
+                            <TextBlock Text="Version"
+                                       FontSize="{StaticResource Font.Caption}"
+                                       FontFamily="{StaticResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}"
+                                       Margin="0,0,0,4"/>
+                            <TextBlock Text="{x:Static services:VersionManager.DisplayVersion}"
+                                       FontSize="{StaticResource Font.Body}"
+                                       FontFamily="{StaticResource Font.Primary}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <!-- Fallback message when no category selected -->
+                    <TextBlock Text="Select a category to view settings"
                                FontSize="{StaticResource Font.Body}"
                                FontFamily="{StaticResource Font.Primary}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
-                               TextWrapping="Wrap"/>
+                               TextWrapping="Wrap"
+                               Margin="0,16,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedCategory}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </StackPanel>
             </ScrollViewer>
         </Border>

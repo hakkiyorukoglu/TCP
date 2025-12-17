@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using TCP.App.Services;
@@ -6,6 +7,8 @@ namespace TCP.App.ViewModels;
 
 /// <summary>
 /// SettingsViewModel - Settings modülü ViewModel'i
+/// 
+/// TCP-0.8.0: Settings System v1
 /// 
 /// Bu ViewModel SettingsView'un data context'idir.
 /// Settings modülü state'ini ve iş mantığını yönetir.
@@ -31,5 +34,64 @@ public class SettingsViewModel : ViewModelBase, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
     
-    // Gelecekte settings modülü property'leri buraya eklenecek
+    /// <summary>
+    /// Settings kategorileri listesi
+    /// TCP-0.8.0: Settings System v1
+    /// </summary>
+    public ObservableCollection<SettingsCategory> Categories { get; }
+    
+    /// <summary>
+    /// Seçili kategori
+    /// TCP-0.8.0: Settings System v1
+    /// </summary>
+    private SettingsCategory? _selectedCategory;
+    public SettingsCategory? SelectedCategory
+    {
+        get => _selectedCategory;
+        set
+        {
+            if (_selectedCategory != value)
+            {
+                _selectedCategory = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Constructor - Initialize categories
+    /// TCP-0.8.0: Settings System v1
+    /// </summary>
+    public SettingsViewModel()
+    {
+        Categories = new ObservableCollection<SettingsCategory>
+        {
+            new SettingsCategory { Name = "Appearance", Description = "Theme and visual settings" },
+            new SettingsCategory { Name = "Shortcuts", Description = "Keyboard shortcuts" },
+            new SettingsCategory { Name = "Paths", Description = "Default paths and directories" },
+            new SettingsCategory { Name = "Performance", Description = "Performance options" },
+            new SettingsCategory { Name = "About", Description = "Application information" }
+        };
+        
+        // Default selection: İlk kategori
+        SelectedCategory = Categories.Count > 0 ? Categories[0] : null;
+    }
+}
+
+/// <summary>
+/// SettingsCategory - Settings kategori model class
+/// 
+/// TCP-0.8.0: Settings System v1
+/// </summary>
+public class SettingsCategory
+{
+    /// <summary>
+    /// Kategori adı
+    /// </summary>
+    public string Name { get; set; } = string.Empty;
+    
+    /// <summary>
+    /// Kategori açıklaması
+    /// </summary>
+    public string Description { get; set; } = string.Empty;
 }
