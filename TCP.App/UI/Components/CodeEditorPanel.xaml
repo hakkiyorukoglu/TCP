@@ -35,17 +35,17 @@
         <TextBox x:Name="CodeEditorTextBox"
                  Grid.Row="0"
                  FontFamily="Consolas"
-                 FontSize="{StaticResource FontSizeNormal}"
-                 Foreground="{DynamicResource TextPrimaryBrush}"
-                 Background="{DynamicResource SurfaceBrush}"
-                 BorderBrush="{DynamicResource BorderBrush}"
+                 FontSize="{StaticResource FontSize.M}"
+                 Foreground="{DynamicResource Brush.Text.Primary}"
+                 Background="{DynamicResource Brush.Surface}"
+                 BorderBrush="{DynamicResource Brush.Border}"
                  BorderThickness="1"
                  AcceptsReturn="True"
                  AcceptsTab="True"
                  TextWrapping="NoWrap"
                  VerticalScrollBarVisibility="Auto"
                  HorizontalScrollBarVisibility="Auto"
-                 Margin="0,0,0,12">
+                 Margin="0,0,0,{StaticResource Spacing.M}">
             <!-- Placeholder text (hardcoded as per requirement) -->
             <TextBox.Text>
                 // Board code placeholder
@@ -60,7 +60,7 @@
             <Button Content="Save"
                     Width="80"
                     Height="30"
-                    Background="{DynamicResource AccentPrimaryBrush}"
+                    Background="{DynamicResource Brush.Accent.Primary}"
                     Foreground="White"
                     BorderThickness="0"
                     Cursor="Hand"

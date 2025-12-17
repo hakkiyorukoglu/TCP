@@ -26,18 +26,18 @@
         - Rounded corners via CornerRadiusNormal token
         - Padding via SpacingL token
     -->
-    <Border Background="{DynamicResource BackgroundPrimaryBrush}"
-            BorderBrush="{DynamicResource BorderBrush}"
+    <Border Background="{DynamicResource Brush.Background.Primary}"
+            BorderBrush="{DynamicResource Brush.Border}"
             BorderThickness="1"
             CornerRadius="4"
             Padding="16">
         <StackPanel>
             <!-- Header (Title) -->
             <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                       FontSize="{StaticResource FontSizeLarge}"
+                       FontSize="{StaticResource FontSize.L}"
                        FontWeight="SemiBold"
-                       Foreground="{DynamicResource TextPrimaryBrush}"
-                       Margin="0,0,0,12"/>
+                       Foreground="{DynamicResource Brush.Text.Primary}"
+                       Margin="0,0,0,{StaticResource Spacing.M}"/>
             
             <!-- Content Area -->
             <!-- Content comes from UserControl.Content (inherited from ContentControl) -->

@@ -1,0 +1,68 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--
+        Theme.Light.xaml - Light Theme Variant
+        
+        TCP-0.7.0: Theme Tokens v1 (Design Tokens)
+        
+        Bu dosya açık tema variant'ını tanımlar.
+        Tüm token dosyalarını merge eder ve light theme color override'larını yapar.
+        
+        Light Theme Palette:
+        - BackgroundPrimary: #FFFFFF (Beyaz)
+        - BackgroundSecondary: #F5F5F5 (Açık gri)
+        - Surface: #FAFAFA (Çok açık gri)
+        - Border: #E0E0E0 (Açık kenarlık)
+        - AccentPrimary: #2196F3 (Mavi)
+        - TextPrimary: #212121 (Koyu metin)
+        - TextSecondary: #757575 (Orta gri metin)
+    -->
+    
+    <ResourceDictionary.MergedDictionaries>
+        <!--
+            Token dosyalarını sırayla yükle:
+            1. Colors (renkler)
+            2. Brushes (brush'lar - colors'a bağlı)
+            3. Spacing (boşluklar)
+            4. Radius (köşe yuvarlaklığı)
+            5. FontSizes (font boyutları)
+        -->
+        <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Tokens/ThemeColors.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Tokens/ThemeBrushes.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Tokens/ThemeSpacing.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Tokens/ThemeRadius.xaml"/>
+        <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Tokens/ThemeFontSizes.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+    
+    <!--
+        ========================================================================
+        LIGHT THEME COLOR OVERRIDES
+        ========================================================================
+        Light theme için color override'ları
+    -->
+    
+    <!-- Background colors -->
+    <Color x:Key="Color.Background.Primary">#FFFFFF</Color>
+    <Color x:Key="Color.Background.Secondary">#F5F5F5</Color>
+    
+    <!-- Surface color -->
+    <Color x:Key="Color.Surface">#FAFAFA</Color>
+    
+    <!-- Border color -->
+    <Color x:Key="Color.Border">#E0E0E0</Color>
+    
+    <!-- Text colors -->
+    <Color x:Key="Color.Text.Primary">#212121</Color>
+    <Color x:Key="Color.Text.Secondary">#757575</Color>
+    <Color x:Key="Color.Text.Disabled">#BDBDBD</Color>
+    
+    <!-- Accent colors (light theme'de de aynı kalabilir veya farklı olabilir) -->
+    <Color x:Key="Color.Accent.Primary">#2196F3</Color>
+    <Color x:Key="Color.Accent.Secondary">#64B5F6</Color>
+    
+    <!--
+        Brush'lar otomatik olarak yeni color değerlerini kullanacak
+        çünkü ThemeBrushes.xaml'de StaticResource binding kullanılıyor.
+    -->
+    
+</ResourceDictionary>

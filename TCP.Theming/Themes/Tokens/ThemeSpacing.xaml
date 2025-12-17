@@ -1,0 +1,36 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!--
+        ThemeSpacing.xaml - Spacing Design Tokens
+        
+        TCP-0.7.0: Theme Tokens v1 (Design Tokens)
+        
+        Bu dosya spacing token'larını içerir.
+        Used for: Margin, Padding, Gaps
+        
+        NO numeric spacing in XAML views - use these tokens.
+    -->
+    
+    <!--
+        ========================================================================
+        SPACING TOKENS
+        ========================================================================
+    -->
+    <sys:Double x:Key="Spacing.XS">4</sys:Double>
+    <sys:Double x:Key="Spacing.S">8</sys:Double>
+    <sys:Double x:Key="Spacing.M">12</sys:Double>
+    <sys:Double x:Key="Spacing.L">16</sys:Double>
+    <sys:Double x:Key="Spacing.XL">24</sys:Double>
+    
+    <!--
+        ========================================================================
+        BACKWARD COMPATIBILITY ALIASES
+        ========================================================================
+    -->
+    <StaticResource ResourceKey="Spacing.XS" x:Key="SpacingXS"/>
+    <StaticResource ResourceKey="Spacing.S" x:Key="SpacingS"/>
+    <StaticResource ResourceKey="Spacing.M" x:Key="SpacingM"/>
+    <StaticResource ResourceKey="Spacing.L" x:Key="SpacingL"/>
+    
+</ResourceDictionary>

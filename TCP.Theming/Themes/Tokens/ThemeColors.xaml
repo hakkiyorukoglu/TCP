@@ -1,0 +1,64 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--
+        ThemeColors.xaml - Color Design Tokens
+        
+        TCP-0.7.0: Theme Tokens v1 (Design Tokens)
+        
+        Bu dosya RAW color token'larını içerir.
+        Colors are NEVER used directly in UI - only brushes are used.
+        
+        Color naming convention:
+        - Color.Background.Primary
+        - Color.Background.Secondary
+        - Color.Surface
+        - Color.Border
+        - Color.Text.Primary
+        - Color.Text.Secondary
+        - Color.Accent.Primary
+        - Color.Accent.Danger
+        - Color.Accent.Success
+    -->
+    
+    <!--
+        ========================================================================
+        BACKGROUND COLORS
+        ========================================================================
+    -->
+    <Color x:Key="Color.Background.Primary">#2B2B2B</Color>
+    <Color x:Key="Color.Background.Secondary">#1E1E1E</Color>
+    
+    <!--
+        ========================================================================
+        SURFACE COLORS
+        ========================================================================
+    -->
+    <Color x:Key="Color.Surface">#333333</Color>
+    
+    <!--
+        ========================================================================
+        BORDER COLORS
+        ========================================================================
+    -->
+    <Color x:Key="Color.Border">#3F3F3F</Color>
+    
+    <!--
+        ========================================================================
+        TEXT COLORS
+        ========================================================================
+    -->
+    <Color x:Key="Color.Text.Primary">#E6E6E6</Color>
+    <Color x:Key="Color.Text.Secondary">#B0B0B0</Color>
+    <Color x:Key="Color.Text.Disabled">#666666</Color>
+    
+    <!--
+        ========================================================================
+        ACCENT COLORS
+        ========================================================================
+    -->
+    <Color x:Key="Color.Accent.Primary">#4FC3F7</Color>
+    <Color x:Key="Color.Accent.Secondary">#81D4FA</Color>
+    <Color x:Key="Color.Accent.Danger">#E81123</Color>
+    <Color x:Key="Color.Accent.Success">#4CAF50</Color>
+    
+</ResourceDictionary>

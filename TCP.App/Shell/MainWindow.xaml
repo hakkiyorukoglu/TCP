@@ -9,7 +9,7 @@
         xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
         mc:Ignorable="d"
         Title="TCP" Height="600" Width="1000"
-        Background="{DynamicResource BackgroundPrimaryBrush}"
+        Background="{DynamicResource Brush.Background.Primary}"
         WindowStyle="None"
         AllowsTransparency="True"
         ResizeMode="CanResize">
@@ -19,6 +19,8 @@
     <Window.Resources>
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <local:IsNullOrEmptyConverter x:Key="IsNullOrEmptyConverter"/>
+        <local:ThicknessConverter x:Key="ThicknessConverter"/>
+        <local:CornerRadiusConverter x:Key="CornerRadiusConverter"/>
     </Window.Resources>
     <!--
         MainWindow.xaml - Application Shell
@@ -50,8 +52,8 @@
             Sağ: Search icon, Settings icon, Info icon, Version, Window buttons
         -->
         <Border Grid.Row="0" 
-                Background="{DynamicResource SurfaceBrush}"
-                BorderBrush="{DynamicResource BorderBrush}"
+                Background="{DynamicResource Brush.Surface}"
+                BorderBrush="{DynamicResource Brush.Border}"
                 BorderThickness="0,0,0,1">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -69,12 +71,12 @@
                             VerticalAlignment="Center"
                             Margin="15,0,20,0">
                     <TextBlock Text="TCP"
-                               FontSize="16"
+                               FontSize="{StaticResource FontSize.L}"
                                FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                               Foreground="{DynamicResource Brush.Text.Primary}"/>
                     <TextBlock Text="Train Control Platform"
-                               FontSize="10"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               FontSize="{StaticResource FontSize.XS}"
+                               Foreground="{DynamicResource Brush.Text.Secondary}"
                                Margin="0,-2,0,0"/>
                 </StackPanel>
                 
@@ -87,7 +89,7 @@
                     <TextBlock x:Name="HomeTab"
                                Text="Home"
                                FontSize="13"
-                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               Foreground="{DynamicResource Brush.Text.Primary}"
                                VerticalAlignment="Center"
                                Margin="10,0"
                                Padding="8,4"
@@ -108,7 +110,7 @@
                     <TextBlock x:Name="ElectronicsTab"
                                Text="Electronics"
                                FontSize="13"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Foreground="{DynamicResource Brush.Text.Secondary}"
                                VerticalAlignment="Center"
                                Margin="10,0"
                                Padding="8,4"
@@ -129,7 +131,7 @@
                     <TextBlock x:Name="SimulationTab"
                                Text="Simulation"
                                FontSize="13"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Foreground="{DynamicResource Brush.Text.Secondary}"
                                VerticalAlignment="Center"
                                Margin="10,0"
                                Padding="8,4"
@@ -150,7 +152,7 @@
                     <TextBlock x:Name="EditorTab"
                                Text="Editor"
                                FontSize="13"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               Foreground="{DynamicResource Brush.Text.Secondary}"
                                VerticalAlignment="Center"
                                Margin="10,0"
                                Padding="8,4"
@@ -185,8 +187,8 @@
                         <!-- Search TextBox -->
                         <Grid>
                             <Border x:Name="SearchTextBoxBorder"
-                                    Background="{DynamicResource SurfaceBrush}"
-                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    Background="{DynamicResource Brush.Surface}"
+                                    BorderBrush="{DynamicResource Brush.Border}"
                                     BorderThickness="1"
                                     CornerRadius="4"
                                     Padding="8,5">
@@ -201,7 +203,7 @@
                                              Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                                              Background="Transparent"
                                              BorderThickness="0"
-                                             Foreground="{DynamicResource TextPrimaryBrush}"
+                                             Foreground="{DynamicResource Brush.Text.Primary}"
                                              FontSize="12"
                                              VerticalContentAlignment="Center"
                                              Padding="0,0,5,0">
@@ -231,7 +233,7 @@
                                     <TextBlock Grid.Column="1"
                                                Text="🔍"
                                                FontSize="12"
-                                               Foreground="{DynamicResource TextSecondaryBrush}"
+                                               Foreground="{DynamicResource Brush.Text.Secondary}"
                                                VerticalAlignment="Center"/>
                                 </Grid>
                             </Border>
@@ -239,7 +241,7 @@
                             <!-- Placeholder text (when empty) -->
                             <TextBlock Text="Search..."
                                        FontSize="12"
-                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}"
                                        VerticalAlignment="Center"
                                        Margin="13,0,25,0"
                                        IsHitTestVisible="False">
@@ -267,8 +269,8 @@
                                StaysOpen="False"
                                IsOpen="{Binding IsDropdownVisible}">
                             <Border Width="250"
-                                    Background="{DynamicResource SurfaceBrush}"
-                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    Background="{DynamicResource Brush.Surface}"
+                                    BorderBrush="{DynamicResource Brush.Border}"
                                     BorderThickness="1"
                                     CornerRadius="4"
                                     MaxHeight="200">
@@ -288,7 +290,7 @@
                                                     Margin="2">
                                                 <TextBlock Text="{Binding DisplayText}"
                                                            FontSize="12"
-                                                           Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                                           Foreground="{DynamicResource Brush.Text.Primary}"/>
                                             </Border>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
@@ -333,7 +335,7 @@
                         <!-- Settings icon (placeholder) -->
                         <TextBlock Text="⚙"
                                    FontSize="14"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Foreground="{DynamicResource Brush.Text.Secondary}"
                                    VerticalAlignment="Center"
                                    Margin="0,0,12,0"
                                    Cursor="Hand"
@@ -342,7 +344,7 @@
                         <!-- Info icon (placeholder) -->
                         <TextBlock Text="ℹ"
                                    FontSize="14"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Foreground="{DynamicResource Brush.Text.Secondary}"
                                    VerticalAlignment="Center"
                                    Margin="0,0,12,0"
                                    Cursor="Hand"
@@ -351,7 +353,7 @@
                         <!-- Versiyon bilgisi -->
                         <TextBlock Text="{x:Static services:VersionManager.DisplayVersion}"
                                    FontSize="11"
-                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Foreground="{DynamicResource Brush.Text.Secondary}"
                                    VerticalAlignment="Center"
                                    Margin="0,0,15,0"/>
                         
@@ -363,7 +365,7 @@
                                 Height="30"
                                 Background="Transparent"
                                 BorderThickness="0"
-                                Foreground="{DynamicResource TextPrimaryBrush}"
+                                Foreground="{DynamicResource Brush.Text.Primary}"
                                 FontSize="14"
                                 Click="MinimizeButton_Click"
                                 Cursor="Hand">
@@ -396,7 +398,7 @@
                                 Height="30"
                                 Background="Transparent"
                                 BorderThickness="0"
-                                Foreground="{DynamicResource TextPrimaryBrush}"
+                                Foreground="{DynamicResource Brush.Text.Primary}"
                                 FontSize="14"
                                 Click="MaximizeRestoreButton_Click"
                                 Cursor="Hand">
@@ -428,7 +430,7 @@
                                 Height="30"
                                 Background="Transparent"
                                 BorderThickness="0"
-                                Foreground="{DynamicResource TextPrimaryBrush}"
+                                Foreground="{DynamicResource Brush.Text.Primary}"
                                 FontSize="18"
                                 Click="CloseButton_Click"
                                 Cursor="Hand">
@@ -466,7 +468,7 @@
         -->
         <ContentControl x:Name="ContentArea"
                         Grid.Row="1"
-                        Background="{DynamicResource BackgroundPrimaryBrush}">
+                        Background="{DynamicResource Brush.Background.Primary}">
             <!-- Default view: HomeView -->
             <views:HomeView/>
         </ContentControl>

@@ -17,13 +17,14 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <!--
-                    Token-based tema sistemi:
-                    1. Önce ThemeTokens.xaml yüklenir (tüm token'lar)
-                    2. Sonra Theme.Dark.xaml yüklenir (dark variant, token'ları kullanır)
+                    TCP-0.7.0: Theme Tokens v1 (Design Tokens)
                     
-                    Bu sıralama önemlidir - token'lar önce yüklenmeli.
+                    Design Token sistemi:
+                    - Theme.Dark.xaml tüm token dosyalarını merge eder
+                    - Colors, Brushes, Spacing, Radius, FontSizes
+                    - Default: Dark theme
+                    - Light theme mevcut ama UI toggle henüz yok
                 -->
-                <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Tokens/ThemeTokens.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Variants/Theme.Dark.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

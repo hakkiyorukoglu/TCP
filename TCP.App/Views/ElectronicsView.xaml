@@ -8,9 +8,11 @@
              xmlns:components="clr-namespace:TCP.App.UI.Components"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="{DynamicResource BackgroundPrimaryBrush}">
+             Background="{DynamicResource Brush.Background.Primary}">
     <UserControl.Resources>
         <local:IsNullToVisibilityConverter x:Key="IsNullToVisibilityConverter"/>
+        <local:ThicknessConverter x:Key="ThicknessConverter"/>
+        <local:CornerRadiusConverter x:Key="CornerRadiusConverter"/>
     </UserControl.Resources>
     <!--
         ElectronicsView.xaml - Electronics modülü view
@@ -50,8 +52,8 @@
         -->
         <Border Grid.Column="0"
                 Grid.RowSpan="2"
-                Background="{DynamicResource SurfaceBrush}"
-                BorderBrush="{DynamicResource BorderBrush}"
+                Background="{DynamicResource Brush.Surface}"
+                BorderBrush="{DynamicResource Brush.Border}"
                 BorderThickness="0,0,1,0">
             <Grid>
                 <Grid.RowDefinitions>
@@ -64,9 +66,9 @@
                 <!-- Header -->
                 <TextBlock Grid.Row="0"
                            Text="Boards"
-                           FontSize="14"
+                           FontSize="{StaticResource FontSize.L}"
                            FontWeight="SemiBold"
-                           Foreground="{DynamicResource TextPrimaryBrush}"
+                           Foreground="{DynamicResource Brush.Text.Primary}"
                            Margin="15,15,15,10"/>
                 
                 <!-- Board List -->
@@ -79,8 +81,8 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Border x:Name="ItemBorder"
-                                    Background="{DynamicResource BackgroundPrimaryBrush}"
-                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    Background="{DynamicResource Brush.Background.Primary}"
+                                    BorderBrush="{DynamicResource Brush.Border}"
                                     BorderThickness="1"
                                     CornerRadius="4"
                                     Margin="0,5,0,0"
@@ -88,14 +90,14 @@
                                 <StackPanel Orientation="Horizontal">
                                     <!-- Icon placeholder -->
                                     <TextBlock Text="⚡"
-                                               FontSize="18"
-                                               Foreground="{DynamicResource AccentPrimaryBrush}"
+                                               FontSize="{StaticResource FontSize.XL}"
+                                               Foreground="{DynamicResource Brush.Accent.Primary}"
                                                VerticalAlignment="Center"
-                                               Margin="0,0,10,0"/>
+                                               Margin="0,0,{StaticResource Spacing.S},0"/>
                                     <!-- Board name -->
                                     <TextBlock Text="{Binding Name}"
-                                               FontSize="13"
-                                               Foreground="{DynamicResource TextPrimaryBrush}"
+                                               FontSize="{StaticResource FontSize.M}"
+                                               Foreground="{DynamicResource Brush.Text.Primary}"
                                                VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
@@ -148,18 +150,18 @@
         -->
         <Border Grid.Column="1"
                 Grid.Row="0"
-                Background="{DynamicResource SurfaceBrush}"
-                BorderBrush="{DynamicResource BorderBrush}"
+                Background="{DynamicResource Brush.Surface}"
+                BorderBrush="{DynamicResource Brush.Border}"
                 BorderThickness="0,0,0,1"
                 Margin="10,10,10,5">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="20">
                     <!-- Board Name -->
                     <TextBlock Text="{Binding SelectedBoard.Name, FallbackValue='No board selected'}"
-                               FontSize="{StaticResource FontSizeTitle}"
+                               FontSize="{StaticResource FontSize.Title}"
                                FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextPrimaryBrush}"
-                               Margin="0,0,0,16"/>
+                               Foreground="{DynamicResource Brush.Text.Primary}"
+                               Margin="0,0,0,{StaticResource Spacing.L}"/>
                     
                     <!-- Summary Cards using reusable components -->
                     <!-- TCP-0.6.1: Using BoardDetailCard and KeyValueRow components -->
@@ -185,10 +187,10 @@
                     
                     <!-- Fallback message when no board selected -->
                     <TextBlock Text="Select a board to view details"
-                               FontSize="{StaticResource FontSizeNormal}"
-                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               FontSize="{StaticResource FontSize.M}"
+                               Foreground="{DynamicResource Brush.Text.Secondary}"
                                TextWrapping="Wrap"
-                               Margin="0,16,0,0">
+                               Margin="0,{StaticResource Spacing.L},0,0">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed"/>
@@ -210,8 +212,8 @@
         -->
         <Border Grid.Column="1"
                 Grid.Row="1"
-                Background="{DynamicResource SurfaceBrush}"
-                BorderBrush="{DynamicResource BorderBrush}"
+                Background="{DynamicResource Brush.Surface}"
+                BorderBrush="{DynamicResource Brush.Border}"
                 BorderThickness="0,1,0,0"
                 Margin="10,5,10,10">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
