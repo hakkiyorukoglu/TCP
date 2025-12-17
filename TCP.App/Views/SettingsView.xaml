@@ -154,10 +154,11 @@
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                    Margin="0,0,0,8"/>
-                        <ComboBox SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
-                                  ItemsSource="{Binding AvailableThemes}"
-                                  MinWidth="140"
-                                  Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <ComboBox SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
+                                      ItemsSource="{Binding AvailableThemes}"
+                                      MinWidth="140"
+                                      Margin="0,0,12,0">
                             <ComboBox.Style>
                                 <Style TargetType="ComboBox">
                                     <Setter Property="Background" Value="{DynamicResource Brush.Surface}"/>
@@ -253,6 +254,43 @@
                                 </Style>
                             </ComboBox.ItemContainerStyle>
                         </ComboBox>
+                        
+                        <!-- Apply Theme Button -->
+                        <Button Content="Apply Theme"
+                                Command="{Binding ApplyThemeCommand}"
+                                MinWidth="120"
+                                Padding="16,8"
+                                FontSize="{StaticResource Font.Body}"
+                                FontFamily="{StaticResource Font.Primary}"
+                                Background="{DynamicResource Brush.Accent.Primary}"
+                                Foreground="White"
+                                BorderThickness="0"
+                                Cursor="Hand">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}"
+                                            BorderThickness="0"
+                                            CornerRadius="4"
+                                            Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Opacity" Value="0.9"/>
+                                        </Trigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Opacity" Value="0.5"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        </StackPanel>
                         
                         <TextBlock Text="Accent Color"
                                    FontSize="{StaticResource Font.Heading.Small}"

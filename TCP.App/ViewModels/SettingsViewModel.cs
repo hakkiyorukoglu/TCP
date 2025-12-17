@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using TCP.App.Services;
 using TCP.App.Models;
 
@@ -67,12 +68,11 @@ public class SettingsViewModel : ViewModelBase, INotifyPropertyChanged
     }
     
     /// <summary>
-    /// Seçili tema
-    /// TCP-0.8.1: Theme Selection Fix
+    /// Seçili tema (UI'da seçilen, henüz uygulanmamış)
+    /// TCP-0.8.1: Safe Theme Apply with Save Button
     /// 
-    /// Setter'da:
-    /// - ThemeService.ApplyTheme() çağrılır (immediate apply)
-    /// - SettingsPersistenceService.Save() çağrılır (persist)
+    /// Setter'da theme apply edilmez.
+    /// ApplyThemeCommand ile explicit olarak uygulanır.
     /// </summary>
     private string _selectedTheme = "Dark";
     public string SelectedTheme
@@ -84,32 +84,50 @@ public class SettingsViewModel : ViewModelBase, INotifyPropertyChanged
             {
                 _selectedTheme = value;
                 OnPropertyChanged();
-                
-                // TCP-0.8.1: Theme Selection Fix
-                // Theme'i hemen uygula
-                try
-                {
-                    ThemeService.ApplyTheme(value);
-                    
-                    // Settings'i kaydet
-                    var settings = App.LoadedSettings ?? new AppSettings();
-                    settings.Theme = value;
-                    App.SettingsService.Save(settings);
-                    App.UpdateLoadedSettings(settings);
-                }
-                catch
-                {
-                    // Exception durumunda sessizce fail eder
-                    // App crash etmez
-                }
             }
         }
     }
     
     /// <summary>
+    /// Uygulanmış tema (şu anda aktif olan tema)
+    /// TCP-0.8.1: Safe Theme Apply with Save Button
+    /// </summary>
+    private string _appliedTheme = "Dark";
+    public string AppliedTheme
+    {
+        get => _appliedTheme;
+        private set
+        {
+            if (_appliedTheme != value)
+            {
+                _appliedTheme = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Apply Theme Command
+    /// TCP-0.8.1: Safe Theme Apply with Save Button
+    /// 
+    /// Bu command theme'i güvenli bir şekilde uygular:
+    /// 1. SettingsView kapatılır (navigation back)
+    /// 2. ThemeService.ApplyTheme() çağrılır (Dispatcher.Invoke ile)
+    /// 3. Settings persist edilir
+    /// </summary>
+    public ICommand ApplyThemeCommand { get; }
+    
+    /// <summary>
+    /// Theme apply event
+    /// SettingsView kapatıldıktan sonra theme apply edilecek
+    /// TCP-0.8.1: Safe Theme Apply with Save Button
+    /// </summary>
+    public event Action<string>? ThemeApplyRequested;
+    
+    /// <summary>
     /// Constructor - Initialize categories and load theme
     /// TCP-0.8.0: Settings System v1
-    /// TCP-0.8.1: Theme Selection Fix
+    /// TCP-0.8.1: Safe Theme Apply with Save Button
     /// </summary>
     public SettingsViewModel()
     {
@@ -133,11 +151,42 @@ public class SettingsViewModel : ViewModelBase, INotifyPropertyChanged
         if (settings != null && !string.IsNullOrWhiteSpace(settings.Theme))
         {
             _selectedTheme = settings.Theme;
+            _appliedTheme = settings.Theme;
         }
         else
         {
             _selectedTheme = "Dark"; // Default
+            _appliedTheme = "Dark"; // Default
         }
+        
+        // TCP-0.8.1: Initialize ApplyThemeCommand
+        ApplyThemeCommand = new RelayCommand<object>(_ => ApplyTheme());
+    }
+    
+    /// <summary>
+    /// Theme'i uygula (command execute)
+    /// TCP-0.8.1: Safe Theme Apply with Save Button
+    /// 
+    /// Bu metod:
+    /// 1. SelectedTheme == AppliedTheme kontrolü yapar
+    /// 2. ThemeApplyRequested event'ini tetikler (SettingsView kapatılacak)
+    /// 3. Event handler'da theme apply edilecek
+    /// 4. AppliedTheme'i günceller
+    /// </summary>
+    private void ApplyTheme()
+    {
+        // Eğer seçili tema zaten uygulanmışsa işlem yapma
+        if (SelectedTheme == AppliedTheme)
+        {
+            return;
+        }
+        
+        // AppliedTheme'i güncelle (UI feedback için)
+        AppliedTheme = SelectedTheme;
+        
+        // ThemeApplyRequested event'ini tetikle
+        // MainWindow'da bu event handle edilecek ve SettingsView kapatıldıktan sonra theme apply edilecek
+        ThemeApplyRequested?.Invoke(SelectedTheme);
     }
 }
 
