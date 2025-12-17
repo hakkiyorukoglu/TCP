@@ -146,30 +146,20 @@ public static class ThemeService
     
     /// <summary>
     /// Initial theme loading (startup safe)
-    /// TCP-0.8.1 Hotfix-2: Startup Safe Resources
+    /// TCP-0.8.2: Force Dark Theme Only
     /// 
     /// Bu metod MainWindow Loaded event'inde çağrılır.
     /// Startup'ta StaticResource resolution failure'ı önler.
     /// 
-    /// Behavior:
-    /// - Try load persisted theme from settings
-    /// - If fails → load Dark theme
-    /// - If still fails → continue without theme (NO CRASH)
+    /// TCP-0.8.2: Theme switching disabled - always loads Dark theme
     /// </summary>
     public static void LoadInitialTheme()
     {
         try
         {
-            var settings = App.LoadedSettings;
-            string themeToLoad = "Dark"; // Default
-            
-            if (settings != null && !string.IsNullOrWhiteSpace(settings.Theme))
-            {
-                themeToLoad = settings.Theme;
-            }
-            
-            // Theme'i güvenli bir şekilde yükle
-            ApplyTheme(themeToLoad);
+            // TCP-0.8.2: Always load Dark theme (theme switching disabled)
+            // Theme dictionary is already loaded in App.xaml, but we ensure it's set correctly
+            _currentTheme = "Dark";
         }
         catch
         {

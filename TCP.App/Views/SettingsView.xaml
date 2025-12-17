@@ -154,143 +154,24 @@
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                    Margin="0,0,0,8"/>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <ComboBox SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
-                                      ItemsSource="{Binding AvailableThemes}"
-                                      MinWidth="140"
-                                      Margin="0,0,12,0">
-                            <ComboBox.Style>
-                                <Style TargetType="ComboBox">
-                                    <Setter Property="Background" Value="{DynamicResource Brush.Surface}"/>
-                                    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border}"/>
-                                    <Setter Property="BorderThickness" Value="1"/>
-                                    <Setter Property="Padding" Value="12,8"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}"/>
-                                    <Setter Property="FontSize" Value="{DynamicResource Font.Body}"/>
-                                    <Setter Property="FontFamily" Value="{DynamicResource Font.Primary}"/>
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="ComboBox">
-                                                <Grid>
-                                                    <ToggleButton Name="ToggleButton"
-                                                                  Grid.Column="2"
-                                                                  Focusable="false"
-                                                                  ClickMode="Press"
-                                                                  IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}">
-                                                        <ToggleButton.Template>
-                                                            <ControlTemplate TargetType="ToggleButton">
-                                                                <Border Background="{TemplateBinding Background}"
-                                                                        BorderBrush="{TemplateBinding BorderBrush}"
-                                                                        BorderThickness="{TemplateBinding BorderThickness}"
-                                                                        CornerRadius="4">
-                                                                    <Grid>
-                                                                        <Grid.ColumnDefinitions>
-                                                                            <ColumnDefinition/>
-                                                                            <ColumnDefinition Width="20"/>
-                                                                        </Grid.ColumnDefinitions>
-                                                                        <ContentPresenter HorizontalAlignment="Left"
-                                                                                          VerticalAlignment="Center"
-                                                                                          Margin="12,0,0,0"
-                                                                                          Content="{TemplateBinding Content}"/>
-                                                                        <Path x:Name="Arrow"
-                                                                              Grid.Column="1"
-                                                                              Fill="{DynamicResource Brush.Text.Secondary}"
-                                                                              HorizontalAlignment="Center"
-                                                                              VerticalAlignment="Center"
-                                                                              Data="M 0 0 L 4 4 L 8 0 Z"/>
-                                                                    </Grid>
-                                                                </Border>
-                                                            </ControlTemplate>
-                                                        </ToggleButton.Template>
-                                                    </ToggleButton>
-                                                    <ContentPresenter Name="ContentSite"
-                                                                      IsHitTestVisible="False"
-                                                                      Content="{TemplateBinding SelectionBoxItem}"
-                                                                      ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
-                                                                      ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
-                                                                      Margin="12,0,23,0"
-                                                                      VerticalAlignment="Center"
-                                                                      HorizontalAlignment="Left"/>
-                                                    <Popup Name="Popup"
-                                                           Placement="Bottom"
-                                                           IsOpen="{TemplateBinding IsDropDownOpen}"
-                                                           AllowsTransparency="True"
-                                                           Focusable="False"
-                                                           PopupAnimation="Slide">
-                                                        <Grid Name="DropDown"
-                                                              SnapsToDevicePixels="True"
-                                                              MinWidth="{TemplateBinding ActualWidth}"
-                                                              MaxHeight="{TemplateBinding MaxDropDownHeight}">
-                                                            <Border x:Name="DropDownBorder"
-                                                                    Background="{DynamicResource Brush.Surface}"
-                                                                    BorderBrush="{DynamicResource Brush.Border}"
-                                                                    BorderThickness="1"
-                                                                    CornerRadius="4">
-                                                                <ScrollViewer Margin="4,6,4,6"
-                                                                              SnapsToDevicePixels="True">
-                                                                    <StackPanel IsItemsHost="True"
-                                                                                KeyboardNavigation.DirectionalNavigation="Contained"/>
-                                                                </ScrollViewer>
-                                                            </Border>
-                                                        </Grid>
-                                                    </Popup>
-                                                </Grid>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </ComboBox.Style>
-                            <ComboBox.ItemContainerStyle>
-                                <Style TargetType="ComboBoxItem">
-                                    <Setter Property="Padding" Value="12,8"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}"/>
-                                    <Setter Property="FontSize" Value="{DynamicResource Font.Body}"/>
-                                    <Setter Property="FontFamily" Value="{DynamicResource Font.Primary}"/>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsHighlighted" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource Brush.Border}"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ComboBox.ItemContainerStyle>
-                        </ComboBox>
-                        
-                        <!-- Apply Theme Button -->
-                        <Button Content="Apply Theme"
-                                Command="{Binding ApplyThemeCommand}"
-                                MinWidth="120"
-                                Padding="16,8"
-                                FontSize="{DynamicResource Font.Body}"
-                                FontFamily="{DynamicResource Font.Primary}"
-                                Background="{DynamicResource Brush.Accent.Primary}"
-                                Foreground="White"
-                                BorderThickness="0"
-                                Cursor="Hand">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Border Background="{TemplateBinding Background}"
-                                            BorderThickness="0"
-                                            CornerRadius="4"
-                                            Padding="{TemplateBinding Padding}">
-                                        <ContentPresenter HorizontalAlignment="Center"
-                                                          VerticalAlignment="Center"/>
-                                    </Border>
-                                </ControlTemplate>
-                            </Button.Template>
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Opacity" Value="0.9"/>
-                                        </Trigger>
-                                        <Trigger Property="IsEnabled" Value="False">
-                                            <Setter Property="Opacity" Value="0.5"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
-                        </StackPanel>
+                        <Border Background="{DynamicResource Brush.Surface}"
+                                BorderBrush="{DynamicResource Brush.Border}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="12,10"
+                                Margin="0,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="Dark (locked)"
+                                           FontSize="{DynamicResource Font.Body}"
+                                           FontFamily="{DynamicResource Font.Primary}"
+                                           Foreground="{DynamicResource Brush.Text.Primary}"/>
+                                <TextBlock Text="Theme switching is disabled in TCP-0.8.2"
+                                           FontSize="{DynamicResource Font.Caption}"
+                                           FontFamily="{DynamicResource Font.Primary}"
+                                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                                           Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
                         
                         <TextBlock Text="Accent Color"
                                    FontSize="{DynamicResource Font.Heading.Small}"
@@ -328,13 +209,72 @@
                                    FontFamily="{DynamicResource Font.Primary}"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource Brush.Text.Primary}"
-                                   Margin="0,0,0,8"/>
-                        <TextBlock Text="Shortcut list will appear here in future versions."
-                                   FontSize="{DynamicResource Font.Body}"
-                                   FontFamily="{DynamicResource Font.Primary}"
-                                   Foreground="{DynamicResource Brush.Text.Secondary}"
-                                   TextWrapping="Wrap"
-                                   Margin="0,0,0,12"/>
+                                   Margin="0,0,0,16"/>
+                        
+                        <!-- Shortcuts List -->
+                        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      MaxHeight="400">
+                            <ItemsControl ItemsSource="{Binding Shortcuts}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{DynamicResource Brush.Surface}"
+                                                BorderBrush="{DynamicResource Brush.Border}"
+                                                BorderThickness="1"
+                                                CornerRadius="4"
+                                                Padding="12,10"
+                                                Margin="0,0,0,8">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <!-- Command Name -->
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <!-- Keys -->
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <!-- Spacer -->
+                                                    <ColumnDefinition Width="*"/>
+                                                    <!-- Description -->
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <!-- Command Name -->
+                                                <TextBlock Grid.Column="0"
+                                                           Text="{Binding CommandName}"
+                                                           FontSize="{DynamicResource Font.Body}"
+                                                           FontFamily="{DynamicResource Font.Primary}"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource Brush.Text.Primary}"
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,16,0"/>
+                                                
+                                                <!-- Keys -->
+                                                <Border Grid.Column="1"
+                                                        Background="{DynamicResource Brush.Background.Primary}"
+                                                        BorderBrush="{DynamicResource Brush.Border}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="2"
+                                                        Padding="6,3"
+                                                        Margin="0,0,16,0">
+                                                    <TextBlock Text="{Binding Keys}"
+                                                               FontSize="{DynamicResource Font.Caption}"
+                                                               FontFamily="Consolas"
+                                                               Foreground="{DynamicResource Brush.Text.Primary}"
+                                                               VerticalAlignment="Center"/>
+                                                </Border>
+                                                
+                                                <!-- Description -->
+                                                <TextBlock Grid.Column="3"
+                                                           Text="{Binding Description}"
+                                                           FontSize="{DynamicResource Font.Caption}"
+                                                           FontFamily="{DynamicResource Font.Primary}"
+                                                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                                                           VerticalAlignment="Center"
+                                                           TextWrapping="Wrap"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
                     </StackPanel>
                     
                     <!-- Paths Category Content -->

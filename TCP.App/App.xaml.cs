@@ -117,6 +117,14 @@ public partial class App : Application
             Route = "Settings"
         });
         
+        // TCP-0.8.2: Register Shortcuts page
+        registry.Register(new SearchItem
+        {
+            Title = "Shortcuts",
+            Keywords = new[] { "shortcuts", "keyboard", "hotkeys", "keys", "ctrl", "f1" },
+            Route = "Settings"
+        });
+        
         // Register Info page
         registry.Register(new SearchItem
         {

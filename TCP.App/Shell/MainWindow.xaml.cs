@@ -85,6 +85,12 @@ public partial class MainWindow : Window
             description: "Fixed StaticResourceExtension crash by: 1) Creating SafeDefaults.xaml with fallback resources, 2) Converting all theme token StaticResource to DynamicResource, 3) Loading SafeDefaults in App.xaml before theme dictionaries. Theme resources are now non-fatal."
         );
         
+        // TCP-0.8.2: Shortcuts Map (UI list) + Dark-only theme
+        changeTracker.RegisterChange(
+            category: "Settings / Feature",
+            description: "Added Shortcuts Map UI list in Settings > Shortcuts. Disabled theme switching - app now uses Dark theme only. Theme selector removed from Appearance page."
+        );
+        
         // Pencere sürükleme için MouseDown event'i ekle
         // WindowStyle="None" olduğu için manuel sürükleme implementasyonu gerekli
         this.MouseDown += MainWindow_MouseDown;
@@ -190,11 +196,6 @@ public partial class MainWindow : Window
                 break;
             case "Settings":
                 var settingsViewFromSearch = new SettingsView();
-                // TCP-0.8.1: ThemeApplyRequested event handler bağla
-                if (settingsViewFromSearch.DataContext is SettingsViewModel settingsViewModelFromSearch)
-                {
-                    settingsViewModelFromSearch.ThemeApplyRequested += SettingsViewModel_ThemeApplyRequested;
-                }
                 NavigateToView(settingsViewFromSearch, "Settings");
                 // Note: Settings tab is not in TopBar navigation tabs, so no SetActiveTab call
                 break;
@@ -295,57 +296,13 @@ public partial class MainWindow : Window
     /// Navigation: Settings icon click handler
     /// TCP-0.8.0.1: Settings Navigation Enabled
     /// TCP-0.8.1: Settings Persistence v1 (Local) - Route save edilir
-    /// TCP-0.8.1: Safe Theme Apply with Save Button - ThemeApplyRequested event handler
+    /// TCP-0.8.2: Theme switching disabled - no ThemeApplyRequested handler needed
     /// </summary>
     private void SettingsIcon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         var settingsView = new SettingsView();
-        
-        // TCP-0.8.1: ThemeApplyRequested event handler bağla
-        if (settingsView.DataContext is SettingsViewModel settingsViewModel)
-        {
-            settingsViewModel.ThemeApplyRequested += SettingsViewModel_ThemeApplyRequested;
-        }
-        
         NavigateToView(settingsView, "Settings");
         // Note: Settings is not in TopBar navigation tabs, so no SetActiveTab call
-    }
-    
-    /// <summary>
-    /// ThemeApplyRequested event handler
-    /// TCP-0.8.1: Safe Theme Apply with Save Button
-    /// 
-    /// Bu handler:
-    /// 1. SettingsView'ı kapatır (Home'a navigate eder)
-    /// 2. Dispatcher.Invoke ile theme'i güvenli bir şekilde apply eder
-    /// 3. Settings'i persist eder
-    /// </summary>
-    private void SettingsViewModel_ThemeApplyRequested(string themeName)
-    {
-        // SettingsView'ı kapat (Home'a navigate et)
-        NavigateToView(new HomeView(), "Home");
-        SetActiveTab(HomeTab);
-        
-        // Theme'i güvenli bir şekilde apply et (Dispatcher.Invoke ile)
-        // Bu sayede SettingsView kapatıldıktan sonra theme apply edilir
-        this.Dispatcher.Invoke(() =>
-        {
-            try
-            {
-                ThemeService.ApplyTheme(themeName);
-                
-                // Settings'i kaydet
-                var settings = App.LoadedSettings ?? new AppSettings();
-                settings.Theme = themeName;
-                App.SettingsService.Save(settings);
-                App.UpdateLoadedSettings(settings);
-            }
-            catch
-            {
-                // Exception durumunda sessizce fail eder
-                // App crash etmez
-            }
-        });
     }
     
     /// <summary>

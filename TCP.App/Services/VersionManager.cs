@@ -15,11 +15,11 @@ public static class VersionManager
     /// <summary>
     /// Mevcut versiyon
     /// Semantic versioning formatında: TCP-Major.Minor.Patch
-    /// TCP-0.8.1-HOTFIX: Fix StaticResource crash + make theme resources non-fatal
+    /// TCP-0.8.2: Shortcuts Map (UI list) + Dark-only theme
     /// 
     /// IMPORTANT: Bu değer tek yerden güncellenir - tüm UI otomatik güncellenir
     /// </summary>
-    public static string CurrentVersion => "TCP-0.8.1";
+    public static string CurrentVersion => "TCP-0.8.2";
     
     /// <summary>
     /// Build time
@@ -31,7 +31,7 @@ public static class VersionManager
     /// Stage adı
     /// Mevcut geliştirme aşaması
     /// </summary>
-    public static string StageName => "Fix StaticResource crash + make theme resources non-fatal";
+    public static string StageName => "Shortcuts Map (UI list) + Dark-only theme";
     
     /// <summary>
     /// Display versiyon

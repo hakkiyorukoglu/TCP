@@ -26,6 +26,13 @@
                     This prevents StaticResource resolution failures at startup
                 -->
                 <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/SafeDefaults.xaml"/>
+                
+                <!--
+                    TCP-0.8.2: Force Dark Theme Only
+                    Dark theme dictionary is loaded directly at startup
+                    No Light theme, no theme switching
+                -->
+                <ResourceDictionary Source="pack://application:,,,/TCP.Theming;component/Themes/Variants/Theme.Dark.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
