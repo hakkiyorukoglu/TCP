@@ -19,8 +19,10 @@
         ========================================================================
         FONT FAMILY TOKEN
         ========================================================================
+        CRITICAL: FontFamily MUST be of type System.Windows.Media.FontFamily, NOT string
+        FontFamily supports fallback fonts via comma-separated list
     -->
-    <sys:String x:Key="Font.Primary">Segoe UI, Inter, Roboto, sans-serif</sys:String>
+    <FontFamily x:Key="Font.Primary">Segoe UI</FontFamily>
     
     <!--
         ========================================================================
