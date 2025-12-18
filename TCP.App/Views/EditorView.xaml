@@ -3,22 +3,66 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              Background="{DynamicResource Brush.Background.Primary}">
     <!--
         EditorView.xaml - Editor modülü view
         
-        TCP-0.4: Navigation Shell
-        Bu view editor modülü içeriğini gösterir.
+        TCP-1.0.1: Editor Foundation (Empty Scene)
+        
+        Layout:
+        - TopBar: Shell'den geliyor (MainWindow TopBar)
+        - Content area: Empty canvas/surface (future rendering area)
+        - StatusBar: Bottom status bar with status text and version
+        
         MVVM Pattern: Sadece UI, hiçbir mantık içermez.
     -->
     <Grid>
-        <TextBlock Text="Editor"
-                   FontSize="24"
-                   FontWeight="Light"
-                   Foreground="{DynamicResource Brush.Text.Primary}"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
+        <Grid.RowDefinitions>
+            <!-- Content area (empty canvas) -->
+            <RowDefinition Height="*"/>
+            <!-- StatusBar -->
+            <RowDefinition Height="28"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Content area - Empty canvas for future rendering -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource Brush.Background.Secondary}"
+                BorderBrush="{DynamicResource Brush.Border}"
+                BorderThickness="0">
+            <!-- Empty canvas area - ready for future rendering -->
+            <!-- TCP-1.0.1: No tools, no drawing, just empty space -->
+        </Border>
+        
+        <!-- StatusBar - TCP-1.0.1: Editor Foundation (Empty Scene) -->
+        <Border Grid.Row="1"
+                Background="{DynamicResource Brush.Surface}"
+                BorderBrush="{DynamicResource Brush.Border}"
+                BorderThickness="0,1,0,0">
+            <Grid Margin="12,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Status text -->
+                <TextBlock Grid.Column="0"
+                           Text="{Binding StatusText, Mode=OneWay, FallbackValue='Editor ready'}"
+                           FontSize="{DynamicResource Font.Caption}"
+                           FontFamily="{DynamicResource Font.Primary}"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                           VerticalAlignment="Center"/>
+                
+                <!-- Version text -->
+                <TextBlock Grid.Column="1"
+                           Text="{Binding CurrentVersion, Mode=OneWay, FallbackValue='TCP-1.0.1'}"
+                           FontSize="{DynamicResource Font.Caption}"
+                           FontFamily="{DynamicResource Font.Primary}"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                           VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>

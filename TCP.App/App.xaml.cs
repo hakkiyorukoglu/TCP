@@ -113,6 +113,14 @@ public partial class App : Application
             Route = "Simulation"
         });
         
+        // TCP-1.0.1: Register Editor page
+        registry.Register(new SearchItem
+        {
+            Title = "Editor",
+            Keywords = new[] { "editor", "edit", "canvas", "draw", "design" },
+            Route = "Editor"
+        });
+        
         // Register Settings page
         registry.Register(new SearchItem
         {
