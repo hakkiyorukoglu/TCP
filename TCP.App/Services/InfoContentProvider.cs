@@ -121,6 +121,13 @@ public static class InfoContentProvider
     {
         return new List<VersionEntry>
         {
+            // TCP-1.0.1: Editor Foundation (Empty Scene)
+            new VersionEntry
+            {
+                Version = "TCP-1.0.1",
+                Title = "Editor Foundation (Empty Scene)",
+                Description = "Added Editor page with empty scene canvas. Editor is accessible via navigation tab. StatusBar shows editor status. No tools or drawing functionality yet - foundation only."
+            },
             new VersionEntry
             {
                 Version = "TCP-0.9.1",

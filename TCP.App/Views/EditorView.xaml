@@ -29,6 +29,7 @@
         
         <!-- Content area - Empty canvas for future rendering -->
         <Border Grid.Row="0"
+                x:Name="EditorSurface"
                 Background="{DynamicResource Brush.Background.Secondary}"
                 BorderBrush="{DynamicResource Brush.Border}"
                 BorderThickness="0">
