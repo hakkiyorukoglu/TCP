@@ -64,10 +64,21 @@ public partial class EditorView : System.Windows.Controls.UserControl
         _overlayContainer = EditorSurface?.Parent as Grid;
         
         // TCP-1.0.2: Wire viewport size changed event
+        // TCP-1.0.3: Wire input router events
         if (EditorSurface != null)
         {
             EditorSurface.SizeChanged += EditorSurface_SizeChanged;
+            
+            // TCP-1.0.3: Wire input router events (replace direct MouseMove handler)
             EditorSurface.MouseMove += EditorSurface_MouseMove;
+            EditorSurface.MouseDown += EditorSurface_MouseDown;
+            EditorSurface.MouseUp += EditorSurface_MouseUp;
+            EditorSurface.MouseWheel += EditorSurface_MouseWheel;
+            EditorSurface.KeyDown += EditorSurface_KeyDown;
+            EditorSurface.KeyUp += EditorSurface_KeyUp;
+            
+            // TCP-1.0.3: Ensure editor surface can receive keyboard focus
+            EditorSurface.Focusable = true;
             
             // TCP-1.0.2: Initialize viewport size
             if (DataContext is EditorViewModel viewModel)
@@ -142,41 +153,211 @@ public partial class EditorView : System.Windows.Controls.UserControl
     /// <summary>
     /// EditorSurface MouseMove event handler
     /// TCP-1.0.2: ViewportState (World/Screen transform foundation)
-    /// 
-    /// Updates cursor world coordinates display as mouse moves.
+    /// TCP-1.0.3: EditorInputRouter - Forward to router
     /// </summary>
     private void EditorSurface_MouseMove(object sender, MouseEventArgs e)
     {
         try
         {
-            // TCP-1.0.2: Safety guard - ViewModel null check
+            // TCP-1.0.3: Safety guard - ViewModel null check
             if (DataContext is not EditorViewModel viewModel)
             {
                 return;
             }
             
-            // TCP-1.0.2: Safety guard - EditorSurface null check
+            // TCP-1.0.3: Safety guard - EditorSurface null check
             if (EditorSurface == null)
             {
                 return;
             }
             
-            // TCP-1.0.2: Get mouse position relative to EditorSurface
+            // TCP-1.0.3: Get mouse position and state
             var screenPoint = e.GetPosition(EditorSurface);
-            var viewportSize = new Size(EditorSurface.ActualWidth, EditorSurface.ActualHeight);
+            var modifiers = Keyboard.Modifiers;
+            var leftButton = e.LeftButton;
+            var rightButton = e.RightButton;
+            var middleButton = e.MiddleButton;
             
-            // TCP-1.0.2: Safety guard - Invalid viewport size
-            if (viewportSize.Width <= 0 || viewportSize.Height <= 0)
+            // TCP-1.0.3: Forward to input router
+            viewModel.InputRouter.OnMouseMove(screenPoint, modifiers, leftButton, rightButton, middleButton);
+        }
+        catch
+        {
+            // TCP-1.0.3: Safety - ignore exceptions during mouse move
+        }
+    }
+    
+    /// <summary>
+    /// EditorSurface MouseDown event handler
+    /// TCP-1.0.3: EditorInputRouter (single input gateway)
+    /// </summary>
+    private void EditorSurface_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        try
+        {
+            // TCP-1.0.3: Safety guard - ViewModel null check
+            if (DataContext is not EditorViewModel viewModel)
             {
                 return;
             }
             
-            // TCP-1.0.2: Update cursor world coordinates
-            viewModel.UpdateCursorWorld(screenPoint, viewportSize);
+            // TCP-1.0.3: Safety guard - EditorSurface null check
+            if (EditorSurface == null)
+            {
+                return;
+            }
+            
+            // TCP-1.0.3: Focus editor surface for keyboard input
+            EditorSurface.Focus();
+            
+            // TCP-1.0.3: Get mouse position and state
+            var screenPoint = e.GetPosition(EditorSurface);
+            var button = e.ChangedButton;
+            var modifiers = Keyboard.Modifiers;
+            var leftButton = e.LeftButton;
+            var rightButton = e.RightButton;
+            var middleButton = e.MiddleButton;
+            
+            // TCP-1.0.3: Forward to input router
+            viewModel.InputRouter.OnMouseDown(screenPoint, button, modifiers, leftButton, rightButton, middleButton);
         }
         catch
         {
-            // TCP-1.0.2: Safety - ignore exceptions during mouse move
+            // TCP-1.0.3: Safety - ignore exceptions during mouse down
+        }
+    }
+    
+    /// <summary>
+    /// EditorSurface MouseUp event handler
+    /// TCP-1.0.3: EditorInputRouter (single input gateway)
+    /// </summary>
+    private void EditorSurface_MouseUp(object sender, MouseButtonEventArgs e)
+    {
+        try
+        {
+            // TCP-1.0.3: Safety guard - ViewModel null check
+            if (DataContext is not EditorViewModel viewModel)
+            {
+                return;
+            }
+            
+            // TCP-1.0.3: Safety guard - EditorSurface null check
+            if (EditorSurface == null)
+            {
+                return;
+            }
+            
+            // TCP-1.0.3: Get mouse position and state
+            var screenPoint = e.GetPosition(EditorSurface);
+            var button = e.ChangedButton;
+            var modifiers = Keyboard.Modifiers;
+            var leftButton = e.LeftButton;
+            var rightButton = e.RightButton;
+            var middleButton = e.MiddleButton;
+            
+            // TCP-1.0.3: Forward to input router
+            viewModel.InputRouter.OnMouseUp(screenPoint, button, modifiers, leftButton, rightButton, middleButton);
+        }
+        catch
+        {
+            // TCP-1.0.3: Safety - ignore exceptions during mouse up
+        }
+    }
+    
+    /// <summary>
+    /// EditorSurface MouseWheel event handler
+    /// TCP-1.0.3: EditorInputRouter (single input gateway)
+    /// 
+    /// NOTE: TCP-1.0.3 does NOT implement zoom/pan behavior yet.
+    /// Wheel events are only collected and displayed in debug.
+    /// </summary>
+    private void EditorSurface_MouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        try
+        {
+            // TCP-1.0.3: Safety guard - ViewModel null check
+            if (DataContext is not EditorViewModel viewModel)
+            {
+                return;
+            }
+            
+            // TCP-1.0.3: Safety guard - EditorSurface null check
+            if (EditorSurface == null)
+            {
+                return;
+            }
+            
+            // TCP-1.0.3: Get mouse position and state
+            var screenPoint = e.GetPosition(EditorSurface);
+            var delta = e.Delta;
+            var modifiers = Keyboard.Modifiers;
+            var leftButton = e.LeftButton;
+            var rightButton = e.RightButton;
+            var middleButton = e.MiddleButton;
+            
+            // TCP-1.0.3: Forward to input router
+            // NOTE: No zoom/pan behavior in TCP-1.0.3 - just collect event
+            viewModel.InputRouter.OnMouseWheel(screenPoint, delta, modifiers, leftButton, rightButton, middleButton);
+        }
+        catch
+        {
+            // TCP-1.0.3: Safety - ignore exceptions during mouse wheel
+        }
+    }
+    
+    /// <summary>
+    /// EditorSurface KeyDown event handler
+    /// TCP-1.0.3: EditorInputRouter (single input gateway)
+    /// </summary>
+    private void EditorSurface_KeyDown(object sender, KeyEventArgs e)
+    {
+        try
+        {
+            // TCP-1.0.3: Safety guard - ViewModel null check
+            if (DataContext is not EditorViewModel viewModel)
+            {
+                return;
+            }
+            
+            // TCP-1.0.3: Get key and state
+            var key = e.Key;
+            var isRepeat = e.IsRepeat;
+            var modifiers = Keyboard.Modifiers;
+            
+            // TCP-1.0.3: Forward to input router
+            viewModel.InputRouter.OnKeyDown(key, isRepeat, modifiers);
+        }
+        catch
+        {
+            // TCP-1.0.3: Safety - ignore exceptions during key down
+        }
+    }
+    
+    /// <summary>
+    /// EditorSurface KeyUp event handler
+    /// TCP-1.0.3: EditorInputRouter (single input gateway)
+    /// </summary>
+    private void EditorSurface_KeyUp(object sender, KeyEventArgs e)
+    {
+        try
+        {
+            // TCP-1.0.3: Safety guard - ViewModel null check
+            if (DataContext is not EditorViewModel viewModel)
+            {
+                return;
+            }
+            
+            // TCP-1.0.3: Get key and state
+            var key = e.Key;
+            var isRepeat = e.IsRepeat;
+            var modifiers = Keyboard.Modifiers;
+            
+            // TCP-1.0.3: Forward to input router
+            viewModel.InputRouter.OnKeyUp(key, isRepeat, modifiers);
+        }
+        catch
+        {
+            // TCP-1.0.3: Safety - ignore exceptions during key up
         }
     }
 }

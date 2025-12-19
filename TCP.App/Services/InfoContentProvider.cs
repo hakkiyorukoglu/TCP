@@ -121,6 +121,13 @@ public static class InfoContentProvider
     {
         return new List<VersionEntry>
         {
+            // TCP-1.0.3: EditorInputRouter (single input gateway)
+            new VersionEntry
+            {
+                Version = "TCP-1.0.3",
+                Title = "EditorInputRouter (single input gateway)",
+                Description = "Added EditorInputRouter; Editor input events centralized; keyboard focus enabled on editor surface; still no zoom/pan behavior."
+            },
             // TCP-1.0.2: ViewportState (World/Screen transform foundation)
             new VersionEntry
             {
