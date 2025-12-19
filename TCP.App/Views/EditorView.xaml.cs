@@ -51,6 +51,8 @@ public partial class EditorView : System.Windows.Controls.UserControl
     /// Loaded event handler - Ensure DataContext is set and wire events
     /// TCP-1.0.1: Editor Foundation (Empty Scene)
     /// TCP-1.0.2: ViewportState - Wire SizeChanged and MouseMove events
+    /// TCP-1.0.3: EditorInputRouter - Wire input router events
+    /// TCP-1.0.4: Zoom + Pan - Wire RequestRedraw event
     /// </summary>
     private void EditorView_Loaded(object sender, RoutedEventArgs e)
     {
@@ -65,6 +67,7 @@ public partial class EditorView : System.Windows.Controls.UserControl
         
         // TCP-1.0.2: Wire viewport size changed event
         // TCP-1.0.3: Wire input router events
+        // TCP-1.0.4: Wire RequestRedraw event
         if (EditorSurface != null)
         {
             EditorSurface.SizeChanged += EditorSurface_SizeChanged;
@@ -85,6 +88,9 @@ public partial class EditorView : System.Windows.Controls.UserControl
             {
                 viewModel.UpdateViewportSize(new Size(EditorSurface.ActualWidth, EditorSurface.ActualHeight));
                 
+                // TCP-1.0.4: Subscribe to RequestRedraw event
+                viewModel.RequestRedraw += ViewModel_RequestRedraw;
+                
                 // TCP-1.0.2: Create and add origin crosshair overlay
                 if (_overlayContainer != null)
                 {
@@ -93,6 +99,31 @@ public partial class EditorView : System.Windows.Controls.UserControl
                     UpdateOriginOverlay(viewModel);
                 }
             }
+        }
+    }
+    
+    /// <summary>
+    /// RequestRedraw event handler
+    /// TCP-1.0.4: Zoom + Pan (working)
+    /// 
+    /// Invalidates visual to trigger redraw after zoom/pan changes.
+    /// </summary>
+    private void ViewModel_RequestRedraw()
+    {
+        try
+        {
+            // TCP-1.0.4: Invalidate origin overlay
+            _originOverlay?.InvalidateVisual();
+            
+            // TCP-1.0.4: Update origin overlay viewport
+            if (DataContext is EditorViewModel viewModel && EditorSurface != null)
+            {
+                UpdateOriginOverlay(viewModel);
+            }
+        }
+        catch
+        {
+            // TCP-1.0.4: Safety - ignore exceptions during redraw
         }
     }
     
@@ -140,6 +171,9 @@ public partial class EditorView : System.Windows.Controls.UserControl
             
             // TCP-1.0.2: Update viewport size
             viewModel.UpdateViewportSize(e.NewSize);
+            
+            // TCP-1.0.4: Request redraw after size change
+            viewModel.RequestRedrawNow();
             
             // TCP-1.0.2: Update origin overlay
             UpdateOriginOverlay(viewModel);

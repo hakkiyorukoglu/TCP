@@ -121,6 +121,13 @@ public static class InfoContentProvider
     {
         return new List<VersionEntry>
         {
+            // TCP-1.0.4: Zoom + Pan (working)
+            new VersionEntry
+            {
+                Version = "TCP-1.0.4",
+                Title = "Zoom + Pan (working)",
+                Description = "Enabled wheel zoom + middle-drag pan; zoom clamped; cursor world coords and zoom shown live; added math guardrails (no NaN/Infinity)."
+            },
             // TCP-1.0.3: EditorInputRouter (single input gateway)
             new VersionEntry
             {

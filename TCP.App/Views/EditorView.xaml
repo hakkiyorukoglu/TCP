@@ -75,9 +75,9 @@
                            VerticalAlignment="Center"
                            Margin="12,0,0,0"/>
                 
-                <!-- Zoom display - TCP-1.0.2: ViewportState -->
+                <!-- Zoom display - TCP-1.0.2: ViewportState, TCP-1.0.4: Live zoom display -->
                 <TextBlock Grid.Column="2"
-                           Text="{Binding ZoomDisplay, Mode=OneWay, FallbackValue='100%'}"
+                           Text="{Binding ZoomDisplay, Mode=OneWay, FallbackValue='Zoom: 100%'}"
                            FontSize="{DynamicResource Font.Caption}"
                            FontFamily="{DynamicResource Font.Primary}"
                            Foreground="{DynamicResource Brush.Text.Secondary}"
