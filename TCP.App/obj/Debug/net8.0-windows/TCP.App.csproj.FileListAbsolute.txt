@@ -1,8 +1,5 @@
 C:\Users\nurul\Desktop\TCP\TCP.App\bin\Debug\net8.0-windows\TCP.App.exe
-C:\Users\nurul\Desktop\TCP\TCP.App\bin\Debug\net8.0-windows\TCP.App.deps.json
-C:\Users\nurul\Desktop\TCP\TCP.App\bin\Debug\net8.0-windows\TCP.App.runtimeconfig.json
 C:\Users\nurul\Desktop\TCP\TCP.App\bin\Debug\net8.0-windows\TCP.App.dll
-C:\Users\nurul\Desktop\TCP\TCP.App\bin\Debug\net8.0-windows\TCP.App.pdb
 C:\Users\nurul\Desktop\TCP\TCP.App\bin\Debug\net8.0-windows\TCP.Theming.dll
 C:\Users\nurul\Desktop\TCP\TCP.App\bin\Debug\net8.0-windows\TCP.Theming.pdb
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.csproj.AssemblyReference.cache
@@ -41,9 +38,12 @@ C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.AssemblyInfo
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.AssemblyInfo.cs
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.csproj.CoreCompileInputs.cache
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.sourcelink.json
-C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.csproj.Up2Date
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.dll
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\refint\TCP.App.dll
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.pdb
+C:\Users\nurul\Desktop\TCP\TCP.App\bin\Debug\net8.0-windows\TCP.App.deps.json
+C:\Users\nurul\Desktop\TCP\TCP.App\bin\Debug\net8.0-windows\TCP.App.runtimeconfig.json
+C:\Users\nurul\Desktop\TCP\TCP.App\bin\Debug\net8.0-windows\TCP.App.pdb
+C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.csproj.Up2Date
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.genruntimeconfig.cache
 C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\ref\TCP.App.dll

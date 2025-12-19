@@ -28,16 +28,20 @@
         </Grid.RowDefinitions>
         
         <!-- Content area - Empty canvas for future rendering -->
-        <Border Grid.Row="0"
-                x:Name="EditorSurface"
-                Background="{DynamicResource Brush.Background.Secondary}"
-                BorderBrush="{DynamicResource Brush.Border}"
-                BorderThickness="0">
-            <!-- Empty canvas area - ready for future rendering -->
-            <!-- TCP-1.0.1: No tools, no drawing, just empty space -->
-        </Border>
+        <Grid Grid.Row="0">
+            <Border x:Name="EditorSurface"
+                    Background="{DynamicResource Brush.Background.Secondary}"
+                    BorderBrush="{DynamicResource Brush.Border}"
+                    BorderThickness="0">
+                <!-- Empty canvas area - ready for future rendering -->
+                <!-- TCP-1.0.1: No tools, no drawing, just empty space -->
+            </Border>
+            <!-- TCP-1.0.2: Origin crosshair overlay (debug) -->
+            <!-- Origin crosshair will be added via code-behind -->
+        </Grid>
         
         <!-- StatusBar - TCP-1.0.1: Editor Foundation (Empty Scene) -->
+        <!-- TCP-1.0.2: ViewportState - Added zoom and cursor world coords display -->
         <Border Grid.Row="1"
                 Background="{DynamicResource Brush.Surface}"
                 BorderBrush="{DynamicResource Brush.Border}"
@@ -45,6 +49,8 @@
             <Grid Margin="12,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 
@@ -56,13 +62,32 @@
                            Foreground="{DynamicResource Brush.Text.Secondary}"
                            VerticalAlignment="Center"/>
                 
-                <!-- Version text -->
+                <!-- Zoom display - TCP-1.0.2: ViewportState -->
                 <TextBlock Grid.Column="1"
-                           Text="{Binding CurrentVersion, Mode=OneWay, FallbackValue='TCP-1.0.1'}"
+                           Text="{Binding ZoomDisplay, Mode=OneWay, FallbackValue='100%'}"
                            FontSize="{DynamicResource Font.Caption}"
                            FontFamily="{DynamicResource Font.Primary}"
                            Foreground="{DynamicResource Brush.Text.Secondary}"
-                           VerticalAlignment="Center"/>
+                           VerticalAlignment="Center"
+                           Margin="12,0,0,0"/>
+                
+                <!-- Cursor world coords display - TCP-1.0.2: ViewportState -->
+                <TextBlock Grid.Column="2"
+                           Text="{Binding CursorWorldDisplay, Mode=OneWay, FallbackValue='X: 0.00  Y: 0.00'}"
+                           FontSize="{DynamicResource Font.Caption}"
+                           FontFamily="{DynamicResource Font.Primary}"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                           VerticalAlignment="Center"
+                           Margin="12,0,0,0"/>
+                
+                <!-- Version text -->
+                <TextBlock Grid.Column="3"
+                           Text="{Binding CurrentVersion, Mode=OneWay, FallbackValue='TCP-1.0.2'}"
+                           FontSize="{DynamicResource Font.Caption}"
+                           FontFamily="{DynamicResource Font.Primary}"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                           VerticalAlignment="Center"
+                           Margin="12,0,0,0"/>
             </Grid>
         </Border>
     </Grid>

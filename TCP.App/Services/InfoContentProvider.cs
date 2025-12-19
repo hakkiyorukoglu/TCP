@@ -121,6 +121,13 @@ public static class InfoContentProvider
     {
         return new List<VersionEntry>
         {
+            // TCP-1.0.2: ViewportState (World/Screen transform foundation)
+            new VersionEntry
+            {
+                Version = "TCP-1.0.2",
+                Title = "ViewportState (World/Screen transform foundation)",
+                Description = "Added ViewportState with world/screen conversion. Editor shows zoom + cursor world coords placeholders. Debug origin crosshair overlay. Input still disabled."
+            },
             // TCP-1.0.1: Editor Foundation (Empty Scene)
             new VersionEntry
             {

@@ -15,11 +15,11 @@ public static class VersionManager
     /// <summary>
     /// Mevcut versiyon
     /// Semantic versioning formatında: TCP-Major.Minor.Patch
-    /// TCP-1.0.1: Editor Foundation (Empty Scene)
+    /// TCP-1.0.2: ViewportState (World/Screen transform foundation)
     /// 
     /// IMPORTANT: Bu değer tek yerden güncellenir - tüm UI otomatik güncellenir
     /// </summary>
-    public static string CurrentVersion => "TCP-1.0.1";
+    public static string CurrentVersion => "TCP-1.0.2";
     
     /// <summary>
     /// Build time
@@ -31,7 +31,7 @@ public static class VersionManager
     /// Stage adı
     /// Mevcut geliştirme aşaması
     /// </summary>
-    public static string StageName => "Editor Foundation (Empty Scene)";
+    public static string StageName => "ViewportState (World/Screen transform foundation)";
     
     /// <summary>
     /// Display versiyon
