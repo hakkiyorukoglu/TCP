@@ -136,6 +136,29 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
+                    
+                    <!-- Editor tab -->
+                    <!-- TCP-1.0.2: Editor reintroduced -->
+                    <TextBlock x:Name="EditorTab"
+                               Text="Editor"
+                               FontSize="{DynamicResource Font.Body}"
+                               FontFamily="{DynamicResource Font.Primary}"
+                               Foreground="{DynamicResource Brush.Text.Secondary}"
+                               VerticalAlignment="Center"
+                               Margin="10,0"
+                               Padding="8,4"
+                               Cursor="Hand"
+                               MouseLeftButtonDown="EditorTab_MouseLeftButtonDown">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Primary}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </StackPanel>
                 
                 <!-- Sağ: Search + Icons + Version + Window buttons -->
@@ -480,12 +503,13 @@
             ContentArea - Ana içerik alanı (View switching)
             TCP-0.4: Navigation Shell
             TCP-0.7.2: Layout Standardization - ContentControl for stable layout
+            TCP-1.0.2: Default view changed to EditorView
         -->
         <ContentControl x:Name="ContentArea"
                         Grid.Row="1"
                         Background="{DynamicResource Brush.Background.Primary}">
-            <!-- Default view: HomeView -->
-            <views:HomeView/>
+            <!-- Default view: EditorView -->
+            <views:EditorView/>
         </ContentControl>
         
         <!--

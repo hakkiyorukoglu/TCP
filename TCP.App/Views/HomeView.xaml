@@ -3,124 +3,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              Background="{DynamicResource Brush.Background.Primary}">
     <!--
         HomeView.xaml - Ana sayfa view
         
-        TCP-1.0.1: Home Map Canvas (Empty)
+        TCP-1.0.2: Home is intentionally empty (postponed until 2.0.0+)
         Bu view ana sayfa içeriğini gösterir.
         MVVM Pattern: Sadece UI, hiçbir mantık içermez.
         
-        Layout:
-        - Sol/Main: Map Area (Border/Card) with Canvas placeholder
-        - Sağ: Fixed-width side panel with Map controls
+        Home route remains but shows empty content.
     -->
-    <UserControl.DataContext>
-        <viewmodels:HomeViewModel/>
-    </UserControl.DataContext>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <!-- Main: Map Area -->
-            <ColumnDefinition Width="*"/>
-            <!-- Right: Side Panel -->
-            <ColumnDefinition Width="300"/>
-        </Grid.ColumnDefinitions>
-        
-        <!-- Main: Map Area -->
-        <Border Grid.Column="0"
-                Background="{DynamicResource Brush.Surface}"
-                BorderBrush="{DynamicResource Brush.Border}"
-                BorderThickness="1"
-                CornerRadius="4"
-                Margin="16">
-            <Grid>
-                <!-- Canvas placeholder (empty) -->
-                <Canvas x:Name="MapCanvas"
-                        Background="{DynamicResource Brush.Background.Primary}">
-                    <!-- Canvas is empty - ready for image loading in TCP-1.0.2 -->
-                </Canvas>
-                
-                <!-- Centered hint text -->
-                <TextBlock Text="Map canvas ready (TCP-1.0.1). Load image in TCP-1.0.2."
-                           FontSize="{DynamicResource Font.Body}"
-                           FontFamily="{DynamicResource Font.Primary}"
-                           Foreground="{DynamicResource Brush.Text.Secondary}"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           TextAlignment="Center"/>
-            </Grid>
-        </Border>
-        
-        <!-- Right: Side Panel -->
-        <Border Grid.Column="1"
-                Background="{DynamicResource Brush.Surface}"
-                BorderBrush="{DynamicResource Brush.Border}"
-                BorderThickness="1,1,0,1"
-                Margin="0,16,16,16">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <!-- Header -->
-                    <RowDefinition Height="Auto"/>
-                    <!-- Content -->
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                
-                <!-- Header: Map -->
-                <Border Grid.Row="0"
-                        Background="{DynamicResource Brush.Background.Secondary}"
-                        BorderBrush="{DynamicResource Brush.Border}"
-                        BorderThickness="0,0,0,1"
-                        Padding="16,12">
-                    <TextBlock Text="Map"
-                               FontSize="{DynamicResource Font.Heading.Small}"
-                               FontFamily="{DynamicResource Font.Primary}"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource Brush.Text.Primary}"/>
-                </Border>
-                
-                <!-- Content: Controls -->
-                <StackPanel Grid.Row="1"
-                            Margin="16"
-                            VerticalAlignment="Top">
-                    <!-- Load Map Image Button -->
-                    <Button Content="Load Map Image"
-                            Command="{Binding LoadMapImageCommand}"
-                            HorizontalAlignment="Stretch"
-                            Padding="16,8"
-                            Margin="0,0,0,8"
-                            Background="{DynamicResource Brush.Accent.Primary}"
-                            Foreground="White"
-                            BorderThickness="0"
-                            FontSize="{DynamicResource Font.Body}"
-                            FontFamily="{DynamicResource Font.Primary}"
-                            Cursor="Hand">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}"
-                                                    CornerRadius="4"
-                                                    Padding="{TemplateBinding Padding}">
-                                                <ContentPresenter HorizontalAlignment="Center"
-                                                                  VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Opacity" Value="0.9"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                </StackPanel>
-            </Grid>
-        </Border>
-    </Grid>
+    <Grid />
 </UserControl>

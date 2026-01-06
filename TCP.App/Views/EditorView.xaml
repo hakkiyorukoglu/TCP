@@ -1,0 +1,259 @@
+<UserControl x:Class="TCP.App.Views.EditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:TCP.App"
+             xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="{DynamicResource Brush.Background.Primary}">
+    <!--
+        EditorView.xaml - Editor view
+        
+        TCP-1.0.2: Background Image Load (Editor)
+        Bu view editor içeriğini gösterir.
+        MVVM Pattern: Sadece UI, hiçbir mantık içermez.
+        
+        Layout:
+        - Editor toolbar (under TopBar)
+        - Main editor area with background image display
+    -->
+    <UserControl.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </UserControl.Resources>
+    <UserControl.DataContext>
+        <viewmodels:EditorViewModel/>
+    </UserControl.DataContext>
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Editor Toolbar -->
+            <RowDefinition Height="Auto"/>
+            <!-- Main Editor Area -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Editor Toolbar -->
+        <!-- TCP-1.0.2: Editor-local toolbar (visible ONLY inside Editor page) -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource Brush.Surface}"
+                BorderBrush="{DynamicResource Brush.Border}"
+                BorderThickness="0,0,0,1"
+                Padding="16,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <!-- Buttons -->
+                    <ColumnDefinition Width="Auto"/>
+                    <!-- Status Text -->
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <!-- Buttons -->
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Left">
+                    <!-- Load Image Button -->
+                    <Button Content="Load Image"
+                            Command="{Binding LoadImageCommand}"
+                            Padding="12,6"
+                            Margin="0,0,8,0"
+                            Background="{DynamicResource Brush.Accent.Primary}"
+                            Foreground="White"
+                            BorderThickness="0"
+                            FontSize="{DynamicResource Font.Body}"
+                            FontFamily="{DynamicResource Font.Primary}"
+                            Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    CornerRadius="4"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Opacity" Value="0.9"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    
+                    <!-- Fit Button -->
+                    <Button Content="Fit"
+                            Command="{Binding SetFitModeCommand}"
+                            Padding="12,6"
+                            Margin="0,0,8,0"
+                            Background="{DynamicResource Brush.Background.Secondary}"
+                            Foreground="{DynamicResource Brush.Text.Primary}"
+                            BorderBrush="{DynamicResource Brush.Border}"
+                            BorderThickness="1"
+                            FontSize="{DynamicResource Font.Body}"
+                            FontFamily="{DynamicResource Font.Primary}"
+                            Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="4"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Opacity" Value="0.9"/>
+                                    </Trigger>
+                                    <DataTrigger Binding="{Binding IsFitMode, Mode=OneWay}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Brush.Accent.Primary}"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    
+                    <!-- Actual Button -->
+                    <Button Content="Actual"
+                            Command="{Binding SetActualModeCommand}"
+                            Padding="12,6"
+                            Margin="0,0,8,0"
+                            Background="{DynamicResource Brush.Background.Secondary}"
+                            Foreground="{DynamicResource Brush.Text.Primary}"
+                            BorderBrush="{DynamicResource Brush.Border}"
+                            BorderThickness="1"
+                            FontSize="{DynamicResource Font.Body}"
+                            FontFamily="{DynamicResource Font.Primary}"
+                            Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="4"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Opacity" Value="0.9"/>
+                                    </Trigger>
+                                    <DataTrigger Binding="{Binding IsActualMode, Mode=OneWay}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Brush.Accent.Primary}"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    
+                    <!-- Clear Button -->
+                    <Button Content="Clear"
+                            Command="{Binding ClearImageCommand}"
+                            Padding="12,6"
+                            Margin="0,0,8,0"
+                            Background="{DynamicResource Brush.Background.Secondary}"
+                            Foreground="{DynamicResource Brush.Text.Primary}"
+                            BorderBrush="{DynamicResource Brush.Border}"
+                            BorderThickness="1"
+                            FontSize="{DynamicResource Font.Body}"
+                            FontFamily="{DynamicResource Font.Primary}"
+                            Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="4"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Opacity" Value="0.9"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+                
+                <!-- Status Text -->
+                <TextBlock Grid.Column="1"
+                           Text="{Binding StatusText, Mode=OneWay, FallbackValue='No image loaded'}"
+                           FontSize="{DynamicResource Font.Caption}"
+                           FontFamily="{DynamicResource Font.Primary}"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"
+                           Margin="16,0,0,0"/>
+            </Grid>
+        </Border>
+        
+        <!-- Main Editor Area -->
+        <!-- TCP-1.0.2: Editor area with background image display -->
+        <Border Grid.Row="1"
+                Background="{DynamicResource Brush.Surface}"
+                BorderBrush="{DynamicResource Brush.Border}"
+                BorderThickness="1"
+                CornerRadius="4"
+                Margin="16">
+            <Grid>
+                <!-- Fit Mode: Image Stretch="Uniform", centered, no scrollbars -->
+                <Image x:Name="FitModeImage"
+                       Source="{Binding BackgroundImage, Mode=OneWay}"
+                       Stretch="Uniform"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Visibility="{Binding IsFitMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                
+                <!-- Actual Mode: ScrollViewer with Image Stretch="None", scrollbars Auto -->
+                <ScrollViewer x:Name="ActualModeScrollViewer"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              Visibility="{Binding IsActualMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Image Source="{Binding BackgroundImage, Mode=OneWay}"
+                           Stretch="None"/>
+                </ScrollViewer>
+                
+                <!-- No Image Placeholder -->
+                <TextBlock Text="No background image loaded."
+                           FontSize="{DynamicResource Font.Body}"
+                           FontFamily="{DynamicResource Font.Primary}"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Visibility="{Binding HasNoImage, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
+

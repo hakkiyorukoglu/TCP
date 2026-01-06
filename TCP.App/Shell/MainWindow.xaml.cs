@@ -29,8 +29,9 @@ public partial class MainWindow : Window
     /// <summary>
     /// Mevcut route name (settings persistence için)
     /// TCP-0.8.1: Settings Persistence v1 (Local)
+    /// TCP-1.0.2: Default route changed to Editor
     /// </summary>
-    private string _currentRoute = "Home";
+    private string _currentRoute = "Editor";
     
     /// <summary>
     /// Constructor - Pencere başlatma
@@ -132,24 +133,26 @@ public partial class MainWindow : Window
     /// Loaded settings'i apply et
     /// TCP-0.8.1: Settings Persistence v1 (Local)
     /// TCP-0.9.0-fix1: Info access & startup route fix
+    /// TCP-1.0.2: Startup route changed to Editor
     /// 
-    /// Startup'ta her zaman Home'a navigate eder.
+    /// Startup'ta Editor'a navigate eder.
     /// LastRoute artık startup'ta kullanılmıyor (UX fix).
     /// Panel widths restore edilecek (gelecekte)
     /// </summary>
     private void ApplyLoadedSettings()
     {
-        // TCP-0.9.0-fix1: Always start on Home page for consistent UX
+        // TCP-1.0.2: Always start on Editor page for consistent UX
         // LastRoute is still saved on navigation changes, but not used at startup
-        _currentRoute = "Home";
-        NavigateToView(new HomeView(), "Home");
-        SetActiveTab(HomeTab);
+        _currentRoute = "Editor";
+        NavigateToView(new EditorView(), "Editor");
+        SetActiveTab(EditorTab);
     }
     
     /// <summary>
     /// Search navigation handler - route'a göre navigate et
     /// TCP-0.5.1: Top-Right Search UI
     /// TCP-0.8.1: Settings Persistence v1 (Local) - Route save edilir
+    /// TCP-1.0.2: Editor route added
     /// </summary>
     private void MainViewModel_NavigateRequested(string route)
     {
@@ -162,6 +165,10 @@ public partial class MainWindow : Window
             case "Electronics":
                 NavigateToView(new ElectronicsView(), "Electronics");
                 SetActiveTab(ElectronicsTab);
+                break;
+            case "Editor":
+                NavigateToView(new EditorView(), "Editor");
+                SetActiveTab(EditorTab);
                 break;
             case "Settings":
                 var settingsViewFromSearch = new SettingsView();
@@ -242,6 +249,15 @@ public partial class MainWindow : Window
         SetActiveTab(ElectronicsTab);
     }
     
+    /// <summary>
+    /// Navigation: Editor tab click handler
+    /// TCP-1.0.2: Editor reintroduced
+    /// </summary>
+    private void EditorTab_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        NavigateToView(new EditorView(), "Editor");
+        SetActiveTab(EditorTab);
+    }
     
     /// <summary>
     /// Navigation: Settings icon click handler
@@ -325,12 +341,14 @@ public partial class MainWindow : Window
     /// <summary>
     /// Aktif tab'ı set et (visual feedback için)
     /// TCP-1.0.1: Removed Editor/Simulation tabs
+    /// TCP-1.0.2: Editor tab added back
     /// </summary>
     private void SetActiveTab(TextBlock activeTab)
     {
         // Tüm tab'ları secondary color'a set et
         HomeTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
         ElectronicsTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
+        EditorTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
         
         // Aktif tab'ı primary color'a set et
         activeTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Primary");

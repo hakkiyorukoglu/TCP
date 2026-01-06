@@ -121,6 +121,13 @@ public static class InfoContentProvider
     {
         return new List<VersionEntry>
         {
+            // TCP-1.0.2: Background Image Load (Editor)
+            new VersionEntry
+            {
+                Version = "TCP-1.0.2",
+                Title = "Background Image Load (Editor)",
+                Description = "Home is intentionally empty (postponed until 2.0.0+). Editor reintroduced with background image load (PNG/JPEG) + fit/actual size toggle. App opens with Editor by default."
+            },
             // TCP-1.0.1: Home Map Canvas (Empty) + Remove Editor/Simulation
             new VersionEntry
             {

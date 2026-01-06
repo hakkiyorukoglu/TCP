@@ -2,6 +2,48 @@
 
 All notable changes to TCP (Train Control Platform) are documented in this file.
 
+## TCP-1.0.2 — Background Image Load (Editor)
+
+**Release Date**: [Current Date]
+
+### Added
+
+- **Editor Page Reintroduced**: Editor page restored with background image loading functionality
+  - Load PNG/JPEG images via file dialog
+  - Display image in editor area (locked, not movable)
+  - Two display modes: Fit-to-area and Actual-size toggle
+  - Editor toolbar with Load Image, Fit, Actual, and Clear buttons
+  - Status text showing image load state
+
+- **Image Loading**: Safe image loading with file lock prevention
+  - Uses `BitmapImage` with `CacheOption.OnLoad` to prevent file locks
+  - Image frozen after loading for thread safety
+  - Toast notifications for success/error feedback
+
+### Changed
+
+- **Home Page**: Made intentionally empty (postponed until 2.0.0+)
+  - Home route remains but shows empty content
+  - No map canvas, no controls, no placeholders
+
+- **Startup Route**: App now opens with Editor by default
+  - Default route changed from Home to Editor
+  - Editor tab added to TopBar navigation
+
+- **Version**: Updated to TCP-1.0.2
+  - VersionManager.CurrentVersion = "TCP-1.0.2"
+  - VersionManager.StageName = "Background Image Load (Editor)"
+
+### Technical Details
+
+- EditorView and EditorViewModel recreated
+- Image display uses OneWay binding (no TwoWay bindings)
+- Fit mode: Image Stretch="Uniform", centered
+- Actual mode: ScrollViewer with Image Stretch="None", scrollbars Auto
+- No pan/zoom, no drawing tools, no selection (locked requirement)
+
+---
+
 ## TCP-1.0.1 — Home Map Canvas (Empty)
 
 **Release Date**: [Current Date]

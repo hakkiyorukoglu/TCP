@@ -105,6 +105,14 @@ public partial class App : Application
             Route = "Electronics"
         });
         
+        // TCP-1.0.2: Register Editor page
+        registry.Register(new SearchItem
+        {
+            Title = "Editor",
+            Keywords = new[] { "editor", "map", "background", "image" },
+            Route = "Editor"
+        });
+        
         // Register Settings page
         registry.Register(new SearchItem
         {
