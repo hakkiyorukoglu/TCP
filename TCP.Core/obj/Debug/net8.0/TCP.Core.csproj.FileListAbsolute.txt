@@ -10,3 +10,15 @@ C:\Users\nurul\Desktop\TCP\TCP.Core\obj\Debug\net8.0\TCP.Core.dll
 C:\Users\nurul\Desktop\TCP\TCP.Core\obj\Debug\net8.0\refint\TCP.Core.dll
 C:\Users\nurul\Desktop\TCP\TCP.Core\obj\Debug\net8.0\TCP.Core.pdb
 C:\Users\nurul\Desktop\TCP\TCP.Core\obj\Debug\net8.0\ref\TCP.Core.dll
+C:\Users\nurul\Desktop\hakkı\TCP\TCP.Core\bin\Debug\net8.0\TCP.Core.deps.json
+C:\Users\nurul\Desktop\hakkı\TCP\TCP.Core\bin\Debug\net8.0\TCP.Core.dll
+C:\Users\nurul\Desktop\hakkı\TCP\TCP.Core\bin\Debug\net8.0\TCP.Core.pdb
+C:\Users\nurul\Desktop\hakkı\TCP\TCP.Core\obj\Debug\net8.0\TCP.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\nurul\Desktop\hakkı\TCP\TCP.Core\obj\Debug\net8.0\TCP.Core.AssemblyInfoInputs.cache
+C:\Users\nurul\Desktop\hakkı\TCP\TCP.Core\obj\Debug\net8.0\TCP.Core.AssemblyInfo.cs
+C:\Users\nurul\Desktop\hakkı\TCP\TCP.Core\obj\Debug\net8.0\TCP.Core.csproj.CoreCompileInputs.cache
+C:\Users\nurul\Desktop\hakkı\TCP\TCP.Core\obj\Debug\net8.0\TCP.Core.sourcelink.json
+C:\Users\nurul\Desktop\hakkı\TCP\TCP.Core\obj\Debug\net8.0\TCP.Core.dll
+C:\Users\nurul\Desktop\hakkı\TCP\TCP.Core\obj\Debug\net8.0\refint\TCP.Core.dll
+C:\Users\nurul\Desktop\hakkı\TCP\TCP.Core\obj\Debug\net8.0\TCP.Core.pdb
+C:\Users\nurul\Desktop\hakkı\TCP\TCP.Core\obj\Debug\net8.0\ref\TCP.Core.dll

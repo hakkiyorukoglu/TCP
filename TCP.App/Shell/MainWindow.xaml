@@ -136,50 +136,6 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-                    
-                    <!-- Simulation tab -->
-                    <TextBlock x:Name="SimulationTab"
-                               Text="Simulation"
-                               FontSize="{DynamicResource Font.Body}"
-                               FontFamily="{DynamicResource Font.Primary}"
-                               Foreground="{DynamicResource Brush.Text.Secondary}"
-                               VerticalAlignment="Center"
-                               Margin="10,0"
-                               Padding="8,4"
-                               Cursor="Hand"
-                               MouseLeftButtonDown="SimulationTab_MouseLeftButtonDown">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Primary}"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    
-                    <!-- Editor tab -->
-                    <TextBlock x:Name="EditorTab"
-                               Text="Editor"
-                               FontSize="{DynamicResource Font.Body}"
-                               FontFamily="{DynamicResource Font.Primary}"
-                               Foreground="{DynamicResource Brush.Text.Secondary}"
-                               VerticalAlignment="Center"
-                               Margin="10,0"
-                               Padding="8,4"
-                               Cursor="Hand"
-                               MouseLeftButtonDown="EditorTab_MouseLeftButtonDown">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Primary}"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
                 </StackPanel>
                 
                 <!-- Sağ: Search + Icons + Version + Window buttons -->

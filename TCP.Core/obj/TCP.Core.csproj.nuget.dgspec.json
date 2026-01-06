@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nurul\\Desktop\\TCP\\TCP.Core\\TCP.Core.csproj": {}
+    "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Core\\TCP.Core.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nurul\\Desktop\\TCP\\TCP.Core\\TCP.Core.csproj": {
+    "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Core\\TCP.Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nurul\\Desktop\\TCP\\TCP.Core\\TCP.Core.csproj",
+        "projectUniqueName": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Core\\TCP.Core.csproj",
         "projectName": "TCP.Core",
-        "projectPath": "C:\\Users\\nurul\\Desktop\\TCP\\TCP.Core\\TCP.Core.csproj",
+        "projectPath": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Core\\TCP.Core.csproj",
         "packagesPath": "C:\\Users\\nurul\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nurul\\Desktop\\TCP\\TCP.Core\\obj\\",
+        "outputPath": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Core\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\nurul\\AppData\\Roaming\\NuGet\\NuGet.Config"

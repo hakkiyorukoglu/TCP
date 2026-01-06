@@ -121,33 +121,12 @@ public static class InfoContentProvider
     {
         return new List<VersionEntry>
         {
-            // TCP-1.0.4: Zoom + Pan (working)
-            new VersionEntry
-            {
-                Version = "TCP-1.0.4",
-                Title = "Zoom + Pan (working)",
-                Description = "Enabled wheel zoom + middle-drag pan; zoom clamped; cursor world coords and zoom shown live; added math guardrails (no NaN/Infinity)."
-            },
-            // TCP-1.0.3: EditorInputRouter (single input gateway)
-            new VersionEntry
-            {
-                Version = "TCP-1.0.3",
-                Title = "EditorInputRouter (single input gateway)",
-                Description = "Added EditorInputRouter; Editor input events centralized; keyboard focus enabled on editor surface; still no zoom/pan behavior."
-            },
-            // TCP-1.0.2: ViewportState (World/Screen transform foundation)
-            new VersionEntry
-            {
-                Version = "TCP-1.0.2",
-                Title = "ViewportState (World/Screen transform foundation)",
-                Description = "Added ViewportState with world/screen conversion. Editor shows zoom + cursor world coords placeholders. Debug origin crosshair overlay. Input still disabled."
-            },
-            // TCP-1.0.1: Editor Foundation (Empty Scene)
+            // TCP-1.0.1: Home Map Canvas (Empty) + Remove Editor/Simulation
             new VersionEntry
             {
                 Version = "TCP-1.0.1",
-                Title = "Editor Foundation (Empty Scene)",
-                Description = "Added Editor page with empty scene canvas. Editor is accessible via navigation tab. StatusBar shows editor status. No tools or drawing functionality yet - foundation only."
+                Title = "Home Map Canvas (Empty)",
+                Description = "Removed Editor/Simulation modules; introduced Home Map Canvas foundation with placeholder UI. Map canvas ready for image loading in TCP-1.0.2."
             },
             new VersionEntry
             {

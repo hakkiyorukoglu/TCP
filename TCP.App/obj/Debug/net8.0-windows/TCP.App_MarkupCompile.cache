@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\nurul\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\
+C:\Users\nurul\Desktop\hakkı\TCP\TCP.App\obj\Debug\net8.0-windows\
 TCP.App
 none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP
-C:\Users\nurul\Desktop\TCP\TCP.App\App.xaml
-12110144570
+C:\Users\nurul\Desktop\hakkı\TCP\TCP.App\App.xaml
+10-584396993
 
-48-566638788
-199-1561768398
-Shell\MainWindow.xaml;UI\Components\BoardDetailCard.xaml;UI\Components\CodeEditorPanel.xaml;UI\Components\KeyValueRow.xaml;Views\Components\ToastNotification.xaml;Views\EditorView.xaml;Views\ElectronicsView.xaml;Views\HomeView.xaml;Views\InfoPanel.xaml;Views\InfoView.xaml;Views\SettingsView.xaml;Views\SimulationView.xaml;
+41394019546
+199948981234
+Shell\MainWindow.xaml;UI\Components\BoardDetailCard.xaml;UI\Components\CodeEditorPanel.xaml;UI\Components\KeyValueRow.xaml;Views\Components\ToastNotification.xaml;Views\ElectronicsView.xaml;Views\HomeView.xaml;Views\InfoPanel.xaml;Views\InfoView.xaml;Views\SettingsView.xaml;
 
 False
 

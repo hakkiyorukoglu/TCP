@@ -106,6 +106,15 @@ public class NotificationService
     }
     
     /// <summary>
+    /// Info notification göster
+    /// TCP-1.0.1: Home Map Canvas (Empty) - Info toast support
+    /// </summary>
+    public void ShowInfo(string title, string message)
+    {
+        ShowNotification(title, message, NotificationType.Info);
+    }
+    
+    /// <summary>
     /// Notification göster (internal)
     /// TCP-0.9.2: Notifications / Toasts v1
     /// </summary>

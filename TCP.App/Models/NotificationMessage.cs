@@ -40,10 +40,12 @@ public class NotificationMessage
 /// <summary>
 /// NotificationType - Notification tipi enum
 /// TCP-0.9.2: Notifications / Toasts v1
+/// TCP-1.0.1: Added Info type
 /// </summary>
 public enum NotificationType
 {
     Success,
     Warning,
-    Error
+    Error,
+    Info
 }

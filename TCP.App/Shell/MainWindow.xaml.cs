@@ -163,10 +163,6 @@ public partial class MainWindow : Window
                 NavigateToView(new ElectronicsView(), "Electronics");
                 SetActiveTab(ElectronicsTab);
                 break;
-            case "Simulation":
-                NavigateToView(new SimulationView(), "Simulation");
-                SetActiveTab(SimulationTab);
-                break;
             case "Settings":
                 var settingsViewFromSearch = new SettingsView();
                 NavigateToView(settingsViewFromSearch, "Settings");
@@ -246,25 +242,6 @@ public partial class MainWindow : Window
         SetActiveTab(ElectronicsTab);
     }
     
-    /// <summary>
-    /// Navigation: Simulation tab click handler
-    /// TCP-0.8.1: Settings Persistence v1 (Local) - Route save edilir
-    /// </summary>
-    private void SimulationTab_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        NavigateToView(new SimulationView(), "Simulation");
-        SetActiveTab(SimulationTab);
-    }
-    
-    /// <summary>
-    /// Navigation: Editor tab click handler
-    /// TCP-0.8.1: Settings Persistence v1 (Local) - Route save edilir
-    /// </summary>
-    private void EditorTab_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        NavigateToView(new EditorView(), "Editor");
-        SetActiveTab(EditorTab);
-    }
     
     /// <summary>
     /// Navigation: Settings icon click handler
@@ -347,14 +324,13 @@ public partial class MainWindow : Window
     
     /// <summary>
     /// Aktif tab'ı set et (visual feedback için)
+    /// TCP-1.0.1: Removed Editor/Simulation tabs
     /// </summary>
     private void SetActiveTab(TextBlock activeTab)
     {
         // Tüm tab'ları secondary color'a set et
         HomeTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
         ElectronicsTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
-        SimulationTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
-        EditorTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
         
         // Aktif tab'ı primary color'a set et
         activeTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Primary");

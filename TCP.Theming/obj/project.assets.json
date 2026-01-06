@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\nurul\\Desktop\\TCP\\TCP.Theming\\TCP.Theming.csproj",
+      "projectUniqueName": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Theming\\TCP.Theming.csproj",
       "projectName": "TCP.Theming",
-      "projectPath": "C:\\Users\\nurul\\Desktop\\TCP\\TCP.Theming\\TCP.Theming.csproj",
+      "projectPath": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Theming\\TCP.Theming.csproj",
       "packagesPath": "C:\\Users\\nurul\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\nurul\\Desktop\\TCP\\TCP.Theming\\obj\\",
+      "outputPath": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Theming\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\nurul\\AppData\\Roaming\\NuGet\\NuGet.Config"

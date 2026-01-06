@@ -28,6 +28,7 @@ public class NotificationTypeToBrushConverter : IValueConverter
                 NotificationType.Success => System.Windows.Application.Current.TryFindResource("Brush.Accent.Success") as SolidColorBrush ?? new SolidColorBrush(System.Windows.Media.Color.FromRgb(76, 175, 80)),
                 NotificationType.Warning => System.Windows.Application.Current.TryFindResource("Brush.Accent.Warning") as SolidColorBrush ?? new SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 152, 0)),
                 NotificationType.Error => System.Windows.Application.Current.TryFindResource("Brush.Accent.Error") as SolidColorBrush ?? new SolidColorBrush(System.Windows.Media.Color.FromRgb(244, 67, 54)),
+                NotificationType.Info => System.Windows.Application.Current.TryFindResource("Brush.Accent.Primary") as SolidColorBrush ?? new SolidColorBrush(System.Windows.Media.Color.FromRgb(33, 150, 243)),
                 _ => System.Windows.Application.Current.TryFindResource("Brush.Surface") as SolidColorBrush ?? new SolidColorBrush(System.Windows.Media.Color.FromRgb(51, 51, 51))
             };
         }
@@ -68,6 +69,7 @@ public class NotificationTypeToIconConverter : IValueConverter
                 NotificationType.Success => "✓",
                 NotificationType.Warning => "⚠",
                 NotificationType.Error => "✕",
+                NotificationType.Info => "ℹ",
                 _ => "ℹ"
             };
         }
