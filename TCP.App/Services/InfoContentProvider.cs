@@ -121,6 +121,13 @@ public static class InfoContentProvider
     {
         return new List<VersionEntry>
         {
+            // TCP-1.0.3: Editor: Add board boxes from registry
+            new VersionEntry
+            {
+                Version = "TCP-1.0.3",
+                Title = "Editor: Add board boxes from registry",
+                Description = "Editor palette now sourced from Electronics registry (single source of truth). Click 'Add to Map' creates box cards on editor canvas. Boxes display DisplayName, Type, and Status."
+            },
             // TCP-1.0.2: Background Image Load (Editor)
             new VersionEntry
             {

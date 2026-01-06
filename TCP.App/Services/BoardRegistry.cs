@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using TCP.App.Models.Editor;
 using TCP.App.ViewModels;
 
 namespace TCP.App.Services;
@@ -92,5 +93,86 @@ public class BoardRegistry : IBoardRegistry
         }
         
         return _boards.FirstOrDefault(b => string.Equals(b.Name, name, StringComparison.OrdinalIgnoreCase));
+    }
+    
+    /// <summary>
+    /// Get all boards as BoardDefinition list (for Editor palette)
+    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// 
+    /// Converts BoardItem to BoardDefinition.
+    /// Single source of truth: This registry.
+    /// </summary>
+    public IReadOnlyList<BoardDefinition> GetAllBoards()
+    {
+        return _boards.Select(item => new BoardDefinition
+        {
+            Id = item.Name, // Use Name as Id (immutable, unique)
+            DisplayName = item.Name,
+            Type = ExtractTypeFromName(item.Name),
+            Status = item.Status,
+            Notes = item.Description
+        }).ToList().AsReadOnly();
+    }
+    
+    /// <summary>
+    /// Get board by ID
+    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// </summary>
+    public BoardDefinition? GetById(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            return null;
+        }
+        
+        var item = _boards.FirstOrDefault(b => string.Equals(b.Name, id, StringComparison.OrdinalIgnoreCase));
+        if (item == null)
+        {
+            return null;
+        }
+        
+        return new BoardDefinition
+        {
+            Id = item.Name,
+            DisplayName = item.Name,
+            Type = ExtractTypeFromName(item.Name),
+            Status = item.Status,
+            Notes = item.Description
+        };
+    }
+    
+    /// <summary>
+    /// Extract type from board name
+    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// 
+    /// Examples:
+    /// - "Arduino Mega" -> "Mega"
+    /// - "Arduino Nano" -> "Nano"
+    /// - "RFID Reader" -> "RFID"
+    /// - "Servo Controller" -> "Servo"
+    /// </summary>
+    private static string ExtractTypeFromName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return "Unknown";
+        }
+        
+        // Remove common prefixes
+        var type = name;
+        if (type.StartsWith("Arduino ", StringComparison.OrdinalIgnoreCase))
+        {
+            type = type.Substring("Arduino ".Length);
+        }
+        else if (type.EndsWith(" Reader", StringComparison.OrdinalIgnoreCase))
+        {
+            type = type.Substring(0, type.Length - " Reader".Length);
+        }
+        else if (type.EndsWith(" Controller", StringComparison.OrdinalIgnoreCase))
+        {
+            type = type.Substring(0, type.Length - " Controller".Length);
+        }
+        
+        return type;
     }
 }

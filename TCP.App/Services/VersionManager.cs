@@ -15,11 +15,11 @@ public static class VersionManager
     /// <summary>
     /// Mevcut versiyon
     /// Semantic versioning formatında: TCP-Major.Minor.Patch
-    /// TCP-1.0.2: Background Image Load (Editor)
+    /// TCP-1.0.3: Editor: Add board boxes from registry
     /// 
     /// IMPORTANT: Bu değer tek yerden güncellenir - tüm UI otomatik güncellenir
     /// </summary>
-    public static string CurrentVersion => "TCP-1.0.2";
+    public static string CurrentVersion => "TCP-1.0.3";
     
     /// <summary>
     /// Build time
@@ -31,7 +31,7 @@ public static class VersionManager
     /// Stage adı
     /// Mevcut geliştirme aşaması
     /// </summary>
-    public static string StageName => "Background Image Load (Editor)";
+    public static string StageName => "Editor: Add board boxes from registry";
     
     /// <summary>
     /// Display versiyon

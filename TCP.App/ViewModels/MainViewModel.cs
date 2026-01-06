@@ -217,3 +217,40 @@ public class RelayCommand<T> : ICommand
         _execute(parameter is T t ? t : default);
     }
 }
+
+/// <summary>
+/// RelayCommandWithCanExecute - ICommand implementation with CanExecute support
+/// TCP-1.0.3: Editor: Add board boxes from registry
+/// </summary>
+public class RelayCommandWithCanExecute<T> : ICommand
+{
+    private readonly Action<T?> _execute;
+    private readonly Func<bool> _canExecute;
+    
+    public RelayCommandWithCanExecute(Action<T?> execute, Func<bool> canExecute)
+    {
+        _execute = execute;
+        _canExecute = canExecute;
+    }
+    
+    public event EventHandler? CanExecuteChanged;
+    
+    public bool CanExecute(object? parameter) => _canExecute();
+    
+    public void Execute(object? parameter)
+    {
+        if (CanExecute(parameter))
+        {
+            _execute(parameter is T t ? t : default);
+        }
+    }
+    
+    /// <summary>
+    /// Raise CanExecuteChanged event
+    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// </summary>
+    public void RaiseCanExecuteChanged()
+    {
+        CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+    }
+}

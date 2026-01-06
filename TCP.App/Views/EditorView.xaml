@@ -29,7 +29,7 @@
         <Grid.RowDefinitions>
             <!-- Editor Toolbar -->
             <RowDefinition Height="Auto"/>
-            <!-- Main Editor Area -->
+            <!-- Main Content (Palette + Editor Area) -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
@@ -218,42 +218,264 @@
             </Grid>
         </Border>
         
-        <!-- Main Editor Area -->
-        <!-- TCP-1.0.2: Editor area with background image display -->
-        <Border Grid.Row="1"
-                Background="{DynamicResource Brush.Surface}"
-                BorderBrush="{DynamicResource Brush.Border}"
-                BorderThickness="1"
-                CornerRadius="4"
-                Margin="16">
-            <Grid>
-                <!-- Fit Mode: Image Stretch="Uniform", centered, no scrollbars -->
-                <Image x:Name="FitModeImage"
-                       Source="{Binding BackgroundImage, Mode=OneWay}"
-                       Stretch="Uniform"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       Visibility="{Binding IsFitMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                
-                <!-- Actual Mode: ScrollViewer with Image Stretch="None", scrollbars Auto -->
-                <ScrollViewer x:Name="ActualModeScrollViewer"
-                              HorizontalScrollBarVisibility="Auto"
-                              VerticalScrollBarVisibility="Auto"
-                              Visibility="{Binding IsActualMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <Image Source="{Binding BackgroundImage, Mode=OneWay}"
-                           Stretch="None"/>
-                </ScrollViewer>
-                
-                <!-- No Image Placeholder -->
-                <TextBlock Text="No background image loaded."
-                           FontSize="{DynamicResource Font.Body}"
-                           FontFamily="{DynamicResource Font.Primary}"
-                           Foreground="{DynamicResource Brush.Text.Secondary}"
+        <!-- Main Content: Palette + Editor Area -->
+        <!-- TCP-1.0.3: 2-column layout (Palette left, Editor right) -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <!-- Left: Palette (fixed width) -->
+                <ColumnDefinition Width="240"/>
+                <!-- Right: Editor Area (star) -->
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Left: Palette Panel -->
+            <!-- TCP-1.0.3: Palette sourced from BoardRegistry -->
+            <Border Grid.Column="0"
+                    Background="{DynamicResource Brush.Surface}"
+                    BorderBrush="{DynamicResource Brush.Border}"
+                    BorderThickness="0,0,1,0"
+                    Margin="16,0,0,16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <!-- Header -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Board List -->
+                        <RowDefinition Height="*"/>
+                        <!-- Add Button -->
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Header: Palette -->
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource Brush.Background.Secondary}"
+                            BorderBrush="{DynamicResource Brush.Border}"
+                            BorderThickness="0,0,0,1"
+                            Padding="16,12">
+                        <TextBlock Text="Palette"
+                                   FontSize="{DynamicResource Font.Heading.Small}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"/>
+                    </Border>
+                    
+                    <!-- Board List -->
+                    <ListBox Grid.Row="1"
+                             ItemsSource="{Binding PaletteBoards, Mode=OneWay}"
+                             SelectedItem="{Binding SelectedPaletteBoard, Mode=TwoWay}"
+                             BorderThickness="0"
+                             Background="Transparent"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                             Margin="0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{DynamicResource Brush.Background.Primary}"
+                                        BorderThickness="0"
+                                        Padding="12,8"
+                                        Margin="2">
+                                    <StackPanel>
+                                        <!-- DisplayName (bold) -->
+                                        <TextBlock Text="{Binding DisplayName, Mode=OneWay}"
+                                                   FontSize="{DynamicResource Font.Body}"
+                                                   FontFamily="{DynamicResource Font.Primary}"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource Brush.Text.Primary}"/>
+                                        <!-- Type + Status line -->
+                                        <StackPanel Orientation="Horizontal"
+                                                    Margin="0,4,0,0">
+                                            <!-- Type badge -->
+                                            <Border Background="{DynamicResource Brush.Background.Secondary}"
+                                                    BorderBrush="{DynamicResource Brush.Border}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="2"
+                                                    Padding="4,2"
+                                                    Margin="0,0,8,0">
+                                                <TextBlock Text="{Binding Type, Mode=OneWay}"
+                                                           FontSize="{DynamicResource Font.Caption}"
+                                                           FontFamily="{DynamicResource Font.Primary}"
+                                                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                            </Border>
+                                            <!-- Status -->
+                                            <TextBlock Text="{Binding Status, Mode=OneWay, StringFormat='Status: {0}'}"
+                                                       FontSize="{DynamicResource Font.Caption}"
+                                                       FontFamily="{DynamicResource Font.Primary}"
+                                                       Foreground="{DynamicResource Brush.Text.Secondary}"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderThickness="0"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="{DynamicResource Brush.Border}"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter Property="Background" Value="{DynamicResource Brush.Accent.Primary}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                    
+                    <!-- Add to Map Button -->
+                    <Button Grid.Row="2"
+                            Content="Add to Map"
+                            Command="{Binding AddBoxCommand}"
+                            HorizontalAlignment="Stretch"
+                            Padding="16,8"
+                            Margin="16"
+                            Background="{DynamicResource Brush.Accent.Primary}"
+                            Foreground="White"
+                            BorderThickness="0"
+                            FontSize="{DynamicResource Font.Body}"
+                            FontFamily="{DynamicResource Font.Primary}"
+                            Cursor="Hand">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    CornerRadius="4"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Opacity" Value="0.9"/>
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Opacity" Value="0.5"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
+            </Border>
+            
+            <!-- Right: Editor Area -->
+            <!-- TCP-1.0.2: Editor area with background image display -->
+            <!-- TCP-1.0.3: Canvas overlay for placed boxes -->
+            <Border Grid.Column="1"
+                    Background="{DynamicResource Brush.Surface}"
+                    BorderBrush="{DynamicResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Margin="16,0,16,16">
+                <Grid>
+                    <!-- Background Image Container -->
+                    <!-- Fit Mode: Image Stretch="Uniform", centered, no scrollbars -->
+                    <Image x:Name="FitModeImage"
+                           Source="{Binding BackgroundImage, Mode=OneWay}"
+                           Stretch="Uniform"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           Visibility="{Binding HasNoImage, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
-            </Grid>
-        </Border>
+                           Visibility="{Binding IsFitMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    
+                    <!-- Actual Mode: ScrollViewer with Image Stretch="None", scrollbars Auto -->
+                    <ScrollViewer x:Name="ActualModeScrollViewer"
+                                  HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Visibility="{Binding IsActualMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <Image Source="{Binding BackgroundImage, Mode=OneWay}"
+                               Stretch="None"/>
+                    </ScrollViewer>
+                    
+                    <!-- No Image Placeholder -->
+                    <TextBlock Text="No background image loaded."
+                               FontSize="{DynamicResource Font.Body}"
+                               FontFamily="{DynamicResource Font.Primary}"
+                               Foreground="{DynamicResource Brush.Text.Secondary}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Visibility="{Binding HasNoImage, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    
+                    <!-- Canvas Overlay for Placed Boxes -->
+                    <!-- TCP-1.0.3: Boxes drawn on top of background image -->
+                    <Canvas x:Name="BoxesCanvas"
+                            Background="Transparent"
+                            IsHitTestVisible="False">
+                        <ItemsControl ItemsSource="{Binding PlacedBoxes, Mode=OneWay}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding X, Mode=OneWay}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding Y, Mode=OneWay}"/>
+                                </Style>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <!-- Box Card -->
+                                    <!-- TCP-1.0.3: Box card with DisplayName, Type, Status -->
+                                    <Border Background="{DynamicResource Brush.Background.Primary}"
+                                            BorderBrush="{DynamicResource Brush.Border}"
+                                            BorderThickness="2"
+                                            CornerRadius="4"
+                                            Padding="12,8"
+                                            MinWidth="150"
+                                            MaxWidth="200">
+                                        <StackPanel>
+                                            <!-- DisplayName (bold) -->
+                                            <TextBlock Text="{Binding DisplayName, Mode=OneWay}"
+                                                       FontSize="{DynamicResource Font.Body}"
+                                                       FontFamily="{DynamicResource Font.Primary}"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource Brush.Text.Primary}"/>
+                                            <!-- Type + Status line -->
+                                            <StackPanel Orientation="Horizontal"
+                                                        Margin="0,4,0,0">
+                                                <!-- Type badge -->
+                                                <Border Background="{DynamicResource Brush.Background.Secondary}"
+                                                        BorderBrush="{DynamicResource Brush.Border}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="2"
+                                                        Padding="4,2"
+                                                        Margin="0,0,8,0">
+                                                    <TextBlock Text="{Binding Type, Mode=OneWay}"
+                                                               FontSize="{DynamicResource Font.Caption}"
+                                                               FontFamily="{DynamicResource Font.Primary}"
+                                                               Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                                </Border>
+                                                <!-- Status -->
+                                                <TextBlock Text="{Binding Status, Mode=OneWay}"
+                                                           FontSize="{DynamicResource Font.Caption}"
+                                                           FontFamily="{DynamicResource Font.Primary}"
+                                                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                                                           VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Canvas>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>
 

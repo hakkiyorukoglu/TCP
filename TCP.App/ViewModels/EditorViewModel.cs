@@ -1,8 +1,10 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
+using TCP.App.Models.Editor;
 using TCP.App.Services;
 
 namespace TCP.App.ViewModels;
@@ -28,6 +30,7 @@ public enum EditorImageMode
 /// EditorViewModel - Editor modülü ViewModel'i
 /// 
 /// TCP-1.0.2: Background Image Load (Editor)
+/// TCP-1.0.3: Editor: Add board boxes from registry
 /// 
 /// Bu ViewModel EditorView'un data context'idir.
 /// Editor modülü state'ini ve iş mantığını yönetir.
@@ -40,6 +43,11 @@ public enum EditorImageMode
 /// </summary>
 public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
 {
+    /// <summary>
+    /// Board registry - Single source of truth for board definitions
+    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// </summary>
+    private readonly BoardRegistry _boardRegistry;
     /// <summary>
     /// PropertyChanged event - UI binding'ler için
     /// </summary>
@@ -178,15 +186,89 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand ClearImageCommand { get; }
     
     /// <summary>
-    /// Constructor - Initialize commands
+    /// Palette boards (from registry)
+    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// </summary>
+    public ObservableCollection<BoardDefinition> PaletteBoards { get; }
+    
+    /// <summary>
+    /// Selected palette board (for Add button)
+    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// </summary>
+    private BoardDefinition? _selectedPaletteBoard;
+    public BoardDefinition? SelectedPaletteBoard
+    {
+        get => _selectedPaletteBoard;
+        set
+        {
+            if (_selectedPaletteBoard != value)
+            {
+                _selectedPaletteBoard = value;
+                OnPropertyChanged();
+                // TCP-1.0.3: Update AddBoxCommand CanExecute
+                if (AddBoxCommand is RelayCommandWithCanExecute<object> cmd)
+                {
+                    cmd.RaiseCanExecuteChanged();
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Placed boxes on editor canvas
+    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// </summary>
+    public ObservableCollection<PlacedBoardBox> PlacedBoxes { get; }
+    
+    /// <summary>
+    /// Selected box (optional for highlight)
+    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// </summary>
+    private PlacedBoardBox? _selectedBox;
+    public PlacedBoardBox? SelectedBox
+    {
+        get => _selectedBox;
+        set
+        {
+            if (_selectedBox != value)
+            {
+                _selectedBox = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Add Box Command
+    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// </summary>
+    public ICommand AddBoxCommand { get; }
+    
+    /// <summary>
+    /// Constructor - Initialize commands and palette
     /// TCP-1.0.2: Background Image Load (Editor)
+    /// TCP-1.0.3: Editor: Add board boxes from registry
     /// </summary>
     public EditorViewModel()
     {
+        // TCP-1.0.3: Initialize board registry
+        _boardRegistry = BoardRegistry.Instance;
+        
+        // TCP-1.0.3: Load palette boards from registry (single source of truth)
+        var boards = _boardRegistry.GetAllBoards();
+        PaletteBoards = new ObservableCollection<BoardDefinition>(boards);
+        
+        // TCP-1.0.3: Initialize placed boxes collection
+        PlacedBoxes = new ObservableCollection<PlacedBoardBox>();
+        
+        // TCP-1.0.2: Initialize image commands
         LoadImageCommand = new RelayCommand<object>(_ => LoadImage());
         SetFitModeCommand = new RelayCommand<object>(_ => SetFitMode());
         SetActualModeCommand = new RelayCommand<object>(_ => SetActualMode());
         ClearImageCommand = new RelayCommand<object>(_ => ClearImage());
+        
+        // TCP-1.0.3: Initialize AddBoxCommand with CanExecute check
+        AddBoxCommand = new RelayCommandWithCanExecute<object>(_ => AddBox(), () => SelectedPaletteBoard != null);
     }
     
     /// <summary>
@@ -280,6 +362,47 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         catch
         {
             // TCP-1.0.2: Safety - ignore exceptions
+        }
+    }
+    
+    /// <summary>
+    /// Add Box command implementation
+    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// 
+    /// Adds a new PlacedBoardBox centered in the visible editor area (X,Y = 0,0 for now).
+    /// </summary>
+    private void AddBox()
+    {
+        try
+        {
+            // TCP-1.0.3: Safety guard - require selected palette board
+            if (SelectedPaletteBoard == null)
+            {
+                NotificationService.Instance.ShowWarning("Select a board first", "Please select a board from the palette before adding.");
+                return;
+            }
+            
+            // TCP-1.0.3: Create new placed box
+            var box = new PlacedBoardBox
+            {
+                BoardId = SelectedPaletteBoard.Id,
+                DisplayName = SelectedPaletteBoard.DisplayName,
+                Type = SelectedPaletteBoard.Type,
+                Status = SelectedPaletteBoard.Status,
+                X = 0.0, // Center for now (simplest)
+                Y = 0.0  // Center for now (simplest)
+            };
+            
+            // TCP-1.0.3: Add to collection
+            PlacedBoxes.Add(box);
+            
+            // TCP-1.0.3: Show success toast
+            NotificationService.Instance.ShowSuccess("Added", $"Added: {box.DisplayName}");
+        }
+        catch (Exception ex)
+        {
+            // TCP-1.0.3: Safety - show error toast (no crash)
+            NotificationService.Instance.ShowError("Failed to add box", ex.Message);
         }
     }
 }

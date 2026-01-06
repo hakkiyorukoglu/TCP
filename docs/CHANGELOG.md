@@ -2,6 +2,57 @@
 
 All notable changes to TCP (Train Control Platform) are documented in this file.
 
+## TCP-1.0.3 — Editor: Add board boxes from registry
+
+**Release Date**: [Current Date]
+
+### Added
+
+- **Editor Palette**: Palette panel sourced from Electronics registry (single source of truth)
+  - Left panel (240px fixed width) with board list from BoardRegistry
+  - Each board shows DisplayName, Type badge, and Status
+  - "Add to Map" button (enabled only when board is selected)
+
+- **Placed Board Boxes**: Box cards on editor canvas
+  - PlacedBoardBox model with BoxId, BoardId, DisplayName, Type, Status, X, Y
+  - Boxes rendered as cards on Canvas overlay (on top of background image)
+  - Each box displays DisplayName (bold), Type badge, and Status
+  - Boxes positioned at X, Y coordinates (currently centered at 0,0)
+
+- **BoardDefinition Model**: Board definition model for Editor palette
+  - Id, DisplayName, Type, Status, Notes fields
+  - Converted from BoardItem (BoardRegistry) - single source of truth
+
+- **BoardRegistry Extensions**: Added GetAllBoards() and GetById() methods
+  - Converts BoardItem to BoardDefinition
+  - Type extracted from board name (e.g., "Arduino Mega" -> "Mega")
+
+### Changed
+
+- **Editor Layout**: 2-column layout (Palette left, Editor area right)
+  - Palette panel with board list and "Add to Map" button
+  - Editor area with background image + Canvas overlay for boxes
+
+- **EditorViewModel**: Added palette and box management
+  - PaletteBoards: ObservableCollection<BoardDefinition> from registry
+  - PlacedBoxes: ObservableCollection<PlacedBoardBox>
+  - SelectedPaletteBoard: For Add button selection
+  - AddBoxCommand: Creates new PlacedBoardBox (with CanExecute check)
+
+- **Version**: Updated to TCP-1.0.3
+  - VersionManager.CurrentVersion = "TCP-1.0.3"
+  - VersionManager.StageName = "Editor: Add board boxes from registry"
+
+### Technical Details
+
+- BoardRegistry is single source of truth (used by both Electronics and Editor)
+- No hardcoded palette items - all boards come from registry
+- AddBoxCommand uses RelayCommandWithCanExecute for button enable/disable
+- Boxes rendered on Canvas overlay (IsHitTestVisible=False for now)
+- No drag-drop, no pan/zoom, no selection (as per requirements)
+
+---
+
 ## TCP-1.0.2 — Background Image Load (Editor)
 
 **Release Date**: [Current Date]
