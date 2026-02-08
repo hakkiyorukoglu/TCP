@@ -48,6 +48,18 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     /// TCP-1.0.3: Editor: Add board boxes from registry
     /// </summary>
     private readonly BoardRegistry _boardRegistry;
+    
+    /// <summary>
+    /// Viewport state - Zoom and pan transformation
+    /// TCP-1.0.4: Background Image Load with Zoom/Pan
+    /// </summary>
+    public ViewportState ViewportState { get; }
+    
+    /// <summary>
+    /// Input router - Mouse input handler for viewport
+    /// TCP-1.0.4: Background Image Load with Zoom/Pan
+    /// </summary>
+    public EditorInputRouter InputRouter { get; }
     /// <summary>
     /// PropertyChanged event - UI binding'ler için
     /// </summary>
@@ -251,6 +263,10 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     /// </summary>
     public EditorViewModel()
     {
+        // TCP-1.0.4: Initialize viewport state and input router
+        ViewportState = new ViewportState();
+        InputRouter = new EditorInputRouter(ViewportState);
+        
         // TCP-1.0.3: Initialize board registry
         _boardRegistry = BoardRegistry.Instance;
         

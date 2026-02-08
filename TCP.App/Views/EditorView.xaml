@@ -376,46 +376,42 @@
             <!-- Right: Editor Area -->
             <!-- TCP-1.0.2: Editor area with background image display -->
             <!-- TCP-1.0.3: Canvas overlay for placed boxes -->
-            <Border Grid.Column="1"
+            <!-- TCP-1.0.4: Viewport transform integration (Zoom/Pan) -->
+            <Border x:Name="ViewportContainer"
+                    Grid.Column="1"
                     Background="{DynamicResource Brush.Surface}"
                     BorderBrush="{DynamicResource Brush.Border}"
                     BorderThickness="1"
                     CornerRadius="4"
-                    Margin="16,0,16,16">
+                    Margin="16,0,16,16"
+                    ClipToBounds="True"
+                    MouseWheel="ViewportContainer_MouseWheel"
+                    MouseDown="ViewportContainer_MouseDown"
+                    MouseMove="ViewportContainer_MouseMove"
+                    MouseUp="ViewportContainer_MouseUp">
                 <Grid>
-                    <!-- Background Image Container -->
-                    <!-- Fit Mode: Image Stretch="Uniform", centered, no scrollbars -->
-                    <Image x:Name="FitModeImage"
-                           Source="{Binding BackgroundImage, Mode=OneWay}"
-                           Stretch="Uniform"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Visibility="{Binding IsFitMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                    
-                    <!-- Actual Mode: ScrollViewer with Image Stretch="None", scrollbars Auto -->
-                    <ScrollViewer x:Name="ActualModeScrollViewer"
-                                  HorizontalScrollBarVisibility="Auto"
-                                  VerticalScrollBarVisibility="Auto"
-                                  Visibility="{Binding IsActualMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                        <Image Source="{Binding BackgroundImage, Mode=OneWay}"
-                               Stretch="None"/>
-                    </ScrollViewer>
-                    
-                    <!-- No Image Placeholder -->
-                    <TextBlock Text="No background image loaded."
-                               FontSize="{DynamicResource Font.Body}"
-                               FontFamily="{DynamicResource Font.Primary}"
-                               Foreground="{DynamicResource Brush.Text.Secondary}"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               Visibility="{Binding HasNoImage, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                    
-                    <!-- Canvas Overlay for Placed Boxes -->
-                    <!-- TCP-1.0.3: Boxes drawn on top of background image -->
-                    <Canvas x:Name="BoxesCanvas"
+                    <!-- Viewport Canvas with Transform -->
+                    <!-- TCP-1.0.4: This Canvas applies zoom/pan transform to all children -->
+                    <Canvas x:Name="ViewportCanvas"
                             Background="Transparent"
-                            IsHitTestVisible="False">
-                        <ItemsControl ItemsSource="{Binding PlacedBoxes, Mode=OneWay}">
+                            RenderTransform="{Binding ViewportState.Transform, Mode=OneWay}"
+                            RenderTransformOrigin="0.5,0.5">
+                        
+                        <!-- Background Image (Z-Index 0, LOCKED) -->
+                        <!-- TCP-1.0.4: Image is locked (IsHitTestVisible=False), only viewport camera moves -->
+                        <!-- CRITICAL: Image must be at Z-Index 0 (background layer) -->
+                        <Image x:Name="BackgroundImage"
+                               Source="{Binding BackgroundImage, Mode=OneWay}"
+                               Stretch="None"
+                               Panel.ZIndex="0"
+                               IsHitTestVisible="False"
+                               Visibility="{Binding HasImage, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        
+                        <!-- Placed Boxes Overlay (Z-Index 1) -->
+                        <!-- TCP-1.0.3: Boxes drawn on top of background image -->
+                        <!-- TCP-1.0.4: Boxes move WITH the viewport transform -->
+                        <ItemsControl ItemsSource="{Binding PlacedBoxes, Mode=OneWay}"
+                                      Panel.ZIndex="1">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <Canvas/>
@@ -473,6 +469,16 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </Canvas>
+                    
+                    <!-- No Image Placeholder (not affected by transform) -->
+                    <!-- TCP-1.0.4: Placeholder shown when no image loaded -->
+                    <TextBlock Text="No background image loaded. Click 'Load Image' to start."
+                               FontSize="{DynamicResource Font.Body}"
+                               FontFamily="{DynamicResource Font.Primary}"
+                               Foreground="{DynamicResource Brush.Text.Secondary}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Visibility="{Binding HasNoImage, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
                 </Grid>
             </Border>
         </Grid>
