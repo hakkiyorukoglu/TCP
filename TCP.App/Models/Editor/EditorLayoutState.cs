@@ -10,6 +10,7 @@ public class EditorLayoutState
 {
     public List<EditorImage> Images { get; set; } = new();
     public List<PlacedItemState> PlacedItems { get; set; } = new();
+    public List<TCP.App.Models.Electronics.TrackRoute> Routes { get; set; } = new();
 }
 
 /// <summary>

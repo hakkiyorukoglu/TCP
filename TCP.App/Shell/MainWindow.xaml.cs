@@ -170,6 +170,10 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
                 NavigateToView(new EditorView(), "Editor");
                 SetActiveTab(EditorTab);
                 break;
+            case "Simulation":
+                NavigateToView(new TCP.App.Views.Pages.SimulationView(), "Simulation");
+                SetActiveTab(SimulationTab);
+                break;
             case "Settings":
                 var settingsViewFromSearch = new SettingsView();
                 NavigateToView(settingsViewFromSearch, "Settings");
@@ -211,6 +215,15 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     {
         NavigateToView(new EditorView(), "Editor");
         SetActiveTab(EditorTab);
+    }
+    
+    /// <summary>
+    /// Navigation: Simulation tab click handler
+    /// </summary>
+    private void SimulationTab_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        NavigateToView(new TCP.App.Views.Pages.SimulationView(), "Simulation");
+        SetActiveTab(SimulationTab);
     }
     
     /// <summary>
@@ -302,6 +315,7 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         HomeTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
         ElectronicsTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
         EditorTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
+        SimulationTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Secondary");
         
         // Aktif tab'ı primary color'a set et
         activeTab.SetResourceReference(TextBlock.ForegroundProperty, "Brush.Text.Primary");

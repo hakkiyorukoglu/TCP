@@ -149,3 +149,5 @@ C:\Users\yoruk\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\Dialogs\RelayC
 C:\Users\yoruk\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\Dialogs\RelayControlWindow.g.cs
 C:\Users\yoruk\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\Dialogs\OtaUpdateWindow.baml
 C:\Users\yoruk\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\Dialogs\OtaUpdateWindow.g.cs
+C:\Users\yoruk\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\Pages\SimulationView.g.cs
+C:\Users\yoruk\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\Pages\SimulationView.baml

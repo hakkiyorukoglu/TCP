@@ -132,6 +132,66 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand OpenRelayControlCommand { get; }
     public ICommand OpenOtaUpdateCommand { get; }
     
+    // Spline Drawing State
+    public ObservableCollection<TrackRoute> Routes { get; } = new();
+    
+    private TrackRoute? _currentRoute;
+    public TrackRoute? CurrentRoute
+    {
+        get => _currentRoute;
+        set
+        {
+            if (_currentRoute != value)
+            {
+                _currentRoute = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
+    private bool _isDrawingRoute;
+    public bool IsDrawingRoute
+    {
+        get => _isDrawingRoute;
+        set
+        {
+            if (_isDrawingRoute != value)
+            {
+                _isDrawingRoute = value;
+                OnPropertyChanged();
+                
+                if (_isDrawingRoute)
+                {
+                    CurrentRoute = new TrackRoute { Name = $"Rota {Routes.Count + 1}" };
+                    Routes.Add(CurrentRoute);
+                    TerminalService.Instance.LogInfo("Rota çizim modu aktif. Haritaya tıklayarak noktalar ekleyin.");
+                }
+                else
+                {
+                    if (CurrentRoute != null && CurrentRoute.Nodes.Count < 2)
+                    {
+                        Routes.Remove(CurrentRoute);
+                        TerminalService.Instance.LogWarning("Rota en az 2 nokta içermelidir. İptal edildi.");
+                    }
+                    else
+                    {
+                        TerminalService.Instance.LogSuccess("Rota çizimi tamamlandı.");
+                    }
+                    CurrentRoute = null;
+                }
+            }
+        }
+    }
+    
+    public void AddRouteNode(double x, double y)
+    {
+        if (!IsDrawingRoute || CurrentRoute == null) return;
+        
+        var node = new TrackNode { X = x, Y = y };
+        CurrentRoute.Nodes.Add(node);
+        OnPropertyChanged(nameof(CurrentRoute)); // Trigger path redraw
+    }
+    
     private bool _isLiveMode;
     public bool IsLiveMode
     {
@@ -590,7 +650,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
 
         if (dialog.ShowDialog() == true)
         {
-            EditorLayoutService.Instance.SaveLayout(dialog.FileName, EditorImages, PlacedBoxes);
+            EditorLayoutService.Instance.SaveLayout(dialog.FileName, EditorImages, PlacedBoxes, Routes);
         }
     }
 
@@ -609,6 +669,9 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             {
                 EditorImages.Clear();
                 foreach (var img in state.Images) EditorImages.Add(img);
+
+                Routes.Clear();
+                foreach (var route in state.Routes) Routes.Add(route);
 
                 PlacedBoxes.Clear();
                 foreach (var stState in state.PlacedItems)

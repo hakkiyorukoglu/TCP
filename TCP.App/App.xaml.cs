@@ -114,6 +114,14 @@ public partial class App : Application
             Route = "Editor"
         });
         
+        // Register Simulation page
+        registry.Register(new SearchItem
+        {
+            TitleKey = "String.Simulation",
+            Keywords = new[] { "simulation", "test", "run", "play", "simülasyon" },
+            Route = "Simulation"
+        });
+        
         // Register Settings page
         registry.Register(new SearchItem
         {

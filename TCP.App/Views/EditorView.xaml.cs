@@ -32,14 +32,23 @@ public partial class EditorView : UserControl
     }
     
     /// <summary>
-    /// Mouse down handler - Start pan
+    /// Mouse down handler - Start pan or draw route
     /// TCP-1.0.4: Pan functionality
     /// </summary>
     private void ViewportContainer_MouseDown(object sender, MouseButtonEventArgs e)
     {
         if (DataContext is EditorViewModel viewModel)
         {
-            viewModel.InputRouter.HandleMouseDown(e);
+            if (e.MiddleButton == MouseButtonState.Pressed)
+            {
+                viewModel.InputRouter.HandleMouseDown(e);
+            }
+            else if (e.LeftButton == MouseButtonState.Pressed && viewModel.IsDrawingRoute)
+            {
+                var pos = e.GetPosition(ViewportCanvas);
+                viewModel.AddRouteNode(pos.X, pos.Y);
+                e.Handled = true;
+            }
         }
     }
     

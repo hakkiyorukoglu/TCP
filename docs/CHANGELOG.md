@@ -2,6 +2,20 @@
 
 All notable changes to TCP (Train Control Platform) are documented in this file.
 
+## TCP-2.6.0 — Spline Routing & Simulation Module
+
+**Release Date**: [Current Date]
+
+### Added
+- **Spline Routing (Rota Çizimi)**: `EditorView`'de yer alan "Rota Çiz (Spline)" aracı ile noktalar halinde serbest ray hatları çizebilme.
+- **Track Models**: `TrackRoute` ve `TrackNode` data modelleri ile rota organizasyonu.
+- **Project Serialization**: Çizilen rotaların `.tcp` JSON dosyası içerisinde `Routes` başlığında Editor Layout olarak serileştirilmesi (Kalıcı kayıt).
+- **Simulation View (Simülasyon UI)**: "Simülasyon" sekmesi ana shell üzerinde aktif edildi.
+- **UI Bugfixes**: `SimulationView`'de bulunan `Page` hatası düzeltildi (`UserControl`'e dönüştürüldü) ve XML kapanış etiket hataları temizlendi.
+- **ViewModel Updates**: `SimulationViewModel` artık sistemin ana `ViewModelBase`'ini kullanıyor ve `INotifyPropertyChanged` desteğine sahip.
+
+---
+
 ## TCP-2.5.0 — OTA Update & Relay HTTP Control
 
 **Release Date**: [Current Date]

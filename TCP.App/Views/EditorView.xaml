@@ -29,6 +29,7 @@
         <converters:LayerTypeToIconConverter x:Key="LayerTypeToIconConverter"/>
         <converters:ConnectionPathConverter x:Key="ConnectionPathConverter"/>
         <converters:LedColorConverter x:Key="LedColorConverter"/>
+        <converters:RoutePathConverter x:Key="RoutePathConverter"/>
     </UserControl.Resources>
     <UserControl.DataContext>
         <viewmodels:EditorViewModel/>
@@ -87,6 +88,22 @@
                             Value="{Binding SelectedImage.Opacity, Mode=TwoWay}"
                             IsEnabled="{Binding HasSelectedImage}"
                             Width="100" VerticalAlignment="Center" Margin="0,0,16,0"/>
+
+                    <!-- Rota Çiz Button -->
+                    <ToggleButton Content="Rota Çiz (Spline)"
+                                  IsChecked="{Binding IsDrawingRoute, Mode=TwoWay}"
+                                  Margin="0,0,16,0"
+                                  Cursor="Hand">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Foreground" Value="Yellow"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
 
                     <ToggleButton Content="Canlı Mod (Live)"
                                   IsChecked="{Binding IsLiveMode, Mode=TwoWay}"
@@ -621,6 +638,42 @@
                                             </MultiBinding>
                                         </Path.Data>
                                     </Path>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Connections Overlay (Z-Index 1) -->
+                        
+                        <!-- Track Routes Overlay (Z-Index 0.8) -->
+                        <ItemsControl ItemsSource="{Binding Routes}" Panel.ZIndex="0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Canvas>
+                                        <!-- The Route Path itself -->
+                                        <Path Stroke="Yellow" StrokeThickness="3" Opacity="0.9"
+                                              Data="{Binding Nodes, Converter={StaticResource RoutePathConverter}}" />
+                                        
+                                        <!-- The Nodes -->
+                                        <ItemsControl ItemsSource="{Binding Nodes}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <Canvas/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Ellipse Width="8" Height="8" Fill="Red" 
+                                                             Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}" 
+                                                             Margin="-4,-4,0,0" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Canvas>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>

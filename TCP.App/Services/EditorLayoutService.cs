@@ -18,11 +18,16 @@ public class EditorLayoutService
     /// <summary>
     /// Saves the current layout state to a JSON file.
     /// </summary>
-    public void SaveLayout(string filePath, IEnumerable<EditorImage> images, IEnumerable<ILayerItem> placedItems)
+    public void SaveLayout(string filePath, IEnumerable<EditorImage> images, IEnumerable<ILayerItem> placedItems, IEnumerable<TrackRoute> routes)
     {
         try
         {
             var state = new EditorLayoutState();
+            
+            foreach(var route in routes)
+            {
+                state.Routes.Add(route);
+            }
             
             foreach (var img in images)
             {
