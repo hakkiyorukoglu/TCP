@@ -95,7 +95,7 @@
                             VerticalAlignment="Center">
                     <!-- Home tab -->
                     <TextBlock x:Name="HomeTab"
-                               Text="Home"
+                               Text="{DynamicResource String.Home}"
                                FontSize="{DynamicResource Font.Body}"
                                FontFamily="{DynamicResource Font.Primary}"
                                Foreground="{DynamicResource Brush.Text.Primary}"
@@ -117,7 +117,7 @@
                     
                     <!-- Electronics tab -->
                     <TextBlock x:Name="ElectronicsTab"
-                               Text="Electronics"
+                               Text="{DynamicResource String.Electronics}"
                                FontSize="{DynamicResource Font.Body}"
                                FontFamily="{DynamicResource Font.Primary}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
@@ -140,7 +140,7 @@
                     <!-- Editor tab -->
                     <!-- TCP-1.0.2: Editor reintroduced -->
                     <TextBlock x:Name="EditorTab"
-                               Text="Editor"
+                               Text="{DynamicResource String.Editor}"
                                FontSize="{DynamicResource Font.Body}"
                                FontFamily="{DynamicResource Font.Primary}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
@@ -232,7 +232,7 @@
                             </Border>
                             
                             <!-- Placeholder text (when empty) -->
-                            <TextBlock Text="Search..."
+                            <TextBlock Text="{DynamicResource String.Search}"
                                        FontSize="{DynamicResource Font.Caption}"
                                        FontFamily="{DynamicResource Font.Primary}"
                                        Foreground="{DynamicResource Brush.Text.Secondary}"
@@ -335,7 +335,7 @@
                                    VerticalAlignment="Center"
                                    Margin="0,0,8,0"
                                    Cursor="Hand"
-                                   ToolTip="Settings"
+                                   ToolTip="{DynamicResource String.Settings}"
                                    MouseLeftButtonDown="SettingsIcon_MouseLeftButtonDown">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">

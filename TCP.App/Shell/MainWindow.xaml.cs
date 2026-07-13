@@ -127,6 +127,10 @@ public partial class MainWindow : Window
     {
         // Theme'i güvenli bir şekilde yükle
         ThemeService.LoadInitialTheme();
+        
+        // Language'i güvenli bir şekilde yükle
+        var lang = App.LoadedSettings?.Language ?? "tr-TR";
+        LanguageService.ApplyLanguage(lang);
     }
     
     /// <summary>

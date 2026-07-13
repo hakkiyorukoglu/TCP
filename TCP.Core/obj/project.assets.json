@@ -8,19 +8,19 @@
     "net8.0": []
   },
   "packageFolders": {
-    "C:\\Users\\nurul\\.nuget\\packages\\": {}
+    "C:\\Users\\yoruk\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Core\\TCP.Core.csproj",
+      "projectUniqueName": "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.Core\\TCP.Core.csproj",
       "projectName": "TCP.Core",
-      "projectPath": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Core\\TCP.Core.csproj",
-      "packagesPath": "C:\\Users\\nurul\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Core\\obj\\",
+      "projectPath": "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.Core\\TCP.Core.csproj",
+      "packagesPath": "C:\\Users\\yoruk\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.Core\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\nurul\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\yoruk\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -64,7 +64,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.417/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.422/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

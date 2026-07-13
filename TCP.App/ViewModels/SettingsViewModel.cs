@@ -67,6 +67,30 @@ public class SettingsViewModel : ViewModelBase, INotifyPropertyChanged
     
     
     /// <summary>
+    /// Desteklenen diller
+    /// </summary>
+    public ObservableCollection<string> Languages { get; }
+
+    private string _selectedLanguage;
+    public string SelectedLanguage
+    {
+        get => _selectedLanguage;
+        set
+        {
+            if (_selectedLanguage != value)
+            {
+                _selectedLanguage = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Ayarları kaydet komutu
+    /// </summary>
+    public System.Windows.Input.ICommand SaveCommand { get; }
+
+    /// <summary>
     /// Constructor - Initialize categories and load shortcuts
     /// TCP-0.8.0: Settings System v1
     /// TCP-0.8.2: Shortcuts Map (UI list) + Dark-only theme
@@ -86,8 +110,26 @@ public class SettingsViewModel : ViewModelBase, INotifyPropertyChanged
         var shortcutsRegistry = ShortcutsRegistry.Instance;
         Shortcuts = new ObservableCollection<ShortcutItem>(shortcutsRegistry.GetAll());
         
+        Languages = new ObservableCollection<string> { "tr-TR", "en-US" };
+        var settings = App.LoadedSettings ?? new TCP.App.Models.AppSettings();
+        SelectedLanguage = settings.Language;
+
+        SaveCommand = new RelayCommand<object>(_ => SaveSettings());
+        
         // Default selection: İlk kategori
         SelectedCategory = Categories.Count > 0 ? Categories[0] : null;
+    }
+
+    private void SaveSettings()
+    {
+        var settings = App.LoadedSettings ?? new TCP.App.Models.AppSettings();
+        settings.Language = SelectedLanguage;
+        
+        App.SettingsService.Save(settings);
+        App.UpdateLoadedSettings(settings);
+        
+        LanguageService.ApplyLanguage(SelectedLanguage);
+        NotificationService.Instance.ShowSuccess("Saved", "Settings updated");
     }
 }
 

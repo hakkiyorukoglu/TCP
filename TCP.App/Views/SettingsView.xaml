@@ -47,7 +47,7 @@
                 
                 <!-- Header -->
                 <TextBlock Grid.Row="0"
-                           Text="Settings"
+                           Text="{DynamicResource String.Settings}"
                            FontSize="{DynamicResource Font.Heading.Medium}"
                            FontFamily="{DynamicResource Font.Primary}"
                            FontWeight="SemiBold"
@@ -148,7 +148,7 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock Text="Theme"
+                        <TextBlock Text="{DynamicResource String.Theme}"
                                    FontSize="{DynamicResource Font.Heading.Small}"
                                    FontFamily="{DynamicResource Font.Primary}"
                                    FontWeight="SemiBold"
@@ -161,7 +161,7 @@
                                 Padding="12,10"
                                 Margin="0,0,0,12">
                             <StackPanel>
-                                <TextBlock Text="Dark (locked)"
+                                <TextBlock Text="{DynamicResource String.Theme.Dark}"
                                            FontSize="{DynamicResource Font.Body}"
                                            FontFamily="{DynamicResource Font.Primary}"
                                            Foreground="{DynamicResource Brush.Text.Primary}"/>
@@ -173,23 +173,23 @@
                             </StackPanel>
                         </Border>
                         
-                        <TextBlock Text="Accent Color"
+                        <!-- Language Option -->
+                        <TextBlock Text="{DynamicResource String.Language}"
                                    FontSize="{DynamicResource Font.Heading.Small}"
                                    FontFamily="{DynamicResource Font.Primary}"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                    Margin="0,16,0,8"/>
-                        <Border Background="{DynamicResource Brush.Surface}"
-                                BorderBrush="{DynamicResource Brush.Border}"
-                                BorderThickness="1"
-                                CornerRadius="4"
-                                Padding="12,10"
-                                Margin="0,0,0,12">
-                            <TextBlock Text="Default accent color"
-                                       FontSize="{DynamicResource Font.Body}"
-                                       FontFamily="{DynamicResource Font.Primary}"
-                                       Foreground="{DynamicResource Brush.Text.Secondary}"/>
-                        </Border>
+                        <ComboBox ItemsSource="{Binding Languages}"
+                                  SelectedItem="{Binding SelectedLanguage}"
+                                  Width="200" HorizontalAlignment="Left"
+                                  Margin="0,0,0,12" />
+
+                        <!-- Save Button -->
+                        <Button Content="{DynamicResource String.Save}"
+                                Command="{Binding SaveCommand}"
+                                Width="100" HorizontalAlignment="Left"
+                                Margin="0,16,0,0" Padding="8,4" />
                     </StackPanel>
                     
                     <!-- Shortcuts Category Content -->

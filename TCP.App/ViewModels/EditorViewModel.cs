@@ -119,6 +119,20 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     /// </summary>
     public bool HasImage => BackgroundImage != null;
     
+    private bool _isLocked;
+    public bool IsLocked
+    {
+        get => _isLocked;
+        set
+        {
+            if (_isLocked != value)
+            {
+                _isLocked = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
     /// <summary>
     /// Has no image (for visibility binding)
     /// TCP-1.0.2: Background Image Load (Editor)
@@ -317,6 +331,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                 // TCP-1.0.2: Set properties
                 BackgroundImage = bitmap;
                 BackgroundImageName = System.IO.Path.GetFileName(dialog.FileName);
+                IsLocked = false;
                 
                 // TCP-1.0.2: Show success toast
                 NotificationService.Instance.ShowSuccess("Background image loaded", $"Loaded: {BackgroundImageName}");

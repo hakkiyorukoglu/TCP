@@ -1,0 +1,29 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Navbar -->
+    <system:String x:Key="String.Home">Ana Sayfa</system:String>
+    <system:String x:Key="String.Electronics">Elektronik</system:String>
+    <system:String x:Key="String.Editor">Editör</system:String>
+    <system:String x:Key="String.Search">Ara...</system:String>
+
+    <!-- Settings -->
+    <system:String x:Key="String.Settings">Ayarlar</system:String>
+    <system:String x:Key="String.Theme">Tema</system:String>
+    <system:String x:Key="String.Theme.Dark">Koyu</system:String>
+    <system:String x:Key="String.Theme.Light">Açık</system:String>
+    <system:String x:Key="String.Language">Dil</system:String>
+    <system:String x:Key="String.Appearance">Görünüm</system:String>
+    <system:String x:Key="String.Application">Uygulama</system:String>
+
+    <!-- Canvas -->
+    <system:String x:Key="String.LoadImage">Resim Yükle</system:String>
+    <system:String x:Key="String.LockImage">Kilitle</system:String>
+    <system:String x:Key="String.UnlockImage">Kilidi Aç</system:String>
+
+    <!-- General -->
+    <system:String x:Key="String.Save">Kaydet</system:String>
+    <system:String x:Key="String.Cancel">İptal</system:String>
+
+</ResourceDictionary>

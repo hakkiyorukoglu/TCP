@@ -20,6 +20,13 @@ public class AppSettings
     public string Theme { get; set; } = "Dark";
     
     /// <summary>
+    /// Seçili dil
+    /// "tr-TR" veya "en-US"
+    /// Default: "tr-TR"
+    /// </summary>
+    public string Language { get; set; } = "tr-TR";
+    
+    /// <summary>
     /// Son ziyaret edilen sayfa route'u
     /// "Home", "Electronics", "Simulation", "Editor", "Settings", "Info"
     /// Default: "Home"

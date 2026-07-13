@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.App\\TCP.App.csproj": {}
+    "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.App\\TCP.App.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.App\\TCP.App.csproj": {
+    "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.App\\TCP.App.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.App\\TCP.App.csproj",
+        "projectUniqueName": "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.App\\TCP.App.csproj",
         "projectName": "TCP.App",
-        "projectPath": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.App\\TCP.App.csproj",
-        "packagesPath": "C:\\Users\\nurul\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.App\\obj\\",
+        "projectPath": "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.App\\TCP.App.csproj",
+        "packagesPath": "C:\\Users\\yoruk\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.App\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\nurul\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\yoruk\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0-windows"
@@ -26,8 +26,8 @@
           "net8.0-windows7.0": {
             "targetAlias": "net8.0-windows",
             "projectReferences": {
-              "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Theming\\TCP.Theming.csproj": {
-                "projectPath": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Theming\\TCP.Theming.csproj"
+              "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.Theming\\TCP.Theming.csproj": {
+                "projectPath": "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.Theming\\TCP.Theming.csproj"
               }
             }
           }
@@ -65,21 +65,21 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.417/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.422/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Theming\\TCP.Theming.csproj": {
+    "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.Theming\\TCP.Theming.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Theming\\TCP.Theming.csproj",
+        "projectUniqueName": "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.Theming\\TCP.Theming.csproj",
         "projectName": "TCP.Theming",
-        "projectPath": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Theming\\TCP.Theming.csproj",
-        "packagesPath": "C:\\Users\\nurul\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nurul\\Desktop\\hakkı\\TCP\\TCP.Theming\\obj\\",
+        "projectPath": "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.Theming\\TCP.Theming.csproj",
+        "packagesPath": "C:\\Users\\yoruk\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.Theming\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\nurul\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\yoruk\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0-windows"
@@ -126,7 +126,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.417/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.422/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -19,7 +19,7 @@ public static class VersionManager
     /// 
     /// IMPORTANT: Bu değer tek yerden güncellenir - tüm UI otomatik güncellenir
     /// </summary>
-    public static string CurrentVersion => "TCP-1.0.4";
+    public static string CurrentVersion => "TCP-2.0.0";
     
     /// <summary>
     /// Build time
