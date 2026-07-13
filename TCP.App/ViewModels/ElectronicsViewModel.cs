@@ -61,6 +61,7 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
             if (SelectedModem != null && SelectedModem.IncomingConnectionId != value)
             {
                 NetworkManager.Instance.SetIncomingConnection(SelectedModem.Id, value);
+                NetworkManager.Instance.SaveNetwork(); // Auto-save and trigger UI update
                 UpdateAvailableConnections();
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SelectedOutgoingId));
@@ -77,6 +78,7 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
             if (SelectedModem != null && SelectedModem.OutgoingConnectionId != value)
             {
                 NetworkManager.Instance.SetOutgoingConnection(SelectedModem.Id, value);
+                NetworkManager.Instance.SaveNetwork(); // Auto-save and trigger UI update
                 UpdateAvailableConnections();
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SelectedIncomingId));
@@ -108,18 +110,45 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
                 }
             }
 
-            AvailableConnections.Clear();
-            foreach (var item in newList)
+            // Sync collection to keep combo boxes from losing selection
+            for (int i = AvailableConnections.Count - 1; i >= 0; i--)
             {
-                AvailableConnections.Add(item);
+                if (!newList.Any(n => n.Id == AvailableConnections[i].Id))
+                {
+                    AvailableConnections.RemoveAt(i);
+                }
             }
-            
+
+            for (int i = 0; i < newList.Count; i++)
+            {
+                var existing = AvailableConnections.FirstOrDefault(a => a.Id == newList[i].Id);
+                if (existing == null)
+                {
+                    AvailableConnections.Insert(i, newList[i]);
+                }
+                else
+                {
+                    existing.Name = newList[i].Name;
+                    int currentIndex = AvailableConnections.IndexOf(existing);
+                    if (currentIndex != i)
+                    {
+                        AvailableConnections.Move(currentIndex, i);
+                    }
+                }
+            }
+
             OnPropertyChanged(nameof(SelectedIncomingId));
             OnPropertyChanged(nameof(SelectedOutgoingId));
         }
         finally
         {
             _isUpdatingConnections = false;
+            
+            // Dispatch async notify to ensure UI is in sync after combo box items update
+            System.Windows.Application.Current.Dispatcher.BeginInvoke(new Action(() => {
+                OnPropertyChanged(nameof(SelectedIncomingId));
+                OnPropertyChanged(nameof(SelectedOutgoingId));
+            }), System.Windows.Threading.DispatcherPriority.Background);
         }
     }
 

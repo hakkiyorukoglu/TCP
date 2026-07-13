@@ -2,6 +2,32 @@
 
 All notable changes to TCP (Train Control Platform) are documented in this file.
 
+## TCP-2.5.0 — OTA Update & Relay HTTP Control
+
+**Release Date**: [Current Date]
+
+### Added
+- **Esp32HttpClient Service**: Created an asynchronous singleton service to execute direct HTTP GET/POST calls to ESP32 boards.
+- **Relay Control Window**: Added a UI dialog allowing users to toggle specific station relay pins (`GET /relay?pin=X&state=Y`).
+- **OTA Update Window**: Added a UI dialog allowing users to browse and deploy `.bin` firmware updates via `multipart/form-data` POST request directly to the station.
+- **Live Mode Integration**: Both tools are now accessible from the context menu of stations placed on the Editor Map during Live Mode.
+
+---
+
+## TCP-2.4.2 — ESP32 WT32-ETH01 Preparations & Wi-Fi Removal
+
+**Release Date**: [Current Date]
+
+### Changed
+- **Wi-Fi Module Removed**: Removed "ESP32 WROOM" from default registry to enforce wired LAN connectivity only.
+
+### Fixed
+- **Connection Refresh Bug**: Fixed bug where incoming/outgoing modem connections would be set to null due to UI ComboBox refresh sequence. Connections are now synced rather than cleared.
+- **Save State**: Auto-saving implemented for connection adjustments.
+- **Build Errors**: Resolved `RefreshNetworkStatus` and `OutgoingConnectionId` naming mismatch in Live Mode and Editor.
+
+---
+
 ## TCP-2.4.1 — Connection Sync & UI Bugfixes
 
 **Release Date**: [Current Date]

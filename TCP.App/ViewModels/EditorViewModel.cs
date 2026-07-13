@@ -129,6 +129,45 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     
     public ICommand AddBoxCommand { get; }
     public ICommand RefreshCommand { get; }
+    public ICommand OpenRelayControlCommand { get; }
+    public ICommand OpenOtaUpdateCommand { get; }
+    
+    private bool _isLiveMode;
+    public bool IsLiveMode
+    {
+        get => _isLiveMode;
+        set
+        {
+            if (_isLiveMode != value)
+            {
+                _isLiveMode = value;
+                OnPropertyChanged();
+                
+                if (_isLiveMode)
+                {
+                    LiveNetworkEngine.Instance.NetworkStatusUpdated += OnNetworkStatusUpdated;
+                    LiveNetworkEngine.Instance.Start();
+                    TerminalService.Instance.LogSuccess("Canlı Mod Aktif. Ağ pingleniyor...");
+                }
+                else
+                {
+                    LiveNetworkEngine.Instance.NetworkStatusUpdated -= OnNetworkStatusUpdated;
+                    LiveNetworkEngine.Instance.Stop();
+                    TerminalService.Instance.LogInfo("Canlı Mod Kapatıldı. Tasarım moduna dönüldü.");
+                }
+            }
+        }
+    }
+
+    private void OnNetworkStatusUpdated()
+    {
+        // Status properties in models trigger UI updates automatically.
+        // We can force a re-render of connection lines if needed.
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            SyncDaisyChainLines();
+        });
+    }
     
     public EditorViewModel()
     {
@@ -169,9 +208,32 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         LoadLayoutCommand = new RelayCommand<object>(_ => LoadLayout());
         
         AddBoxCommand = new RelayCommandWithCanExecute<object>(_ => AddBox(), () => SelectedPaletteItem != null);
-        RemoveSelectedLayerCommand = new RelayCommand<object>(param => RemoveSelectedLayer(param as ILayerItem));
+        RemoveSelectedLayerCommand = new RelayCommand<object>(param => 
+        {
+            if (!IsLiveMode) RemoveSelectedLayer(param as ILayerItem);
+        });
         EditLayerPropertiesCommand = new RelayCommand<object>(param => EditLayerProperties(param as ILayerItem));
         RefreshCommand = new RelayCommand<object>(_ => RefreshEditor());
+        
+        OpenRelayControlCommand = new RelayCommand<object>(param => 
+        {
+            if (IsLiveMode && param is TCP.App.Models.Electronics.StationInstance station)
+            {
+                TerminalService.Instance.LogInfo($"Röle Kontrol paneli açılıyor: {station.Name} ({station.IpAddress})");
+                var window = new TCP.App.Views.Dialogs.RelayControlWindow(station);
+                window.ShowDialog();
+            }
+        });
+
+        OpenOtaUpdateCommand = new RelayCommand<object>(param => 
+        {
+            if (IsLiveMode && param is TCP.App.Models.Electronics.StationInstance station)
+            {
+                TerminalService.Instance.LogInfo($"OTA Güncelleme arayüzü açılıyor: {station.Name} ({station.IpAddress})");
+                var window = new TCP.App.Views.Dialogs.OtaUpdateWindow(station);
+                window.ShowDialog();
+            }
+        });
 
         EditorImages.CollectionChanged += (s, e) => SyncLayers();
         PlacedBoxes.CollectionChanged += (s, e) => SyncLayers();

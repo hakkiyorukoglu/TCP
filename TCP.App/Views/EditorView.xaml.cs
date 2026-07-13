@@ -74,6 +74,8 @@ public partial class EditorView : UserControl
 
     private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
+        if (DataContext is EditorViewModel viewModel && viewModel.IsLiveMode) return;
+
         if (sender is System.Windows.FrameworkElement el && el.DataContext is TCP.App.Models.Editor.EditorImage image)
         {
             if (image.IsLocked) return;
@@ -185,6 +187,8 @@ public partial class EditorView : UserControl
 
     private void Box_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
+        if (DataContext is EditorViewModel vm && vm.IsLiveMode) return;
+
         if (sender is System.Windows.FrameworkElement el)
         {
             if (el.DataContext is TCP.App.Models.Electronics.MainPcInstance pc)

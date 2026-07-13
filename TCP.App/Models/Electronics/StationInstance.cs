@@ -17,6 +17,7 @@ public class StationInstance : ILayerItem, INotifyPropertyChanged
     private bool _isLocked;
     private bool _isSelected;
     private bool _isVisible = true;
+    private NetworkStatus _status = NetworkStatus.Offline;
 
     public Guid Id { get; set; } = Guid.NewGuid();
 
@@ -27,7 +28,7 @@ public class StationInstance : ILayerItem, INotifyPropertyChanged
     public string LayerType => "Station";
     
     [JsonIgnore]
-    public string Type => "Mega (İstasyon)";
+    public string Type => "WT32-ETH01 (İstasyon)";
 
     public string Name { get; set; } = "Yeni İstasyon";
     public string IpAddress { get; set; } = "192.168.1.10";
@@ -69,6 +70,13 @@ public class StationInstance : ILayerItem, INotifyPropertyChanged
     {
         get => _isVisible;
         set { if (_isVisible != value) { _isVisible = value; OnPropertyChanged(); } }
+    }
+
+    [JsonIgnore]
+    public NetworkStatus Status
+    {
+        get => _status;
+        set { if (_status != value) { _status = value; OnPropertyChanged(); } }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

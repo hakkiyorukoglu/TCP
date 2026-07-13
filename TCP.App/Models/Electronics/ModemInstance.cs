@@ -17,6 +17,7 @@ public class ModemInstance : ILayerItem, INotifyPropertyChanged
     private bool _isLocked;
     private bool _isSelected;
     private bool _isVisible = true;
+    private NetworkStatus _status = NetworkStatus.Offline;
 
     public Guid Id { get; set; } = Guid.NewGuid();
 
@@ -70,6 +71,13 @@ public class ModemInstance : ILayerItem, INotifyPropertyChanged
     {
         get => _isVisible;
         set { if (_isVisible != value) { _isVisible = value; OnPropertyChanged(); } }
+    }
+
+    [JsonIgnore]
+    public NetworkStatus Status
+    {
+        get => _status;
+        set { if (_status != value) { _status = value; OnPropertyChanged(); } }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

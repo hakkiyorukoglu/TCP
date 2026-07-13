@@ -166,61 +166,49 @@ public partial class App : Application
         
         if (!boardRegistry.GetAll().Any())
         {
-            // Register Arduino Mega
+            // Register WT32-ETH01
             boardRegistry.Register(new BoardItem
-        {
-            Name = "Arduino Mega",
-            Description = "ATmega2560 microcontroller board with 54 digital I/O pins",
-            Status = "Offline",
-            SummaryData = new Dictionary<string, string>
             {
-                { "Port", "COM3" },
-                { "IP Address", "192.168.0.10" },
-                { "Status", "Offline" }
-            }
-        });
-        
-        // Register Arduino Nano
-        boardRegistry.Register(new BoardItem
-        {
-            Name = "Arduino Nano",
-            Description = "Compact ATmega328P board with 14 digital I/O pins",
-            Status = "Offline",
-            SummaryData = new Dictionary<string, string>
+                Name = "WT32-ETH01",
+                Description = "ESP32 board with built-in Ethernet LAN8720 for wired connectivity",
+                Status = "Offline",
+                SummaryData = new Dictionary<string, string>
+                {
+                    { "Port", "ETH0" },
+                    { "IP Address", "192.168.1.10" },
+                    { "Status", "Offline" }
+                }
+            });
+            
+
+            
+            // Register RFID Reader
+            boardRegistry.Register(new BoardItem
             {
-                { "Port", "COM5" },
-                { "IP Address", "192.168.0.11" },
-                { "Status", "Offline" }
-            }
-        });
-        
-        // Register RFID Reader
-        boardRegistry.Register(new BoardItem
-        {
-            Name = "RFID Reader",
-            Description = "RFID reader/writer module for card detection",
-            Status = "Offline",
-            SummaryData = new Dictionary<string, string>
+                Name = "RFID Reader",
+                Description = "RFID reader/writer module for card detection",
+                Status = "Offline",
+                SummaryData = new Dictionary<string, string>
+                {
+                    { "Port", "ETH1" },
+                    { "IP Address", "192.168.1.20" },
+                    { "Status", "Unknown" }
+                }
+            });
+            
+            // Register Relay Controller
+            boardRegistry.Register(new BoardItem
             {
-                { "Port", "ETH0" },
-                { "IP Address", "192.168.0.20" },
-                { "Status", "Unknown" }
-            }
-        });
-        
-        // Register Servo Controller
-        boardRegistry.Register(new BoardItem
-        {
-            Name = "Servo Controller",
-            Description = "Multi-channel servo motor controller board",
-            Status = "Offline",
-            SummaryData = new Dictionary<string, string>
-            {
-                { "Port", "COM7" },
-                { "IP Address", "192.168.0.30" },
-                { "Status", "Offline" }
-            }
-        });
+                Name = "Relay Controller",
+                Description = "Multi-channel relay board for high power switching",
+                Status = "Offline",
+                SummaryData = new Dictionary<string, string>
+                {
+                    { "Port", "ETH2" },
+                    { "IP Address", "192.168.1.30" },
+                    { "Status", "Offline" }
+                }
+            });
         }
     }
     

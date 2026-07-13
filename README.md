@@ -1,18 +1,22 @@
 # TCP — Train Control Platform
 
-[![Version](https://img.shields.io/badge/version-TCP--2.4.1-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-TCP--2.5.0-blue.svg)](docs/CHANGELOG.md)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
 
 **TCP (Train Control Platform)**, tren kontrol sistemleri, ray yerleşim tasarımı ve donanım kartları yönetimini birleştiren tam donanımlı, profesyonel bir masaüstü (WPF) uygulamasıdır.
 
 ---
 
-## 🚀 Öne Çıkan Özellikler (v2.4.1)
+## 🚀 Öne Çıkan Özellikler (v2.5.0)
 
-Uygulama baştan aşağıya gelişmiş yetenekler ve dinamik bir arayüzle donatıldı:
+Uygulama baştan aşağıya gelişmiş yetenekler, dinamik bir arayüz ve uç nokta donanım yönetimiyle donatıldı:
 
-- 🎛 **Özel Cihaz Yönetimi (Electronics):** "Arduino Mega" gibi şablonlar üzerinden kendi cihazlarınızı (My Devices) yaratın. Her cihaz için `MAC Adresi`, `IP Adresi`, `Port`, `LAN Kablosu` ve `Konum` tanımlayarak kayıt altında tutun.
-- 🗺 **Gelişmiş Editör ve Haritalama:** 
+- 📡 **Canlı HTTP Donanım İletişimi**: Editör üzerindeki istasyonlarla asenkron (GET/POST) haberleşme.
+- 🎛️ **Uzaktan Röle / Pin Kontrolü**: İstasyonlara ait röleleri (ışık, motor, sensör tetikleyici vs.) canlı olarak uygulamadan yönetebilme.
+- 🚀 **Uzaktan OTA Firmware Güncelleme**: İstasyonların yazılımlarını (.bin) masaüstünden kablosuz/LAN üzerinden uzaktan tek tıkla yükleyebilme.
+- 🗂️ **Güçlü Proje Dosyası Modeli**: Ağ mimarilerini kaydetme ve `TCP-1.x` ile tam uyumluluk.
+- 🏗️ **Katman (Layer) Sistemi**: Profesyonel düzenleme ve kilitleme seçenekleri.
+- 🔗 **Papatya Dizilimi (Daisy-Chain)**: Donanımları art arda bağlayarak otomatik ağ keşfi yapabilme.
   - AutoCAD tarzı grid zemin üzerine çoklu arka plan görselleri (harita veya planlar) yükleyin.
   - Şeffaflık (Opacity) kontrolüyle katmanlı haritalar oluşturun.
   - Kaydettiğiniz özel cihazları Harita/Editör paneline ekleyin ve yerleşimlerini tasarlayın.

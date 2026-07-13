@@ -88,6 +88,21 @@
                             IsEnabled="{Binding HasSelectedImage}"
                             Width="100" VerticalAlignment="Center" Margin="0,0,16,0"/>
 
+                    <ToggleButton Content="Canlı Mod (Live)"
+                                  IsChecked="{Binding IsLiveMode, Mode=TwoWay}"
+                                  Margin="0,0,16,0"
+                                  Cursor="Hand">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Foreground" Value="LimeGreen"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+
                     <!-- Save / Load Layout -->
                     <ui:Button Content="Yenile"
                                Command="{Binding RefreshCommand}"
@@ -707,6 +722,12 @@
                                                 </Style.Triggers>
                                             </Style>
                                         </Border.Style>
+                                        <Border.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Röle Kontrol (Canlı)" Command="{Binding DataContext.OpenRelayControlCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                                                <MenuItem Header="OTA Yazılım Yükle (Canlı)" Command="{Binding DataContext.OpenOtaUpdateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
+                                            </ContextMenu>
+                                        </Border.ContextMenu>
                                         <StackPanel>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>

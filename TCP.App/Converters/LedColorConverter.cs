@@ -10,9 +10,17 @@ public class LedColorConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is StationInstance)
+        if (value is MainPcInstance)
         {
-            return new SolidColorBrush(Colors.LimeGreen); // Mega -> Green
+            return new SolidColorBrush(Colors.LimeGreen);
+        }
+        else if (value is ModemInstance modem)
+        {
+            return GetColor(modem.Status);
+        }
+        else if (value is StationInstance station)
+        {
+            return GetColor(station.Status);
         }
         else if (value is ComponentInstance comp)
         {
@@ -26,6 +34,18 @@ public class LedColorConverter : IValueConverter
         }
         
         return new SolidColorBrush(Colors.Gray);
+    }
+
+    private Brush GetColor(NetworkStatus status)
+    {
+        return status switch
+        {
+            NetworkStatus.Online => new SolidColorBrush(Colors.LimeGreen),
+            NetworkStatus.Offline => new SolidColorBrush(Colors.Red),
+            NetworkStatus.Unreachable => new SolidColorBrush(Colors.Gray),
+            NetworkStatus.Error => new SolidColorBrush(Colors.Orange),
+            _ => new SolidColorBrush(Colors.Transparent)
+        };
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

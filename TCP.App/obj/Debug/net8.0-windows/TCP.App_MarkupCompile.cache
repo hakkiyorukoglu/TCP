@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP
 C:\Users\yoruk\Desktop\TCP\TCP.App\App.xaml
-121832021520
+141627772894
 
-67135473801
+72-377005109
 201682590513
-Shell\MainWindow.xaml;UI\Components\BoardDetailCard.xaml;UI\Components\CodeEditorPanel.xaml;UI\Components\KeyValueRow.xaml;Views\Components\TerminalPanel.xaml;Views\EditorView.xaml;Views\ElectronicsView.xaml;Views\HomeView.xaml;Views\InfoPanel.xaml;Views\InfoView.xaml;Views\LayerPropertiesWindow.xaml;Views\SettingsView.xaml;
+Shell\MainWindow.xaml;UI\Components\BoardDetailCard.xaml;UI\Components\CodeEditorPanel.xaml;UI\Components\KeyValueRow.xaml;Views\Components\TerminalPanel.xaml;Views\Dialogs\OtaUpdateWindow.xaml;Views\Dialogs\RelayControlWindow.xaml;Views\EditorView.xaml;Views\ElectronicsView.xaml;Views\HomeView.xaml;Views\InfoPanel.xaml;Views\InfoView.xaml;Views\LayerPropertiesWindow.xaml;Views\SettingsView.xaml;
 
 False
 
