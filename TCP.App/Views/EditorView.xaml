@@ -54,38 +54,44 @@
                             Orientation="Horizontal"
                             HorizontalAlignment="Left">
                     <!-- Load Image Button -->
-                    <ui:Button Content="Load Image"
+                    <ui:Button Content="Add Image"
                                Command="{Binding LoadImageCommand}"
-                               Appearance="Primary"
-                               Margin="0,0,8,0"
-                               Cursor="Hand"/>
-                    
-                    <!-- Fit Button -->
-                    <ui:Button Content="Fit"
-                               Command="{Binding SetFitModeCommand}"
                                Appearance="Secondary"
                                Margin="0,0,8,0"
                                Cursor="Hand"/>
                     
-                    <!-- Actual Button -->
-                    <ui:Button Content="Actual"
-                               Command="{Binding SetActualModeCommand}"
-                               Appearance="Secondary"
-                               Margin="0,0,8,0"
-                               Cursor="Hand"/>
-                    
-                    <!-- Clear Button -->
-                    <ui:Button Content="Clear"
-                               Command="{Binding ClearImageCommand}"
+                    <!-- Remove Selected Image Button -->
+                    <ui:Button Content="Remove Image"
+                               Command="{Binding RemoveImageCommand}"
                                Appearance="Danger"
                                Margin="0,0,8,0"
                                Cursor="Hand"/>
                     
                     <!-- Lock Button -->
                     <ToggleButton Content="{DynamicResource String.LockImage}"
-                                  IsChecked="{Binding IsLocked}"
-                                  Margin="0,0,8,0"
+                                  IsChecked="{Binding SelectedImage.IsLocked, Mode=TwoWay}"
+                                  IsEnabled="{Binding HasSelectedImage}"
+                                  Margin="0,0,16,0"
                                   Cursor="Hand"/>
+                                  
+                    <!-- Opacity Slider -->
+                    <TextBlock Text="Opacity:" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                    <Slider Minimum="0.1" Maximum="1.0" 
+                            Value="{Binding SelectedImage.Opacity, Mode=TwoWay}"
+                            IsEnabled="{Binding HasSelectedImage}"
+                            Width="100" VerticalAlignment="Center" Margin="0,0,16,0"/>
+
+                    <!-- Save / Load Layout -->
+                    <ui:Button Content="Save Page"
+                               Command="{Binding SaveLayoutCommand}"
+                               Appearance="Primary"
+                               Margin="0,0,8,0"
+                               Cursor="Hand"/>
+                    <ui:Button Content="Load Page"
+                               Command="{Binding LoadLayoutCommand}"
+                               Appearance="Secondary"
+                               Margin="0,0,8,0"
+                               Cursor="Hand"/>
                 </StackPanel>
                 
                 <!-- Status Text -->
@@ -249,86 +255,129 @@
                             RenderTransform="{Binding ViewportState.Transform, Mode=OneWay}"
                             RenderTransformOrigin="0.5,0.5">
                         
-                        <!-- Background Image Container -->
-                        <Border x:Name="ImageContainer" 
-                                Canvas.Left="0" Canvas.Top="0" 
-                                Width="400" Height="300"
-                                BorderBrush="{DynamicResource Brush.Accent.Primary}"
-                                BorderThickness="1"
-                                Panel.ZIndex="0">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding HasImage}" Value="False">
-                                            <Setter Property="Visibility" Value="Collapsed"/>
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding IsLocked}" Value="True">
-                                            <Setter Property="BorderThickness" Value="0"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
+                        <!-- AutoCAD-style Limited Space Grid (Z-Index -1) -->
+                        <Rectangle Canvas.Left="-5000" Canvas.Top="-5000" 
+                                   Width="10000" Height="10000"
+                                   Panel.ZIndex="-1">
+                            <Rectangle.Fill>
+                                <DrawingBrush TileMode="Tile" Viewport="0,0,40,40" ViewportUnits="Absolute">
+                                    <DrawingBrush.Drawing>
+                                        <GeometryDrawing>
+                                            <GeometryDrawing.Geometry>
+                                                <GeometryGroup>
+                                                    <LineGeometry StartPoint="0,0" EndPoint="40,0"/>
+                                                    <LineGeometry StartPoint="0,0" EndPoint="0,40"/>
+                                                </GeometryGroup>
+                                            </GeometryDrawing.Geometry>
+                                            <GeometryDrawing.Pen>
+                                                <!-- Faint grid line -->
+                                                <Pen Brush="#33888888" Thickness="0.5"/>
+                                            </GeometryDrawing.Pen>
+                                        </GeometryDrawing>
+                                    </DrawingBrush.Drawing>
+                                </DrawingBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+
+                        <!-- Background Images Container (Z-Index 0) -->
+                        <ItemsControl ItemsSource="{Binding EditorImages}"
+                                      Panel.ZIndex="0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemContainerStyle>
+                                <Style TargetType="ContentPresenter">
+                                    <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                                    <Setter Property="Canvas.Top" Value="{Binding Y}"/>
                                 </Style>
-                            </Border.Style>
-                            <Grid>
-                                <Image x:Name="BackgroundImage"
-                                       Source="{Binding BackgroundImage, Mode=OneWay}"
-                                       Stretch="Fill"
-                                       IsHitTestVisible="True"
-                                       MouseLeftButtonDown="Image_MouseLeftButtonDown"
-                                       MouseMove="Image_MouseMove"
-                                       MouseLeftButtonUp="Image_MouseLeftButtonUp" />
-                                
-                                <!-- Resizing Thumbs -->
-                                <Thumb x:Name="ThumbTL" Width="12" Height="12" Background="{DynamicResource Brush.Accent.Primary}" HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE" DragDelta="ThumbTL_DragDelta" Margin="-6,-6,0,0">
-                                    <Thumb.Style>
-                                        <Style TargetType="Thumb">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsLocked}" Value="True">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Thumb.Style>
-                                </Thumb>
-                                <Thumb x:Name="ThumbTR" Width="12" Height="12" Background="{DynamicResource Brush.Accent.Primary}" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW" DragDelta="ThumbTR_DragDelta" Margin="0,-6,-6,0">
-                                    <Thumb.Style>
-                                        <Style TargetType="Thumb">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsLocked}" Value="True">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Thumb.Style>
-                                </Thumb>
-                                <Thumb x:Name="ThumbBL" Width="12" Height="12" Background="{DynamicResource Brush.Accent.Primary}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW" DragDelta="ThumbBL_DragDelta" Margin="-6,0,0,-6">
-                                    <Thumb.Style>
-                                        <Style TargetType="Thumb">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsLocked}" Value="True">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Thumb.Style>
-                                </Thumb>
-                                <Thumb x:Name="ThumbBR" Width="12" Height="12" Background="{DynamicResource Brush.Accent.Primary}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE" DragDelta="ThumbBR_DragDelta" Margin="0,0,-6,-6">
-                                    <Thumb.Style>
-                                        <Style TargetType="Thumb">
-                                            <Setter Property="Visibility" Value="Visible"/>
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsLocked}" Value="True">
-                                                    <Setter Property="Visibility" Value="Collapsed"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Thumb.Style>
-                                </Thumb>
-                            </Grid>
-                        </Border>
+                            </ItemsControl.ItemContainerStyle>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Width="{Binding Width}" Height="{Binding Height}"
+                                            BorderBrush="{DynamicResource Brush.Accent.Primary}"
+                                            BorderThickness="1"
+                                            Opacity="{Binding Opacity}"
+                                            Background="Transparent">
+                                        <Border.InputBindings>
+                                            <MouseBinding Gesture="LeftClick" Command="{Binding DataContext.SelectImageCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                                        </Border.InputBindings>
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsLocked}" Value="True">
+                                                        <Setter Property="BorderThickness" Value="0"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter Property="BorderThickness" Value="2"/>
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Accent.Primary}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <Grid>
+                                            <Image Source="{Binding ImageSource}"
+                                                   Stretch="Uniform"
+                                                   IsHitTestVisible="True"
+                                                   MouseLeftButtonDown="Image_MouseLeftButtonDown"
+                                                   MouseMove="Image_MouseMove"
+                                                   MouseLeftButtonUp="Image_MouseLeftButtonUp" />
+                                            
+                                            <!-- Resizing Thumbs -->
+                                            <Thumb x:Name="ThumbTL" Width="12" Height="12" Background="{DynamicResource Brush.Accent.Primary}" HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE" DragDelta="ThumbTL_DragDelta" Margin="-6,-6,0,0">
+                                                <Thumb.Style>
+                                                    <Style TargetType="Thumb">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsLocked}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Thumb.Style>
+                                            </Thumb>
+                                            <Thumb x:Name="ThumbTR" Width="12" Height="12" Background="{DynamicResource Brush.Accent.Primary}" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW" DragDelta="ThumbTR_DragDelta" Margin="0,-6,-6,0">
+                                                <Thumb.Style>
+                                                    <Style TargetType="Thumb">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsLocked}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Thumb.Style>
+                                            </Thumb>
+                                            <Thumb x:Name="ThumbBL" Width="12" Height="12" Background="{DynamicResource Brush.Accent.Primary}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW" DragDelta="ThumbBL_DragDelta" Margin="-6,0,0,-6">
+                                                <Thumb.Style>
+                                                    <Style TargetType="Thumb">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsLocked}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Thumb.Style>
+                                            </Thumb>
+                                            <Thumb x:Name="ThumbBR" Width="12" Height="12" Background="{DynamicResource Brush.Accent.Primary}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE" DragDelta="ThumbBR_DragDelta" Margin="0,0,-6,-6">
+                                                <Thumb.Style>
+                                                    <Style TargetType="Thumb">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsLocked}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Thumb.Style>
+                                            </Thumb>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                         
                         <!-- Placed Boxes Overlay (Z-Index 1) -->
                         <!-- TCP-1.0.3: Boxes drawn on top of background image -->
@@ -409,13 +458,12 @@
                     
                     <!-- No Image Placeholder (not affected by transform) -->
                     <!-- TCP-1.0.4: Placeholder shown when no image loaded -->
-                    <TextBlock Text="No background image loaded. Click 'Load Image' to start."
+                    <TextBlock Text="Add an image or device to start."
                                FontSize="{DynamicResource Font.Body}"
                                FontFamily="{DynamicResource Font.Primary}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
                                HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               Visibility="{Binding HasNoImage, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                               VerticalAlignment="Center"/>
                 </Grid>
             </Border>
         </Grid>

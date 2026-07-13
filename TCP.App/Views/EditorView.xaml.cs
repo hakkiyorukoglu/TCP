@@ -70,35 +70,37 @@ public partial class EditorView : UserControl
     private bool _isDragging;
     private System.Windows.Point _clickPosition;
 
+    private TCP.App.Models.Editor.EditorImage? _draggedImage;
+
     private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (DataContext is EditorViewModel vm && vm.IsLocked) return;
+        if (sender is System.Windows.FrameworkElement el && el.DataContext is TCP.App.Models.Editor.EditorImage image)
+        {
+            if (image.IsLocked) return;
 
-        _isDragging = true;
-        var draggableControl = sender as System.Windows.FrameworkElement;
-        _clickPosition = e.GetPosition(this);
-        draggableControl?.CaptureMouse();
-        e.Handled = true; // Prevent viewport pan
+            if (DataContext is EditorViewModel vm)
+            {
+                vm.SelectImageCommand.Execute(image);
+            }
+
+            _isDragging = true;
+            _draggedImage = image;
+            _clickPosition = e.GetPosition(ViewportCanvas);
+            el.CaptureMouse();
+            e.Handled = true; // Prevent viewport pan
+        }
     }
 
     private void Image_MouseMove(object sender, MouseEventArgs e)
     {
-        if (!_isDragging) return;
+        if (!_isDragging || _draggedImage == null || sender is not System.Windows.FrameworkElement) return;
 
-        var draggableControl = sender as System.Windows.FrameworkElement;
-        var currentPosition = e.GetPosition(this);
-
+        var currentPosition = e.GetPosition(ViewportCanvas);
         var transformX = currentPosition.X - _clickPosition.X;
         var transformY = currentPosition.Y - _clickPosition.Y;
 
-        var currentLeft = Canvas.GetLeft(ImageContainer);
-        var currentTop = Canvas.GetTop(ImageContainer);
-
-        if (double.IsNaN(currentLeft)) currentLeft = 0;
-        if (double.IsNaN(currentTop)) currentTop = 0;
-
-        Canvas.SetLeft(ImageContainer, currentLeft + transformX);
-        Canvas.SetTop(ImageContainer, currentTop + transformY);
+        _draggedImage.X += transformX;
+        _draggedImage.Y += transformY;
 
         _clickPosition = currentPosition;
         e.Handled = true;
@@ -115,66 +117,66 @@ public partial class EditorView : UserControl
 
     private void ThumbTL_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
     {
-        var currentLeft = Canvas.GetLeft(ImageContainer);
-        var currentTop = Canvas.GetTop(ImageContainer);
-        
-        if (double.IsNaN(currentLeft)) currentLeft = 0;
-        if (double.IsNaN(currentTop)) currentTop = 0;
-        
-        double newWidth = ImageContainer.Width - e.HorizontalChange;
-        double newHeight = ImageContainer.Height - e.VerticalChange;
+        if (sender is System.Windows.FrameworkElement el && el.DataContext is TCP.App.Models.Editor.EditorImage image)
+        {
+            double newWidth = image.Width - e.HorizontalChange;
+            double newHeight = image.Height - e.VerticalChange;
 
-        if (newWidth > 50)
-        {
-            ImageContainer.Width = newWidth;
-            Canvas.SetLeft(ImageContainer, currentLeft + e.HorizontalChange);
-        }
-        if (newHeight > 50)
-        {
-            ImageContainer.Height = newHeight;
-            Canvas.SetTop(ImageContainer, currentTop + e.VerticalChange);
+            if (newWidth > 50)
+            {
+                image.Width = newWidth;
+                image.X += e.HorizontalChange;
+            }
+            if (newHeight > 50)
+            {
+                image.Height = newHeight;
+                image.Y += e.VerticalChange;
+            }
         }
     }
 
     private void ThumbTR_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
     {
-        var currentTop = Canvas.GetTop(ImageContainer);
-        if (double.IsNaN(currentTop)) currentTop = 0;
-
-        double newWidth = ImageContainer.Width + e.HorizontalChange;
-        double newHeight = ImageContainer.Height - e.VerticalChange;
-
-        if (newWidth > 50) ImageContainer.Width = newWidth;
-        if (newHeight > 50)
+        if (sender is System.Windows.FrameworkElement el && el.DataContext is TCP.App.Models.Editor.EditorImage image)
         {
-            ImageContainer.Height = newHeight;
-            Canvas.SetTop(ImageContainer, currentTop + e.VerticalChange);
+            double newWidth = image.Width + e.HorizontalChange;
+            double newHeight = image.Height - e.VerticalChange;
+
+            if (newWidth > 50) image.Width = newWidth;
+            if (newHeight > 50)
+            {
+                image.Height = newHeight;
+                image.Y += e.VerticalChange;
+            }
         }
     }
 
     private void ThumbBL_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
     {
-        var currentLeft = Canvas.GetLeft(ImageContainer);
-        if (double.IsNaN(currentLeft)) currentLeft = 0;
-
-        double newWidth = ImageContainer.Width - e.HorizontalChange;
-        double newHeight = ImageContainer.Height + e.VerticalChange;
-
-        if (newWidth > 50)
+        if (sender is System.Windows.FrameworkElement el && el.DataContext is TCP.App.Models.Editor.EditorImage image)
         {
-            ImageContainer.Width = newWidth;
-            Canvas.SetLeft(ImageContainer, currentLeft + e.HorizontalChange);
+            double newWidth = image.Width - e.HorizontalChange;
+            double newHeight = image.Height + e.VerticalChange;
+
+            if (newWidth > 50)
+            {
+                image.Width = newWidth;
+                image.X += e.HorizontalChange;
+            }
+            if (newHeight > 50) image.Height = newHeight;
         }
-        if (newHeight > 50) ImageContainer.Height = newHeight;
     }
 
     private void ThumbBR_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
     {
-        double newWidth = ImageContainer.Width + e.HorizontalChange;
-        double newHeight = ImageContainer.Height + e.VerticalChange;
+        if (sender is System.Windows.FrameworkElement el && el.DataContext is TCP.App.Models.Editor.EditorImage image)
+        {
+            double newWidth = image.Width + e.HorizontalChange;
+            double newHeight = image.Height + e.VerticalChange;
 
-        if (newWidth > 50) ImageContainer.Width = newWidth;
-        if (newHeight > 50) ImageContainer.Height = newHeight;
+            if (newWidth > 50) image.Width = newWidth;
+            if (newHeight > 50) image.Height = newHeight;
+        }
     }
 
     private bool _isBoxDragging;

@@ -2,6 +2,36 @@
 
 All notable changes to TCP (Train Control Platform) are documented in this file.
 
+## TCP-2.1.0 — Editor Background & Transparency Features
+
+**Release Date**: [Current Date]
+
+### Added
+
+- **Multi-Image Support**: Users can now load multiple background images into the editor canvas simultaneously.
+- **Original Aspect Ratio Preservation**: Images strictly preserve their aspect ratios. Large files decode efficiently via MemoryStream bypassing WPF rendering limits without freezing the UI.
+- **Opacity Control**: Added an opacity slider to make overlay maps or references semi-transparent.
+- **Page Persistence**: "Save Page" and "Load Page" functionalities to store all Editor Image objects to a JSON state file.
+- **AutoCAD-Style Canvas**: A subtle grid drawing brush has been set as the background for the canvas viewport.
+
+### Fixed
+
+- **WPF Deadlock in Image Decoding**: Fully migrated `BitmapImage` decoding to a synchronous `MemoryStream` execution on the UI thread, bypassing MTA threading COM lockouts and XamlParse exceptions due to dynamic data triggers on item generation.
+
+---
+
+## TCP-2.0.0 — Custom Devices & Editor Mapping
+
+**Release Date**: [Current Date]
+
+### Added
+
+- **My Devices Tab**: A new tab in Electronics view to manage custom instances of devices.
+- **Device Management**: Add, delete, and duplicate custom device instances. Devices include IP, Port, MAC address, LAN settings, and user-assigned names.
+- **Editor Integration**: The palette now features user-created custom devices alongside default registry definitions.
+
+---
+
 ## TCP-1.0.3 — Editor: Add board boxes from registry
 
 **Release Date**: [Current Date]

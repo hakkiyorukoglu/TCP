@@ -7,8 +7,7 @@ using Microsoft.Win32;
 using TCP.App.Models.Editor;
 using TCP.App.Models.Electronics;
 using TCP.App.Services;
-
-namespace TCP.App.ViewModels;
+using System.Linq;namespace TCP.App.ViewModels;
 
 /// <summary>
 /// EditorImageMode - Image display mode enum
@@ -74,142 +73,44 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     }
     
     /// <summary>
-    /// Background image source
-    /// TCP-1.0.2: Background Image Load (Editor)
+    /// Collection of background images on the editor
     /// </summary>
-    private BitmapImage? _backgroundImage;
-    public BitmapImage? BackgroundImage
+    public ObservableCollection<EditorImage> EditorImages { get; } = new();
+
+    private EditorImage? _selectedImage;
+    public EditorImage? SelectedImage
     {
-        get => _backgroundImage;
-        private set
-        {
-            if (_backgroundImage != value)
-            {
-                _backgroundImage = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(HasImage));
-                OnPropertyChanged(nameof(HasNoImage));
-                OnPropertyChanged(nameof(StatusText));
-            }
-        }
-    }
-    
-    /// <summary>
-    /// Background image filename (for display)
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// </summary>
-    private string? _backgroundImageName;
-    public string? BackgroundImageName
-    {
-        get => _backgroundImageName;
-        private set
-        {
-            if (_backgroundImageName != value)
-            {
-                _backgroundImageName = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(StatusText));
-            }
-        }
-    }
-    
-    /// <summary>
-    /// Has image loaded
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// </summary>
-    public bool HasImage => BackgroundImage != null;
-    
-    private bool _isLocked;
-    public bool IsLocked
-    {
-        get => _isLocked;
+        get => _selectedImage;
         set
         {
-            if (_isLocked != value)
+            if (_selectedImage != value)
             {
-                _isLocked = value;
+                if (_selectedImage != null) _selectedImage.IsSelected = false;
+                _selectedImage = value;
+                if (_selectedImage != null) _selectedImage.IsSelected = true;
+                
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(HasSelectedImage));
+                if (RemoveImageCommand is RelayCommandWithCanExecute<object> cmd)
+                {
+                    cmd.RaiseCanExecuteChanged();
+                }
             }
         }
     }
-    
-    /// <summary>
-    /// Has no image (for visibility binding)
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// </summary>
-    public bool HasNoImage => !HasImage;
-    
-    /// <summary>
-    /// Image display mode (Fit or Actual)
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// </summary>
-    private EditorImageMode _imageMode = EditorImageMode.Fit;
-    public EditorImageMode ImageMode
-    {
-        get => _imageMode;
-        private set
-        {
-            if (_imageMode != value)
-            {
-                _imageMode = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(IsFitMode));
-                OnPropertyChanged(nameof(IsActualMode));
-            }
-        }
-    }
-    
-    /// <summary>
-    /// Is Fit mode (for binding convenience)
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// </summary>
-    public bool IsFitMode => ImageMode == EditorImageMode.Fit;
-    
-    /// <summary>
-    /// Is Actual mode (for binding convenience)
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// </summary>
-    public bool IsActualMode => ImageMode == EditorImageMode.Actual;
-    
+
+    public bool HasSelectedImage => SelectedImage != null;
+
     /// <summary>
     /// Status text (for display in toolbar)
-    /// TCP-1.0.2: Background Image Load (Editor)
     /// </summary>
-    public string StatusText
-    {
-        get
-        {
-            if (!HasImage)
-            {
-                return "No image loaded";
-            }
-            return $"Image loaded: {BackgroundImageName ?? "Unknown"}";
-        }
-    }
+    public string StatusText => "Editor Ready";
     
-    /// <summary>
-    /// Load Image Command
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// </summary>
     public ICommand LoadImageCommand { get; }
-    
-    /// <summary>
-    /// Set Fit Mode Command
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// </summary>
-    public ICommand SetFitModeCommand { get; }
-    
-    /// <summary>
-    /// Set Actual Mode Command
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// </summary>
-    public ICommand SetActualModeCommand { get; }
-    
-    /// <summary>
-    /// Clear Image Command
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// </summary>
-    public ICommand ClearImageCommand { get; }
+    public ICommand RemoveImageCommand { get; }
+    public ICommand SelectImageCommand { get; }
+    public ICommand SaveLayoutCommand { get; }
+    public ICommand LoadLayoutCommand { get; }
     
     /// <summary>
     /// Palette boards (from device manager)
@@ -293,108 +194,130 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             }
         }
         
-        // TCP-1.0.2: Initialize image commands
         LoadImageCommand = new RelayCommand<object>(_ => LoadImage());
-        SetFitModeCommand = new RelayCommand<object>(_ => SetFitMode());
-        SetActualModeCommand = new RelayCommand<object>(_ => SetActualMode());
-        ClearImageCommand = new RelayCommand<object>(_ => ClearImage());
+        RemoveImageCommand = new RelayCommandWithCanExecute<object>(_ => RemoveImage(), () => SelectedImage != null);
+        SelectImageCommand = new RelayCommand<object>(img => SelectedImage = img as EditorImage);
+        SaveLayoutCommand = new RelayCommand<object>(_ => SaveLayout());
+        LoadLayoutCommand = new RelayCommand<object>(_ => LoadLayout());
         
         // TCP-1.0.3: Initialize AddBoxCommand with CanExecute check
         AddBoxCommand = new RelayCommandWithCanExecute<object>(_ => AddBox(), () => SelectedPaletteBoard != null);
     }
     
-    /// <summary>
-    /// Load Image command implementation
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// 
-    /// Opens file dialog, loads image safely with CacheOption.OnLoad to prevent file lock.
-    /// </summary>
     private void LoadImage()
     {
         try
         {
-            // TCP-1.0.2: Open file dialog
+            TerminalService.Instance.LogInfo("Opening image selection dialog...");
             var dialog = new OpenFileDialog
             {
                 Filter = "Image Files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg|All Files (*.*)|*.*",
                 Title = "Load Background Image"
             };
             
-            if (dialog.ShowDialog() == true)
+            var owner = System.Windows.Application.Current.MainWindow;
+            if (dialog.ShowDialog(owner) == true)
             {
-                // TCP-1.0.2: Load image safely
+                var filePath = dialog.FileName;
+                var fileName = System.IO.Path.GetFileName(filePath);
+                TerminalService.Instance.LogInfo($"Loading image {fileName} (Sync MemoryStream)...");
+                
+                // Read fully into memory on UI thread. This avoids ALL MTA thread deadlocks 
+                // and WPF internal background downloader deadlocks.
+                byte[] imageBytes = System.IO.File.ReadAllBytes(filePath);
+                using var stream = new System.IO.MemoryStream(imageBytes);
+                
                 var bitmap = new BitmapImage();
                 bitmap.BeginInit();
-                bitmap.CacheOption = BitmapCacheOption.OnLoad; // Prevents file lock!
-                bitmap.UriSource = new System.Uri(dialog.FileName);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.StreamSource = stream;
                 bitmap.EndInit();
-                bitmap.Freeze(); // Thread-safe
+                bitmap.Freeze(); 
                 
-                // TCP-1.0.2: Set properties
-                BackgroundImage = bitmap;
-                BackgroundImageName = System.IO.Path.GetFileName(dialog.FileName);
-                IsLocked = false;
+                var newImage = new EditorImage
+                {
+                    FilePath = filePath,
+                    Name = fileName,
+                    ImageSource = bitmap,
+                    Width = bitmap.PixelWidth,
+                    Height = bitmap.PixelHeight,
+                    X = 0,
+                    Y = 0,
+                    Opacity = 1.0,
+                    IsLocked = false
+                };
                 
-                // TCP-1.0.2: Show success toast
-                TerminalService.Instance.LogSuccess("Background image loaded: Loaded: {BackgroundImageName}");
+                EditorImages.Add(newImage);
+                SelectedImage = newImage;
+                
+                TerminalService.Instance.LogSuccess($"Image loaded successfully: {newImage.Name}");
             }
         }
         catch (Exception ex)
         {
-            // TCP-1.0.2: Show error toast (no crash)
             TerminalService.Instance.LogError($"Failed to load image: {ex.Message}");
         }
     }
-    
-    /// <summary>
-    /// Set Fit Mode command implementation
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// </summary>
-    private void SetFitMode()
+
+    private void RemoveImage()
     {
-        try
+        if (SelectedImage != null)
         {
-            ImageMode = EditorImageMode.Fit;
-        }
-        catch
-        {
-            // TCP-1.0.2: Safety - ignore exceptions
+            EditorImages.Remove(SelectedImage);
+            SelectedImage = null;
         }
     }
-    
-    /// <summary>
-    /// Set Actual Mode command implementation
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// </summary>
-    private void SetActualMode()
+
+    private void SaveLayout()
     {
-        try
+        var dialog = new SaveFileDialog
         {
-            ImageMode = EditorImageMode.Actual;
-        }
-        catch
+            Filter = "TCP Layout (*.tcplayout)|*.tcplayout|JSON Files (*.json)|*.json",
+            DefaultExt = "tcplayout",
+            Title = "Save Editor Layout"
+        };
+
+        if (dialog.ShowDialog() == true)
         {
-            // TCP-1.0.2: Safety - ignore exceptions
+            EditorLayoutService.Instance.SaveLayout(dialog.FileName, EditorImages, PlacedBoxes);
         }
     }
-    
-    /// <summary>
-    /// Clear Image command implementation
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// </summary>
-    private void ClearImage()
+
+    private void LoadLayout()
     {
-        try
+        var dialog = new OpenFileDialog
         {
-            BackgroundImage = null;
-            BackgroundImageName = null;
-            
-            // TCP-1.0.2: Show toast (Removed per user request)
-            // TerminalService.Instance.ShowInfo("Background image cleared", "Image removed from editor");
-        }
-        catch
+            Filter = "TCP Layout (*.tcplayout)|*.tcplayout|JSON Files (*.json)|*.json",
+            Title = "Load Editor Layout"
+        };
+
+        if (dialog.ShowDialog() == true)
         {
-            // TCP-1.0.2: Safety - ignore exceptions
+            var state = EditorLayoutService.Instance.LoadLayout(dialog.FileName);
+            if (state != null)
+            {
+                EditorImages.Clear();
+                foreach (var img in state.Images)
+                {
+                    EditorImages.Add(img);
+                }
+
+                PlacedBoxes.Clear();
+                foreach (var devState in state.PlacedDevices)
+                {
+                    var globalDev = _deviceManager.Devices.FirstOrDefault(d => d.Id == devState.DeviceId);
+                    if (globalDev != null)
+                    {
+                        globalDev.X = devState.X;
+                        globalDev.Y = devState.Y;
+                        globalDev.IsLocked = devState.IsLocked;
+                        PlacedBoxes.Add(globalDev);
+                    }
+                }
+                
+                SelectedImage = null;
+                SelectedBox = null;
+            }
         }
     }
     

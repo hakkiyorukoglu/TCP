@@ -1,18 +1,23 @@
 # TCP — Train Control Platform
 
-[![Version](https://img.shields.io/badge/version-TCP--2.0.0-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-TCP--2.1.0-blue.svg)](docs/CHANGELOG.md)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
 
 **TCP (Train Control Platform)**, tren kontrol sistemleri, ray yerleşim tasarımı ve donanım kartları yönetimini birleştiren tam donanımlı, profesyonel bir masaüstü (WPF) uygulamasıdır.
 
 ---
 
-## 🚀 Öne Çıkan Özellikler (v2.0.0)
+## 🚀 Öne Çıkan Özellikler (v2.1.0)
 
 Uygulama baştan aşağıya gelişmiş yetenekler ve dinamik bir arayüzle donatıldı:
 
 - 🎛 **Özel Cihaz Yönetimi (Electronics):** "Arduino Mega" gibi şablonlar üzerinden kendi cihazlarınızı (My Devices) yaratın. Her cihaz için `MAC Adresi`, `IP Adresi`, `Port`, `LAN Kablosu` ve `Konum` tanımlayarak kayıt altında tutun.
-- 🗺 **Editör ve Haritalama:** Kaydettiğiniz özel cihazları Harita/Editör paneline ekleyin. Sürükle-bırak özelliği ile yerleşimlerini tasarlayın ve **Kilit (🔒)** sistemiyle konumlarını sabitleyin. 
+- 🗺 **Gelişmiş Editör ve Haritalama:** 
+  - AutoCAD tarzı grid zemin üzerine çoklu arka plan görselleri (harita veya planlar) yükleyin.
+  - Şeffaflık (Opacity) kontrolüyle katmanlı haritalar oluşturun.
+  - Resimlerin orijinal çözünürlükleri ve en/boy oranları akıllı bellek yöntemiyle korunur.
+  - Kaydettiğiniz özel cihazları Harita/Editör paneline ekleyin ve yerleşimlerini tasarlayın.
+  - Editör sayfa durumunu **Save Page** ve **Load Page** ile kaydedip geri yükleyin.
 - 🌍 **Dinamik Dil Desteği:** Tek tıkla tamamen **İngilizce** ve **Türkçe** dilleri arasında geçiş yapın. Tüm sistem anında çevrilir.
 - 🌓 **Tema Motoru:** Akıcı ve estetik bir arayüz ile **Karanlık (Dark)** ve **Aydınlık (Light)** temalar arasında geçiş imkanı.
 - ⌨ **Terminal ve Konsol:** Her sayfada görünen, katlanabilir ve uygulamanın arka planında olan biteni gösteren canlı terminal konsolu.
