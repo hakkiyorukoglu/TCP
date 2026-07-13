@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCP.Theming", "TCP.Theming\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCP.Core", "TCP.Core\TCP.Core.csproj", "{55DFCA69-7E66-495F-82A5-ABBE889CDBFE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCP.Tests", "TCP.Tests\TCP.Tests.csproj", "{8F42389B-61A1-4656-9573-B9B551137016}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{55DFCA69-7E66-495F-82A5-ABBE889CDBFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55DFCA69-7E66-495F-82A5-ABBE889CDBFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55DFCA69-7E66-495F-82A5-ABBE889CDBFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F42389B-61A1-4656-9573-B9B551137016}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F42389B-61A1-4656-9573-B9B551137016}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F42389B-61A1-4656-9573-B9B551137016}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F42389B-61A1-4656-9573-B9B551137016}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

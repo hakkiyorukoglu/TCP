@@ -25,15 +25,20 @@ namespace TCP.App.Services
 
         public void Log(string message, TerminalLogType type = TerminalLogType.Info)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            var msg = new TerminalMessage { Message = message, LogType = type };
+            if (Application.Current?.Dispatcher != null)
             {
-                Messages.Add(new TerminalMessage { Message = message, LogType = type });
-                // Keep the list bounded if needed, e.g., max 500 messages
-                if (Messages.Count > 500)
+                Application.Current.Dispatcher.Invoke(() =>
                 {
-                    Messages.RemoveAt(0);
-                }
-            });
+                    Messages.Add(msg);
+                    if (Messages.Count > 500) Messages.RemoveAt(0);
+                });
+            }
+            else
+            {
+                Messages.Add(msg);
+                if (Messages.Count > 500) Messages.RemoveAt(0);
+            }
         }
 
         public void LogInfo(string message) => Log(message, TerminalLogType.Info);

@@ -37,4 +37,14 @@ public interface ILayerItem : INotifyPropertyChanged
     /// Is the item visible on the canvas?
     /// </summary>
     bool IsVisible { get; set; }
+
+    /// <summary>
+    /// X coordinate on the canvas
+    /// </summary>
+    double X { get; set; }
+
+    /// <summary>
+    /// Y coordinate on the canvas
+    /// </summary>
+    double Y { get; set; }
 }

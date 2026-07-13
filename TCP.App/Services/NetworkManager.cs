@@ -44,22 +44,64 @@ public class NetworkManager
 
     private NetworkManager()
     {
+        _modems = new ObservableCollection<ModemInstance>();
+        _mainPc = new MainPcInstance();
+        
         var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TCP");
         if (!Directory.Exists(appData))
         {
             Directory.CreateDirectory(appData);
         }
         _saveFilePath = Path.Combine(appData, "modems.json");
-        _modems = new ObservableCollection<ModemInstance>();
-        _mainPc = new MainPcInstance();
 
         LoadNetwork();
+    }
+
+    public void ClearNetwork()
+    {
+        _modems.Clear();
+        _mainPc = new MainPcInstance();
+        NetworkChanged?.Invoke();
+    }
+
+    public string GetJsonState()
+    {
+        var state = new NetworkState { MainPc = _mainPc, Modems = _modems };
+        return JsonSerializer.Serialize(state);
+    }
+
+    public void LoadFromJson(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json) || json == "{}")
+        {
+            ClearNetwork();
+            return;
+        }
+
+        try
+        {
+            var state = JsonSerializer.Deserialize<NetworkState>(json);
+            if (state != null)
+            {
+                _modems.Clear();
+                _mainPc = state.MainPc ?? new MainPcInstance();
+                if (state.Modems != null)
+                {
+                    foreach (var m in state.Modems) _modems.Add(m);
+                }
+                NetworkChanged?.Invoke();
+            }
+        }
+        catch (Exception ex)
+        {
+            TerminalService.Instance.LogError($"Failed to parse network JSON: {ex.Message}");
+        }
     }
 
     public void AddModem(ModemInstance modem)
     {
         _modems.Add(modem);
-        SaveNetwork();
+        NetworkChanged?.Invoke();
     }
 
     public void RemoveModem(Guid id)
@@ -184,21 +226,10 @@ public class NetworkManager
 
     public void SaveNetwork()
     {
-        try
-        {
-            var state = new NetworkState
-            {
-                MainPc = _mainPc,
-                Modems = _modems
-            };
-            var json = JsonSerializer.Serialize(state, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(_saveFilePath, json);
-            NetworkChanged?.Invoke();
-        }
-        catch (Exception ex)
-        {
-            TerminalService.Instance.LogError($"Ağ durumu kaydedilemedi: {ex.Message}");
-        }
+        // Dosyaya yazmayı bıraktık, ProjectManager veritabanına yazacak.
+        // Fakat diğer ViewModel'ler burayı çağırıp "değişiklik oldu" demek istediği için
+        // Event'i tetiklemeye devam ediyoruz.
+        NetworkChanged?.Invoke();
     }
     
     // For backward compatibility from previous steps
@@ -206,44 +237,7 @@ public class NetworkManager
 
     private void LoadNetwork()
     {
-        try
-        {
-            if (File.Exists(_saveFilePath))
-            {
-                var json = File.ReadAllText(_saveFilePath);
-                
-                try 
-                {
-                    // Try to load as NetworkState
-                    var state = JsonSerializer.Deserialize<NetworkState>(json);
-                    if (state != null)
-                    {
-                        if (state.MainPc != null) _mainPc = state.MainPc;
-                        if (state.Modems != null)
-                        {
-                            foreach (var m in state.Modems) _modems.Add(m);
-                        }
-                        return;
-                    }
-                }
-                catch
-                {
-                    // If it fails, fallback to List<ModemInstance> (previous version)
-                    var loaded = JsonSerializer.Deserialize<List<ModemInstance>>(json);
-                    if (loaded != null)
-                    {
-                        foreach (var m in loaded)
-                        {
-                            _modems.Add(m);
-                        }
-                        SaveNetwork(); // Resave in new format
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            TerminalService.Instance.LogError($"Ağ durumu yüklenemedi: {ex.Message}");
-        }
+        // Artık AppData'dan otomatik yükleme yapmıyoruz. 
+        // Kullanıcı HomeView üzerinden senaryo seçip yükleyecek.
     }
 }

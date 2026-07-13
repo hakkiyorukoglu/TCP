@@ -164,6 +164,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                 {
                     CurrentRoute = new TrackRoute { Name = $"Rota {Routes.Count + 1}" };
                     Routes.Add(CurrentRoute);
+                    SyncLayers();
                     TerminalService.Instance.LogInfo("Rota çizim modu aktif. Haritaya tıklayarak noktalar ekleyin.");
                 }
                 else
@@ -171,6 +172,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                     if (CurrentRoute != null && CurrentRoute.Nodes.Count < 2)
                     {
                         Routes.Remove(CurrentRoute);
+                        SyncLayers();
                         TerminalService.Instance.LogWarning("Rota en az 2 nokta içermelidir. İptal edildi.");
                     }
                     else
@@ -264,8 +266,13 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         LoadImageCommand = new RelayCommand<object>(_ => LoadImage());
         RemoveImageCommand = new RelayCommandWithCanExecute<object>(_ => RemoveImage(), () => SelectedImage != null);
         SelectImageCommand = new RelayCommand<object>(img => SelectedImage = img as EditorImage);
-        SaveLayoutCommand = new RelayCommand<object>(_ => SaveLayout());
-        LoadLayoutCommand = new RelayCommand<object>(_ => LoadLayout());
+        
+        // Save/Load layout file commands are removed since ProjectManager handles DB
+        SaveLayoutCommand = new RelayCommand<object>(_ => { /* Deprecated */ });
+        LoadLayoutCommand = new RelayCommand<object>(_ => { /* Deprecated */ });
+        
+        ProjectManager.Instance.GetEditorJsonFunc = () => EditorLayoutService.Instance.GetCurrentLayoutJson(EditorImages, PlacedBoxes, Routes);
+        ProjectManager.Instance.LoadEditorJsonAction = json => LoadEditorFromJson(json);
         
         AddBoxCommand = new RelayCommandWithCanExecute<object>(_ => AddBox(), () => SelectedPaletteItem != null);
         RemoveSelectedLayerCommand = new RelayCommand<object>(param => 
@@ -295,8 +302,9 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             }
         });
 
-        EditorImages.CollectionChanged += (s, e) => SyncLayers();
-        PlacedBoxes.CollectionChanged += (s, e) => SyncLayers();
+        EditorImages.CollectionChanged += (s, e) => { SyncLayers(); ProjectManager.Instance.MarkDirty(); };
+        PlacedBoxes.CollectionChanged += (s, e) => { SyncLayers(); ProjectManager.Instance.MarkDirty(); };
+        Routes.CollectionChanged += (s, e) => { SyncLayers(); ProjectManager.Instance.MarkDirty(); };
         
         RefreshPaletteItems();
         _networkManager.NetworkChanged += OnNetworkChanged;
@@ -350,8 +358,8 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                         st.X = m.X + stOffsetX;
                         st.Y = m.Y + 160;
                         PlacedBoxes.Add(st);
-                        stOffsetX += 160;
                     }
+                    stOffsetX += 160;
 
                     double cmpOffsetX = 160;
                     foreach (var c in st.Components)
@@ -361,8 +369,8 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                             c.X = st.X + cmpOffsetX;
                             c.Y = st.Y + 160;
                             PlacedBoxes.Add(c);
-                            cmpOffsetX += 160;
                         }
+                        cmpOffsetX += 160;
                     }
                 }
             }
@@ -390,6 +398,15 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             foreach (var img in EditorImages)
                 imagesGroup.Children.Add(img);
             Layers.Add(imagesGroup);
+        }
+
+        // 1.5. Group Routes
+        if (Routes.Any())
+        {
+            var routesGroup = new LayerGroup("Rotalar");
+            foreach(var route in Routes)
+                routesGroup.Children.Add(route);
+            Layers.Add(routesGroup);
         }
 
         // 2. Group by Modem (Ağ)
@@ -447,7 +464,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                     source = _networkManager.Modems.FirstOrDefault(m => m.Id == modem.IncomingConnectionId.Value);
                 }
 
-                if (source != null && PlacedBoxes.Contains(source) && PlacedBoxes.Contains(modem))
+                if (source != null)
                 {
                     DaisyChainLines.Add(new ConnectionLine { Source = source, Target = modem, LineType = "Modem" });
                 }
@@ -455,17 +472,13 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
 
             foreach(var st in modem.Stations)
             {
-                if (PlacedBoxes.Contains(modem) && PlacedBoxes.Contains(st))
-                {
-                    DaisyChainLines.Add(new ConnectionLine { Source = modem, Target = st, LineType = "Station" });
-                }
+                // Draw line between modem and station unconditionally, like PaletteItems did
+                DaisyChainLines.Add(new ConnectionLine { Source = modem, Target = st, LineType = "Station" });
 
                 foreach(var c in st.Components)
                 {
-                    if (PlacedBoxes.Contains(st) && PlacedBoxes.Contains(c))
-                    {
-                        DaisyChainLines.Add(new ConnectionLine { Source = st, Target = c, LineType = "Component" });
-                    }
+                    // Draw line between station and component unconditionally
+                    DaisyChainLines.Add(new ConnectionLine { Source = st, Target = c, LineType = "Component" });
                 }
             }
         }
@@ -639,88 +652,64 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         }
     }
 
-    private void SaveLayout()
+    private void LoadEditorFromJson(string json)
     {
-        var dialog = new SaveFileDialog
+        var state = EditorLayoutService.Instance.LoadFromJson(json);
+        if (state != null)
         {
-            Filter = "TCP Layout (*.tcplayout)|*.tcplayout|JSON Files (*.json)|*.json",
-            DefaultExt = "tcplayout",
-            Title = "Save Editor Layout"
-        };
+            EditorImages.Clear();
+            foreach (var img in state.Images) EditorImages.Add(img);
 
-        if (dialog.ShowDialog() == true)
-        {
-            EditorLayoutService.Instance.SaveLayout(dialog.FileName, EditorImages, PlacedBoxes, Routes);
-        }
-    }
+            Routes.Clear();
+            foreach (var route in state.Routes) Routes.Add(route);
 
-    private void LoadLayout()
-    {
-        var dialog = new OpenFileDialog
-        {
-            Filter = "TCP Layout (*.tcplayout)|*.tcplayout|JSON Files (*.json)|*.json",
-            Title = "Load Editor Layout"
-        };
-
-        if (dialog.ShowDialog() == true)
-        {
-            var state = EditorLayoutService.Instance.LoadLayout(dialog.FileName);
-            if (state != null)
+            PlacedBoxes.Clear();
+            foreach (var stState in state.PlacedItems)
             {
-                EditorImages.Clear();
-                foreach (var img in state.Images) EditorImages.Add(img);
-
-                Routes.Clear();
-                foreach (var route in state.Routes) Routes.Add(route);
-
-                PlacedBoxes.Clear();
-                foreach (var stState in state.PlacedItems)
+                // Look for MainPc
+                if (_networkManager.MainPc.Id == stState.ItemId)
                 {
-                    // Look for MainPc
-                    if (_networkManager.MainPc.Id == stState.ItemId)
-                    {
-                        _networkManager.MainPc.X = stState.X; _networkManager.MainPc.Y = stState.Y; _networkManager.MainPc.IsLocked = stState.IsLocked;
-                        PlacedBoxes.Add(_networkManager.MainPc);
-                        continue;
-                    }
+                    _networkManager.MainPc.X = stState.X; _networkManager.MainPc.Y = stState.Y; _networkManager.MainPc.IsLocked = stState.IsLocked;
+                    PlacedBoxes.Add(_networkManager.MainPc);
+                    continue;
+                }
 
-                    // Look for Modems
-                    var modem = _networkManager.Modems.FirstOrDefault(m => m.Id == stState.ItemId);
-                    if (modem != null)
+                // Look for Modems
+                var modem = _networkManager.Modems.FirstOrDefault(m => m.Id == stState.ItemId);
+                if (modem != null)
+                {
+                    modem.X = stState.X; modem.Y = stState.Y; modem.IsLocked = stState.IsLocked;
+                    PlacedBoxes.Add(modem);
+                    continue;
+                }
+                
+                // Look for Stations
+                var st = _networkManager.Modems.SelectMany(m => m.Stations).FirstOrDefault(s => s.Id == stState.ItemId);
+                if (st != null)
+                {
+                    st.X = stState.X; st.Y = stState.Y; st.IsLocked = stState.IsLocked;
+                    PlacedBoxes.Add(st);
+                    continue;
+                }
+                
+                // Look for Components
+                foreach(var m in _networkManager.Modems)
+                {
+                    foreach(var station in m.Stations)
                     {
-                        modem.X = stState.X; modem.Y = stState.Y; modem.IsLocked = stState.IsLocked;
-                        PlacedBoxes.Add(modem);
-                        continue;
-                    }
-                    
-                    // Look for Stations
-                    var st = _networkManager.Modems.SelectMany(m => m.Stations).FirstOrDefault(s => s.Id == stState.ItemId);
-                    if (st != null)
-                    {
-                        st.X = stState.X; st.Y = stState.Y; st.IsLocked = stState.IsLocked;
-                        PlacedBoxes.Add(st);
-                        continue;
-                    }
-                    
-                    // Look for Components
-                    foreach(var m in _networkManager.Modems)
-                    {
-                        foreach(var station in m.Stations)
+                        var comp = station.Components.FirstOrDefault(c => c.Id == stState.ItemId);
+                        if (comp != null)
                         {
-                            var comp = station.Components.FirstOrDefault(c => c.Id == stState.ItemId);
-                            if (comp != null)
-                            {
-                                comp.X = stState.X; comp.Y = stState.Y; comp.IsLocked = stState.IsLocked;
-                                PlacedBoxes.Add(comp);
-                                break;
-                            }
+                            comp.X = stState.X; comp.Y = stState.Y; comp.IsLocked = stState.IsLocked;
+                            PlacedBoxes.Add(comp);
+                            break;
                         }
                     }
                 }
-                
-                SelectedImage = null;
-                SelectedLayerItem = null;
             }
+            
+            SelectedImage = null;
+            SelectedLayerItem = null;
         }
     }
     

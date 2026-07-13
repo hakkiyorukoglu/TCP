@@ -70,6 +70,9 @@ public class LayerGroup : ILayerItem
         }
     }
 
+    public double X { get; set; }
+    public double Y { get; set; }
+
     /// <summary>
     /// Child layers in this group
     /// </summary>

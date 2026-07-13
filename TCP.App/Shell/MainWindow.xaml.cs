@@ -127,6 +127,41 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
         // Language'i güvenli bir şekilde yükle
         var lang = App.LoadedSettings?.Language ?? "tr-TR";
         LanguageService.ApplyLanguage(lang);
+
+        // Set App window reference if not already set
+        if (Application.Current.MainWindow != this)
+        {
+            Application.Current.MainWindow = this;
+        }
+
+        // TCP-1.0.2: Always start on Home page
+        _currentRoute = "Home";
+        NavigateToView(new HomeView(), "Home");
+        SetActiveTab(HomeTab);
+    }
+    
+    protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+    {
+        if (ProjectManager.Instance.IsDirty)
+        {
+            var result = MessageBox.Show(
+                "Senaryoda kaydedilmemiş değişiklikler var. Kaydetmek istiyor musunuz?",
+                "Uyarı",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Warning);
+                
+            if (result == MessageBoxResult.Yes)
+            {
+                ProjectManager.Instance.SaveScenario();
+            }
+            else if (result == MessageBoxResult.Cancel)
+            {
+                e.Cancel = true;
+                return;
+            }
+        }
+        
+        base.OnClosing(e);
     }
     
     /// <summary>

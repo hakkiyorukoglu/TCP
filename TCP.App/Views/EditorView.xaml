@@ -445,6 +445,37 @@
                                         </ToggleButton>
                                     </Grid>
                                 </DataTemplate>
+
+                                <DataTemplate DataType="{x:Type electronics:TrackRoute}">
+                                    <Grid Width="210">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/> <!-- Visibility -->
+                                            <ColumnDefinition Width="Auto"/> <!-- Icon -->
+                                            <ColumnDefinition Width="*"/>    <!-- Name -->
+                                            <ColumnDefinition Width="Auto"/> <!-- Center Line Toggle -->
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <ToggleButton Grid.Column="0" IsChecked="{Binding IsVisible, Mode=TwoWay}" 
+                                                      Background="Transparent" BorderThickness="0" Padding="8" Margin="0,0,4,0" Cursor="Hand">
+                                            <TextBlock Text="👁" FontSize="16" Opacity="{Binding IsVisible, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                        </ToggleButton>
+                                        
+                                        <TextBlock Grid.Column="1" Text="🛤" 
+                                                   VerticalAlignment="Center" Margin="0,0,8,0" FontSize="14" Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                        
+                                        <TextBlock Grid.Column="2" Text="{Binding Name}" 
+                                                   FontSize="{DynamicResource Font.Body}"
+                                                   FontFamily="{DynamicResource Font.Primary}"
+                                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                                   VerticalAlignment="Center"/>
+                                                   
+                                        <!-- Center line toggle -->
+                                        <ToggleButton Grid.Column="3" IsChecked="{Binding IsCenterLineVisible, Mode=TwoWay}" 
+                                                      Background="Transparent" BorderThickness="0" Padding="8" Margin="0,0,4,0" Cursor="Hand" ToolTip="Merkez Çizgisini Göster/Gizle">
+                                            <TextBlock Text="➖" FontSize="16" Foreground="Yellow" Opacity="{Binding IsCenterLineVisible, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                        </ToggleButton>
+                                    </Grid>
+                                </DataTemplate>
                             </TreeView.Resources>
                         </TreeView>
                     </Grid>
@@ -600,8 +631,8 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                         
-                        <!-- Daisy-Chain Connections Overlay (Z-Index 0.5) -->
-                        <ItemsControl ItemsSource="{Binding DaisyChainLines}" Panel.ZIndex="0">
+                        <!-- Daisy-Chain Connections Overlay (Z-Index 1) -->
+                        <ItemsControl ItemsSource="{Binding DaisyChainLines}" Panel.ZIndex="1">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <Canvas/>
@@ -619,7 +650,7 @@
                                                     <DataTrigger Binding="{Binding LineType}" Value="Station">
                                                         <Setter Property="Stroke" Value="#FFA500" /> <!-- Orange -->
                                                         <Setter Property="StrokeThickness" Value="4" />
-                                                        <Setter Property="StrokeDashArray" Value="2,2" />
+                                                        <Setter Property="Opacity" Value="0.8" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding LineType}" Value="Component">
                                                         <Setter Property="Stroke" Value="#AAAAAA" /> <!-- Gray -->
@@ -641,8 +672,6 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-
-                        <!-- Connections Overlay (Z-Index 1) -->
                         
                         <!-- Track Routes Overlay (Z-Index 0.8) -->
                         <ItemsControl ItemsSource="{Binding Routes}" Panel.ZIndex="0">
@@ -654,9 +683,25 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Canvas>
-                                        <!-- The Route Path itself -->
-                                        <Path Stroke="Yellow" StrokeThickness="3" Opacity="0.9"
-                                              Data="{Binding Nodes, Converter={StaticResource RoutePathConverter}}" />
+                                        <!-- Track Base / Gölge -->
+                                        <Path Stroke="#222222" StrokeThickness="20" Opacity="0.4"
+                                              Data="{Binding RoutePathData}" Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                                        <!-- Traversler (Sleepers) -->
+                                        <Path Stroke="#6b4423" StrokeThickness="16" StrokeDashArray="0.2, 0.4" StrokeEndLineCap="Flat" StrokeStartLineCap="Flat" Opacity="0.9"
+                                              Data="{Binding RoutePathData}" Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                        
+                                        <!-- Sol Ray -->
+                                        <Path Stroke="#C0C0C0" StrokeThickness="2" 
+                                              Data="{Binding LeftRailPathData}" Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                              
+                                        <!-- Sağ Ray -->
+                                        <Path Stroke="#C0C0C0" StrokeThickness="2" 
+                                              Data="{Binding RightRailPathData}" Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                                        <!-- Merkez Çizgi -->
+                                        <Path Stroke="Yellow" StrokeThickness="2" Opacity="0.9" StrokeDashArray="2, 2"
+                                              Data="{Binding RoutePathData}" Visibility="{Binding IsCenterLineVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
                                         
                                         <!-- The Nodes -->
                                         <ItemsControl ItemsSource="{Binding Nodes}">
@@ -670,64 +715,6 @@
                                                     <Ellipse Width="8" Height="8" Fill="Red" 
                                                              Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}" 
                                                              Margin="-4,-4,0,0" />
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </Canvas>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-
-                        <!-- Connections Overlay (Z-Index 1) -->
-                        <ItemsControl ItemsSource="{Binding PaletteItems}" Panel.ZIndex="1">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <Canvas/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Canvas>
-                                        <!-- Lines from Modem to Station -->
-                                        <ItemsControl ItemsSource="{Binding Stations}">
-                                            <ItemsControl.ItemsPanel>
-                                                <ItemsPanelTemplate><Canvas/></ItemsPanelTemplate>
-                                            </ItemsControl.ItemsPanel>
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Canvas>
-                                                        <Path Stroke="Orange" StrokeThickness="4" Opacity="0.8">
-                                                            <Path.Data>
-                                                                <MultiBinding Converter="{StaticResource ConnectionPathConverter}">
-                                                                    <Binding Path="DataContext.X" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
-                                                                    <Binding Path="DataContext.Y" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
-                                                                    <Binding Path="X"/>
-                                                                    <Binding Path="Y"/>
-                                                                </MultiBinding>
-                                                            </Path.Data>
-                                                        </Path>
-
-                                                        <!-- Lines from Station to Component -->
-                                                        <ItemsControl ItemsSource="{Binding Components}">
-                                                            <ItemsControl.ItemsPanel>
-                                                                <ItemsPanelTemplate><Canvas/></ItemsPanelTemplate>
-                                                            </ItemsControl.ItemsPanel>
-                                                            <ItemsControl.ItemTemplate>
-                                                                <DataTemplate>
-                                                                    <Path Stroke="{DynamicResource Brush.Text.Secondary}" StrokeThickness="3" Opacity="0.6">
-                                                                        <Path.Data>
-                                                                            <MultiBinding Converter="{StaticResource ConnectionPathConverter}">
-                                                                                <Binding Path="DataContext.X" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
-                                                                                <Binding Path="DataContext.Y" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
-                                                                                <Binding Path="X"/>
-                                                                                <Binding Path="Y"/>
-                                                                            </MultiBinding>
-                                                                        </Path.Data>
-                                                                    </Path>
-                                                                </DataTemplate>
-                                                            </ItemsControl.ItemTemplate>
-                                                        </ItemsControl>
-                                                    </Canvas>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
@@ -849,14 +836,7 @@
                         </ItemsControl>
                     </Canvas>
                     
-                    <!-- No Image Placeholder (not affected by transform) -->
-                    <!-- TCP-1.0.4: Placeholder shown when no image loaded -->
-                    <TextBlock Text="Add an image or device to start."
-                               FontSize="{DynamicResource Font.Body}"
-                               FontFamily="{DynamicResource Font.Primary}"
-                               Foreground="{DynamicResource Brush.Text.Secondary}"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"/>
+
                 </Grid>
             </Border>
         </Grid>

@@ -15,10 +15,7 @@ public class EditorLayoutService
 
     private EditorLayoutService() { }
 
-    /// <summary>
-    /// Saves the current layout state to a JSON file.
-    /// </summary>
-    public void SaveLayout(string filePath, IEnumerable<EditorImage> images, IEnumerable<ILayerItem> placedItems, IEnumerable<TrackRoute> routes)
+    public string GetCurrentLayoutJson(IEnumerable<EditorImage> images, IEnumerable<ILayerItem> placedItems, IEnumerable<TrackRoute> routes)
     {
         try
         {
@@ -58,6 +55,14 @@ public class EditorLayoutService
                 {
                     x = comp.X; y = comp.Y; isLocked = comp.IsLocked;
                 }
+                else if (item is MainPcInstance pc)
+                {
+                    x = pc.X; y = pc.Y; isLocked = pc.IsLocked;
+                }
+                else if (item is ModemInstance m)
+                {
+                    x = m.X; y = m.Y; isLocked = m.IsLocked;
+                }
 
                 state.PlacedItems.Add(new PlacedItemState
                 {
@@ -68,26 +73,34 @@ public class EditorLayoutService
                 });
             }
 
-            var json = JsonSerializer.Serialize(state, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(filePath, json);
-            TerminalService.Instance.LogSuccess($"Layout saved successfully to {Path.GetFileName(filePath)}");
+            return JsonSerializer.Serialize(state, new JsonSerializerOptions { WriteIndented = true });
         }
         catch (Exception ex)
         {
-            TerminalService.Instance.LogError($"Failed to save layout: {ex.Message}");
+            TerminalService.Instance.LogError($"Failed to generate layout JSON: {ex.Message}");
+            return "{}";
         }
     }
 
     /// <summary>
-    /// Loads the layout state from a JSON file.
+    /// Saves the current layout state to a JSON file. (Deprecated: ProjectManager handles DB)
     /// </summary>
-    public EditorLayoutState? LoadLayout(string filePath)
+    public void SaveLayout(string filePath, IEnumerable<EditorImage> images, IEnumerable<ILayerItem> placedItems, IEnumerable<TrackRoute> routes)
     {
+        var json = GetCurrentLayoutJson(images, placedItems, routes);
+        if (json != "{}")
+        {
+            File.WriteAllText(filePath, json);
+            TerminalService.Instance.LogSuccess($"Layout saved successfully to {Path.GetFileName(filePath)}");
+        }
+    }
+
+    public EditorLayoutState? LoadFromJson(string json)
+    {
+        if (string.IsNullOrWhiteSpace(json) || json == "{}") return null;
+
         try
         {
-            if (!File.Exists(filePath)) return null;
-
-            var json = File.ReadAllText(filePath);
             var state = JsonSerializer.Deserialize<EditorLayoutState>(json);
 
             if (state != null)
@@ -108,12 +121,35 @@ public class EditorLayoutService
                 }
             }
 
-            TerminalService.Instance.LogSuccess($"Layout loaded successfully from {Path.GetFileName(filePath)}");
             return state;
         }
         catch (Exception ex)
         {
-            TerminalService.Instance.LogError($"Failed to load layout: {ex.Message}");
+            TerminalService.Instance.LogError($"Failed to load layout from JSON: {ex.Message}");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Loads the layout state from a JSON file.
+    /// </summary>
+    public EditorLayoutState? LoadLayout(string filePath)
+    {
+        try
+        {
+            if (!File.Exists(filePath)) return null;
+
+            var json = File.ReadAllText(filePath);
+            var state = LoadFromJson(json);
+
+            if (state != null)
+                TerminalService.Instance.LogSuccess($"Layout loaded successfully from {Path.GetFileName(filePath)}");
+                
+            return state;
+        }
+        catch (Exception ex)
+        {
+            TerminalService.Instance.LogError($"Failed to load layout from file: {ex.Message}");
             return null;
         }
     }
