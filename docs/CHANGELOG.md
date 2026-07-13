@@ -2,6 +2,19 @@
 
 All notable changes to TCP (Train Control Platform) are documented in this file.
 
+## TCP-2.3.0 — 3-Column Layout & TreeView Layer Management
+
+**Release Date**: [Current Date]
+
+### Added
+
+- **3-Column Layout**: Improved Editor interface with a separate left panel for the Palette, center area for the Editor map, and right panel for Layers.
+- **TreeView Hierarchy**: Converted flat layer list into a hierarchical TreeView grouped by device location. Unassigned devices appear in "Atanmamış".
+- **Context Menu Actions**: Right-click on devices in the Layer Tree to safely delete them from the Editor or open their properties.
+- **Detailed Properties Screen**: Edit CustomName, Location, IP Address, Port, MAC Address, and LAN Cable directly from the Editor via the properties context menu window.
+
+---
+
 ## TCP-2.2.0 — Editor Layers Panel
 
 **Release Date**: [Current Date]

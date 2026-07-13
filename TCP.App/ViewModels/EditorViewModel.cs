@@ -93,9 +93,20 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                 SelectedBox = _selectedLayerItem as DeviceInstance;
                 
                 OnPropertyChanged();
+                if (RemoveSelectedLayerCommand is RelayCommandWithCanExecute<object> rcmd)
+                {
+                    rcmd.RaiseCanExecuteChanged();
+                }
+                if (EditLayerPropertiesCommand is RelayCommandWithCanExecute<object> ecmd)
+                {
+                    ecmd.RaiseCanExecuteChanged();
+                }
             }
         }
     }
+    
+    public ICommand RemoveSelectedLayerCommand { get; }
+    public ICommand EditLayerPropertiesCommand { get; }
     
     /// <summary>
     /// Collection of background images on the editor
@@ -121,6 +132,10 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                 if (RemoveImageCommand is RelayCommandWithCanExecute<object> cmd)
                 {
                     cmd.RaiseCanExecuteChanged();
+                }
+                if (RemoveSelectedLayerCommand is RelayCommandWithCanExecute<object> rcmd)
+                {
+                    rcmd.RaiseCanExecuteChanged();
                 }
             }
         }
@@ -233,6 +248,8 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         
         // TCP-1.0.3: Initialize AddBoxCommand with CanExecute check
         AddBoxCommand = new RelayCommandWithCanExecute<object>(_ => AddBox(), () => SelectedPaletteBoard != null);
+        RemoveSelectedLayerCommand = new RelayCommand<object>(param => RemoveSelectedLayer(param as ILayerItem));
+        EditLayerPropertiesCommand = new RelayCommand<object>(param => EditLayerProperties(param as ILayerItem));
 
         // Sync layers on collection change
         EditorImages.CollectionChanged += (s, e) => SyncLayers();
@@ -244,11 +261,100 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     {
         var selectedId = SelectedLayerItem?.Id;
         Layers.Clear();
-        foreach (var img in EditorImages) Layers.Add(img);
-        foreach (var box in PlacedBoxes) Layers.Add(box);
+        
+        // 1. Group Images
+        if (EditorImages.Any())
+        {
+            var imagesGroup = new LayerGroup("Arka Planlar");
+            foreach (var img in EditorImages)
+            {
+                imagesGroup.Children.Add(img);
+            }
+            Layers.Add(imagesGroup);
+        }
+
+        // 2. Group Devices by Location
+        var locationGroups = PlacedBoxes.GroupBy(b => string.IsNullOrWhiteSpace(b.Location) ? "Atanmamış" : b.Location)
+                                        .OrderBy(g => g.Key);
+        
+        foreach (var group in locationGroups)
+        {
+            var layerGroup = new LayerGroup(group.Key);
+            foreach (var box in group)
+            {
+                layerGroup.Children.Add(box);
+            }
+            Layers.Add(layerGroup);
+        }
+
         if (selectedId.HasValue)
         {
-            SelectedLayerItem = Layers.FirstOrDefault(l => l.Id == selectedId.Value);
+            SelectedLayerItem = FindLayerById(selectedId.Value);
+        }
+    }
+
+    private ILayerItem? FindLayerById(Guid id)
+    {
+        foreach(var layer in Layers)
+        {
+            if (layer.Id == id) return layer;
+            if (layer is LayerGroup grp)
+            {
+                var child = grp.Children.FirstOrDefault(c => c.Id == id);
+                if (child != null) return child;
+            }
+        }
+        return null;
+    }
+    
+    private void RemoveSelectedLayer(ILayerItem? item = null)
+    {
+        var target = item ?? SelectedLayerItem;
+        if (target == null) return;
+
+        if (target is EditorImage img)
+        {
+            EditorImages.Remove(img);
+            if (SelectedLayerItem == img) SelectedLayerItem = null;
+        }
+        else if (target is DeviceInstance dev)
+        {
+            dev.X = 0;
+            dev.Y = 0;
+            dev.IsLocked = false;
+            PlacedBoxes.Remove(dev);
+            if (SelectedLayerItem == dev) SelectedLayerItem = null;
+            TCP.App.Services.DeviceManager.Instance.SaveDevices();
+        }
+        else if (target is LayerGroup grp)
+        {
+            foreach(var child in grp.Children.ToList())
+            {
+                if (child is EditorImage i) EditorImages.Remove(i);
+                if (child is DeviceInstance d)
+                {
+                    d.X = 0;
+                    d.Y = 0;
+                    d.IsLocked = false;
+                    PlacedBoxes.Remove(d);
+                }
+            }
+            if (SelectedLayerItem == grp) SelectedLayerItem = null;
+            TCP.App.Services.DeviceManager.Instance.SaveDevices();
+        }
+    }
+
+    private void EditLayerProperties(ILayerItem? item = null)
+    {
+        var target = item ?? SelectedLayerItem;
+        if (target == null || target is LayerGroup) return;
+
+        var window = new TCP.App.Views.LayerPropertiesWindow(target);
+        if (window.ShowDialog() == true)
+        {
+            // If location changed or name changed, sync layers to refresh tree
+            SyncLayers();
+            TCP.App.Services.DeviceManager.Instance.SaveDevices();
         }
     }
     

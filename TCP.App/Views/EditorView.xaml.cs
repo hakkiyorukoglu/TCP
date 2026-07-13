@@ -237,5 +237,13 @@ public partial class EditorView : UserControl
         TCP.App.Services.DeviceManager.Instance.SaveDevices();
         e.Handled = true;
     }
+
+    private void TreeView_SelectedItemChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<object> e)
+    {
+        if (DataContext is EditorViewModel viewModel && e.NewValue is TCP.App.Models.Editor.ILayerItem layerItem)
+        {
+            viewModel.SelectedLayerItem = layerItem;
+        }
+    }
 }
 

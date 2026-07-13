@@ -143,3 +143,5 @@ C:\Users\yoruk\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\refint\TCP.App.dll
 C:\Users\yoruk\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.pdb
 C:\Users\yoruk\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\TCP.App.genruntimeconfig.cache
 C:\Users\yoruk\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\ref\TCP.App.dll
+C:\Users\yoruk\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\LayerPropertiesWindow.baml
+C:\Users\yoruk\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\LayerPropertiesWindow.g.cs

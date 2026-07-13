@@ -6,6 +6,8 @@
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:local="clr-namespace:TCP.App"
              xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
+             xmlns:models="clr-namespace:TCP.App.Models.Editor"
+             xmlns:electronics="clr-namespace:TCP.App.Models.Electronics"
              xmlns:converters="clr-namespace:TCP.App.Converters"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
@@ -109,29 +111,23 @@
             </Grid>
         </Border>
         
-        <!-- Main Content: Palette + Editor Area -->
-        <!-- TCP-1.0.3: 2-column layout (Editor left, Palette+Layers right) -->
+        <!-- Main Content: 3-column layout (Palette left, Editor center, Layers right) -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <!-- Left: Editor Area (star) -->
-                <ColumnDefinition Width="*"/>
-                <!-- Right: Palette and Layers (fixed width) -->
+                <!-- Left: Palette Panel (fixed width) -->
                 <ColumnDefinition Width="260"/>
+                <!-- Middle: Editor Area (star) -->
+                <ColumnDefinition Width="*"/>
+                <!-- Right: Layers Panel (fixed width) -->
+                <ColumnDefinition Width="280"/>
             </Grid.ColumnDefinitions>
             
-            <!-- Right: Palette + Layers Panel -->
-            <Grid Grid.Column="1" Margin="0,0,16,16">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/> <!-- Palette -->
-                    <RowDefinition Height="1*"/> <!-- Layers -->
-                </Grid.RowDefinitions>
-            
-                <!-- Top Right: Palette Panel -->
-                <Border Grid.Row="0"
+            <!-- Left: Palette Panel -->
+            <Border Grid.Column="0"
                     Background="{DynamicResource Brush.Surface}"
                     BorderBrush="{DynamicResource Brush.Border}"
                     BorderThickness="1"
-                    Margin="16,0,0,8">
+                    Margin="16,0,0,16">
                 <Grid>
                     <Grid.RowDefinitions>
                         <!-- Header -->
@@ -239,54 +235,82 @@
                                Cursor="Hand"/>
                 </Grid>
             </Border>
+            
+            <!-- Right: Layers & Properties Panel -->
+            <Grid Grid.Column="2" Margin="16,0,16,16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/> <!-- Layers Tree -->
+                    <RowDefinition Height="Auto"/> <!-- Properties -->
+                </Grid.RowDefinitions>
 
-            <!-- Bottom Right: Layers Panel -->
-            <Border Grid.Row="1"
-                    Background="{DynamicResource Brush.Surface}"
-                    BorderBrush="{DynamicResource Brush.Border}"
-                    BorderThickness="1"
-                    Margin="16,8,0,0">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <!-- Header -->
-                        <RowDefinition Height="Auto"/>
-                        <!-- Layers List -->
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    
-                    <!-- Header: Layers -->
-                    <Border Grid.Row="0"
-                            Background="{DynamicResource Brush.Background.Secondary}"
-                            BorderBrush="{DynamicResource Brush.Border}"
-                            BorderThickness="0,0,0,1"
-                            Padding="16,12">
-                        <TextBlock Text="Layers"
-                                   FontSize="{DynamicResource Font.Heading.Small}"
-                                   FontFamily="{DynamicResource Font.Primary}"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource Brush.Text.Primary}"/>
-                    </Border>
-                    
-                    <!-- Layers List -->
-                    <ListBox Grid.Row="1"
-                             ItemsSource="{Binding Layers}"
-                             SelectedItem="{Binding SelectedLayerItem, Mode=TwoWay}"
-                             BorderThickness="0"
-                             Background="Transparent"
-                             ScrollViewer.VerticalScrollBarVisibility="Auto"
-                             Margin="0">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="{DynamicResource Brush.Background.Primary}"
-                                        BorderThickness="0"
-                                        Padding="12,8"
-                                        Margin="2">
-                                    <Grid>
+                <!-- Layers Panel -->
+                <Border Grid.Row="0"
+                        Background="{DynamicResource Brush.Surface}"
+                        BorderBrush="{DynamicResource Brush.Border}"
+                        BorderThickness="1"
+                        Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <!-- Header -->
+                            <RowDefinition Height="Auto"/>
+                            <!-- Layers List -->
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!-- Header: Layers -->
+                        <Border Grid.Row="0"
+                                Background="{DynamicResource Brush.Background.Secondary}"
+                                BorderBrush="{DynamicResource Brush.Border}"
+                                BorderThickness="0,0,0,1"
+                                Padding="16,12">
+                            <TextBlock Text="Layers"
+                                       FontSize="{DynamicResource Font.Heading.Small}"
+                                       FontFamily="{DynamicResource Font.Primary}"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Brush.Text.Primary}"/>
+                        </Border>
+                        
+                        <!-- Layers TreeView -->
+                        <TreeView Grid.Row="1"
+                                  ItemsSource="{Binding Layers}"
+                                  BorderThickness="0"
+                                  Background="Transparent"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                  Margin="0"
+                                  SelectedItemChanged="TreeView_SelectedItemChanged">
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="TreeViewItem">
+                                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                                    <Setter Property="IsExpanded" Value="True"/>
+                                    <Setter Property="Padding" Value="4"/>
+                                    <Setter Property="Margin" Value="0,2"/>
+                                    <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=TreeView}}"/>
+                                    <Setter Property="ContextMenu">
+                                        <Setter.Value>
+                                            <ContextMenu>
+                                                <MenuItem Header="Özellikler" Command="{Binding PlacementTarget.Tag.EditLayerPropertiesCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding}"/>
+                                                <MenuItem Header="Sil" Command="{Binding PlacementTarget.Tag.RemoveSelectedLayerCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding}"/>
+                                            </ContextMenu>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource Brush.Accent.Secondary}"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource Brush.Border}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                            <TreeView.Resources>
+                                <!-- HierarchicalDataTemplate for LayerGroup -->
+                                <HierarchicalDataTemplate DataType="{x:Type models:LayerGroup}" ItemsSource="{Binding Children}">
+                                    <Grid Width="230">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/> <!-- Visibility -->
                                             <ColumnDefinition Width="Auto"/> <!-- Icon -->
                                             <ColumnDefinition Width="*"/>    <!-- Name -->
-                                            <ColumnDefinition Width="Auto"/> <!-- Lock -->
                                         </Grid.ColumnDefinitions>
                                         
                                         <!-- Visibility Toggle -->
@@ -295,63 +319,91 @@
                                             <TextBlock Text="👁" FontSize="12" Opacity="{Binding IsVisible, Converter={StaticResource BoolToOpacityConverter}}"/>
                                         </ToggleButton>
                                         
-                                        <!-- Type Icon -->
-                                        <TextBlock Grid.Column="1" Text="{Binding LayerType, Converter={StaticResource LayerTypeToIconConverter}}" 
+                                        <!-- Folder Icon -->
+                                        <TextBlock Grid.Column="1" Text="📁" 
                                                    VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12" Foreground="{DynamicResource Brush.Text.Secondary}"/>
                                         
-                                        <!-- Layer Name -->
-                                        <TextBlock Grid.Column="2" Text="{Binding LayerName, Mode=OneWay}"
+                                        <!-- Name -->
+                                        <TextBlock Grid.Column="2" Text="{Binding LayerName}" 
                                                    FontSize="{DynamicResource Font.Body}"
                                                    FontFamily="{DynamicResource Font.Primary}"
-                                                   FontWeight="SemiBold"
-                                                   VerticalAlignment="Center"
-                                                   Foreground="{DynamicResource Brush.Text.Primary}"/>
+                                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                                   VerticalAlignment="Center"/>
+                                    </Grid>
+                                </HierarchicalDataTemplate>
+                                
+                                <!-- DataTemplate for ILayerItem (Device/Image) -->
+                                <DataTemplate DataType="{x:Type electronics:DeviceInstance}">
+                                    <Grid Width="210">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/> <!-- Visibility -->
+                                            <ColumnDefinition Width="Auto"/> <!-- Icon -->
+                                            <ColumnDefinition Width="*"/>    <!-- Name -->
+                                            <ColumnDefinition Width="Auto"/> <!-- Lock -->
+                                        </Grid.ColumnDefinitions>
                                         
-                                        <!-- Lock Toggle -->
+                                        <ToggleButton Grid.Column="0" IsChecked="{Binding IsVisible, Mode=TwoWay}" 
+                                                      Background="Transparent" BorderThickness="0" Padding="4" Margin="0,0,4,0" Cursor="Hand">
+                                            <TextBlock Text="👁" FontSize="12" Opacity="{Binding IsVisible, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                        </ToggleButton>
+                                        
+                                        <TextBlock Grid.Column="1" Text="🔌" 
+                                                   VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12" Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                        
+                                        <TextBlock Grid.Column="2" Text="{Binding CustomName}" 
+                                                   FontSize="{DynamicResource Font.Body}"
+                                                   FontFamily="{DynamicResource Font.Primary}"
+                                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                                   VerticalAlignment="Center"/>
+                                                   
                                         <ToggleButton Grid.Column="3" IsChecked="{Binding IsLocked, Mode=TwoWay}" 
-                                                      Background="Transparent" BorderThickness="0" Padding="4" Margin="4,0,0,0" Cursor="Hand">
+                                                      Background="Transparent" BorderThickness="0" Padding="4" Margin="0,0,4,0" Cursor="Hand">
                                             <TextBlock Text="🔒" FontSize="12" Opacity="{Binding IsLocked, Converter={StaticResource BoolToOpacityConverter}}"/>
                                         </ToggleButton>
                                     </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="Padding" Value="0"/>
-                                <Setter Property="Margin" Value="0"/>
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="ListBoxItem">
-                                            <Border Background="{TemplateBinding Background}"
-                                                    BorderThickness="0"
-                                                    Padding="{TemplateBinding Padding}">
-                                                <ContentPresenter/>
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="{DynamicResource Brush.Border}"/>
-                                                </Trigger>
-                                                <Trigger Property="IsSelected" Value="True">
-                                                    <Setter Property="Background" Value="{DynamicResource Brush.Accent.Primary}"/>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-                    </ListBox>
-                </Grid>
-            </Border>
+                                </DataTemplate>
+                                
+                                <DataTemplate DataType="{x:Type models:EditorImage}">
+                                    <Grid Width="210">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/> <!-- Visibility -->
+                                            <ColumnDefinition Width="Auto"/> <!-- Icon -->
+                                            <ColumnDefinition Width="*"/>    <!-- Name -->
+                                            <ColumnDefinition Width="Auto"/> <!-- Lock -->
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <ToggleButton Grid.Column="0" IsChecked="{Binding IsVisible, Mode=TwoWay}" 
+                                                      Background="Transparent" BorderThickness="0" Padding="4" Margin="0,0,4,0" Cursor="Hand">
+                                            <TextBlock Text="👁" FontSize="12" Opacity="{Binding IsVisible, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                        </ToggleButton>
+                                        
+                                        <TextBlock Grid.Column="1" Text="🖼" 
+                                                   VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12" Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                        
+                                        <TextBlock Grid.Column="2" Text="{Binding Name}" 
+                                                   FontSize="{DynamicResource Font.Body}"
+                                                   FontFamily="{DynamicResource Font.Primary}"
+                                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                                   VerticalAlignment="Center"/>
+                                                   
+                                        <ToggleButton Grid.Column="3" IsChecked="{Binding IsLocked, Mode=TwoWay}" 
+                                                      Background="Transparent" BorderThickness="0" Padding="4" Margin="0,0,4,0" Cursor="Hand">
+                                            <TextBlock Text="🔒" FontSize="12" Opacity="{Binding IsLocked, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                        </ToggleButton>
+                                    </Grid>
+                                </DataTemplate>
+                            </TreeView.Resources>
+                        </TreeView>
+                    </Grid>
+                </Border>
             </Grid>
             
-            <!-- Left: Editor Area -->
+            <!-- Middle: Editor Area -->
             <!-- TCP-1.0.2: Editor area with background image display -->
             <!-- TCP-1.0.3: Canvas overlay for placed boxes -->
             <!-- TCP-1.0.4: Viewport transform integration (Zoom/Pan) -->
             <Border x:Name="ViewportContainer"
-                    Grid.Column="0"
+                    Grid.Column="1"
                     Background="{DynamicResource Brush.Surface}"
                     BorderBrush="{DynamicResource Brush.Border}"
                     BorderThickness="1"
