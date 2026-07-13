@@ -89,6 +89,11 @@
                             Width="100" VerticalAlignment="Center" Margin="0,0,16,0"/>
 
                     <!-- Save / Load Layout -->
+                    <ui:Button Content="Yenile"
+                               Command="{Binding RefreshCommand}"
+                               Appearance="Success"
+                               Margin="0,0,8,0"
+                               Cursor="Hand"/>
                     <ui:Button Content="Save Page"
                                Command="{Binding SaveLayoutCommand}"
                                Appearance="Primary"

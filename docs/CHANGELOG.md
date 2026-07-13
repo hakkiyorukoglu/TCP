@@ -2,6 +2,18 @@
 
 All notable changes to TCP (Train Control Platform) are documented in this file.
 
+## TCP-2.4.1 — Connection Sync & UI Bugfixes
+
+**Release Date**: [Current Date]
+
+### Added
+- **Manual Save & Refresh Controls**: Added explicit "Kaydet" button for modem incoming/outgoing connections to force save to local JSON. Added explicit "Yenile" button in Editor toolbar to force-sync and redraw all visual representations of the network on the canvas.
+
+### Fixed
+- **ComboBox Duplication Bug**: Fixed a recursive collection modification bug where the `AvailableConnections` list would duplicate items endlessly due to WPF automatically setting values to `null` when the item source is cleared. Protected by `_isUpdatingConnections` state flag.
+
+---
+
 ## TCP-2.4.0 — Logical Flaws Fixes & Network Elastic Links
 
 **Release Date**: [Current Date]

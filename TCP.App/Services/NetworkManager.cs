@@ -79,45 +79,104 @@ public class NetworkManager
         }
     }
 
-    // Two-way binding helper for connections
-    public void LinkModems(Guid? sourceId, Guid? targetId)
+    public void SetIncomingConnection(Guid targetModemId, Guid? newSourceId)
     {
-        // Enforce MainPc can only connect to 1 modem. If another modem is already using MainPc as source, break it.
-        if (sourceId.HasValue && sourceId.Value == _mainPc.Id && targetId.HasValue)
+        if (targetModemId == newSourceId) return; // Prevent self-loop
+
+        var targetModem = _modems.FirstOrDefault(m => m.Id == targetModemId);
+        if (targetModem == null) return;
+
+        if (newSourceId.HasValue && newSourceId == targetModem.OutgoingConnectionId) return; // Prevent incoming=outgoing
+
+        var oldSourceId = targetModem.IncomingConnectionId;
+        if (oldSourceId == newSourceId) return;
+
+        // 1. Clean up old source's outgoing
+        if (oldSourceId.HasValue && oldSourceId.Value != _mainPc.Id)
         {
-            var alreadyConnected = _modems.FirstOrDefault(m => m.IncomingConnectionId == _mainPc.Id);
-            if (alreadyConnected != null && alreadyConnected.Id != targetId.Value)
+            var oldSource = _modems.FirstOrDefault(m => m.Id == oldSourceId.Value);
+            if (oldSource != null && oldSource.OutgoingConnectionId == targetModemId)
             {
-                alreadyConnected.IncomingConnectionId = null;
+                oldSource.OutgoingConnectionId = null;
             }
         }
 
-        // First, clear old incoming links to the target
-        if (targetId.HasValue && targetId.Value != _mainPc.Id)
+        // 2. Set new incoming
+        targetModem.IncomingConnectionId = newSourceId;
+
+        // 3. Establish new incoming connection from source
+        if (newSourceId.HasValue)
         {
-            var target = _modems.FirstOrDefault(m => m.Id == targetId.Value);
-            if (target != null)
+            if (newSourceId.Value == _mainPc.Id)
             {
-                // If target was connected to someone else previously, we break that
-                if (target.IncomingConnectionId.HasValue)
+                // MainPC can only connect to one modem. Clean up others.
+                foreach (var m in _modems)
                 {
-                    var oldSource = _modems.FirstOrDefault(m => m.Id == target.IncomingConnectionId.Value);
-                    if (oldSource != null && oldSource.OutgoingConnectionId == targetId)
+                    if (m.Id != targetModemId && m.IncomingConnectionId == _mainPc.Id)
                     {
-                        oldSource.OutgoingConnectionId = null;
+                        m.IncomingConnectionId = null;
                     }
                 }
-                target.IncomingConnectionId = sourceId;
+            }
+            else
+            {
+                var newSource = _modems.FirstOrDefault(m => m.Id == newSourceId.Value);
+                if (newSource != null)
+                {
+                    // If new source was pointing somewhere else, break that target's incoming
+                    if (newSource.OutgoingConnectionId.HasValue && newSource.OutgoingConnectionId.Value != targetModemId)
+                    {
+                        var oldTarget = _modems.FirstOrDefault(m => m.Id == newSource.OutgoingConnectionId.Value);
+                        if (oldTarget != null) oldTarget.IncomingConnectionId = null;
+                    }
+                    newSource.OutgoingConnectionId = targetModemId;
+                }
+            }
+        }
+        SaveNetwork();
+    }
+
+    public void SetOutgoingConnection(Guid sourceModemId, Guid? newTargetId)
+    {
+        if (sourceModemId == newTargetId) return; // Prevent self-loop
+
+        var sourceModem = _modems.FirstOrDefault(m => m.Id == sourceModemId);
+        if (sourceModem == null) return;
+
+        if (newTargetId.HasValue && newTargetId == sourceModem.IncomingConnectionId) return; // Prevent incoming=outgoing
+
+        var oldTargetId = sourceModem.OutgoingConnectionId;
+        if (oldTargetId == newTargetId) return;
+
+        // 1. Clean up old target's incoming
+        if (oldTargetId.HasValue)
+        {
+            var oldTarget = _modems.FirstOrDefault(m => m.Id == oldTargetId.Value);
+            if (oldTarget != null && oldTarget.IncomingConnectionId == sourceModemId)
+            {
+                oldTarget.IncomingConnectionId = null;
             }
         }
 
-        // Now set the outgoing of source
-        if (sourceId.HasValue && sourceId.Value != _mainPc.Id)
+        // 2. Set new outgoing
+        sourceModem.OutgoingConnectionId = newTargetId;
+
+        // 3. Establish new outgoing connection to target
+        if (newTargetId.HasValue)
         {
-            var source = _modems.FirstOrDefault(m => m.Id == sourceId.Value);
-            if (source != null)
+            var newTarget = _modems.FirstOrDefault(m => m.Id == newTargetId.Value);
+            if (newTarget != null)
             {
-                source.OutgoingConnectionId = targetId;
+                // If new target was receiving from somewhere else, break that source's outgoing
+                if (newTarget.IncomingConnectionId.HasValue && newTarget.IncomingConnectionId.Value != sourceModemId)
+                {
+                    if (newTarget.IncomingConnectionId.Value != _mainPc.Id)
+                    {
+                        var oldSource = _modems.FirstOrDefault(m => m.Id == newTarget.IncomingConnectionId.Value);
+                        if (oldSource != null) oldSource.OutgoingConnectionId = null;
+                    }
+                }
+                newTarget.IncomingConnectionId = sourceModemId;
             }
         }
         SaveNetwork();

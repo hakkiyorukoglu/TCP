@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TCP.Theming")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0c38ae29423c6bca74a0a4829ac90c884c7c8a0b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f02af4081d62104686c57e046dcc6d1517f8a08a")]
 [assembly: System.Reflection.AssemblyProductAttribute("TCP.Theming")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TCP.Theming")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

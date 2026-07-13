@@ -128,6 +128,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     public ObservableCollection<ConnectionLine> DaisyChainLines { get; } = new();
     
     public ICommand AddBoxCommand { get; }
+    public ICommand RefreshCommand { get; }
     
     public EditorViewModel()
     {
@@ -170,6 +171,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         AddBoxCommand = new RelayCommandWithCanExecute<object>(_ => AddBox(), () => SelectedPaletteItem != null);
         RemoveSelectedLayerCommand = new RelayCommand<object>(param => RemoveSelectedLayer(param as ILayerItem));
         EditLayerPropertiesCommand = new RelayCommand<object>(param => EditLayerProperties(param as ILayerItem));
+        RefreshCommand = new RelayCommand<object>(_ => RefreshEditor());
 
         EditorImages.CollectionChanged += (s, e) => SyncLayers();
         PlacedBoxes.CollectionChanged += (s, e) => SyncLayers();
@@ -178,6 +180,12 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         _networkManager.NetworkChanged += OnNetworkChanged;
         
         SyncLayers();
+    }
+
+    private void RefreshEditor()
+    {
+        OnNetworkChanged();
+        TerminalService.Instance.LogSuccess("Editör güncellendi.");
     }
 
     private void OnNetworkChanged()

@@ -50,14 +50,18 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
 
     public ObservableCollection<ConnectionOption> AvailableConnections { get; } = new();
 
+    private bool _isUpdatingConnections;
+
     public Guid? SelectedIncomingId
     {
         get => SelectedModem?.IncomingConnectionId;
         set
         {
-            if (SelectedModem != null)
+            if (_isUpdatingConnections) return;
+            if (SelectedModem != null && SelectedModem.IncomingConnectionId != value)
             {
-                NetworkManager.Instance.LinkModems(value, SelectedModem.Id);
+                NetworkManager.Instance.SetIncomingConnection(SelectedModem.Id, value);
+                UpdateAvailableConnections();
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SelectedOutgoingId));
             }
@@ -69,9 +73,11 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
         get => SelectedModem?.OutgoingConnectionId;
         set
         {
-            if (SelectedModem != null)
+            if (_isUpdatingConnections) return;
+            if (SelectedModem != null && SelectedModem.OutgoingConnectionId != value)
             {
-                NetworkManager.Instance.LinkModems(SelectedModem.Id, value);
+                NetworkManager.Instance.SetOutgoingConnection(SelectedModem.Id, value);
+                UpdateAvailableConnections();
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SelectedIncomingId));
             }
@@ -80,21 +86,40 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
 
     private void UpdateAvailableConnections()
     {
-        AvailableConnections.Clear();
-        AvailableConnections.Add(new ConnectionOption { Id = null, Name = "Yok" });
+        if (_isUpdatingConnections) return;
+        _isUpdatingConnections = true;
 
-        bool mainPcTaken = NetworkManager.Instance.Modems.Any(m => m.IncomingConnectionId == NetworkManager.Instance.MainPc.Id && m.Id != SelectedModem?.Id);
-        if (!mainPcTaken)
+        try
         {
-            AvailableConnections.Add(new ConnectionOption { Id = NetworkManager.Instance.MainPc.Id, Name = NetworkManager.Instance.MainPc.Name });
-        }
+            var newList = new System.Collections.Generic.List<ConnectionOption>();
+            newList.Add(new ConnectionOption { Id = null, Name = "Yok" });
 
-        foreach (var m in NetworkManager.Instance.Modems)
-        {
-            if (SelectedModem == null || m.Id != SelectedModem.Id)
+            bool mainPcTaken = NetworkManager.Instance.Modems.Any(m => m.IncomingConnectionId == NetworkManager.Instance.MainPc.Id && m.Id != SelectedModem?.Id);
+            if (!mainPcTaken)
             {
-                AvailableConnections.Add(new ConnectionOption { Id = m.Id, Name = m.Name });
+                newList.Add(new ConnectionOption { Id = NetworkManager.Instance.MainPc.Id, Name = NetworkManager.Instance.MainPc.Name });
             }
+
+            foreach (var m in NetworkManager.Instance.Modems)
+            {
+                if (SelectedModem == null || m.Id != SelectedModem.Id)
+                {
+                    newList.Add(new ConnectionOption { Id = m.Id, Name = m.Name });
+                }
+            }
+
+            AvailableConnections.Clear();
+            foreach (var item in newList)
+            {
+                AvailableConnections.Add(item);
+            }
+            
+            OnPropertyChanged(nameof(SelectedIncomingId));
+            OnPropertyChanged(nameof(SelectedOutgoingId));
+        }
+        finally
+        {
+            _isUpdatingConnections = false;
         }
     }
 
@@ -116,6 +141,8 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand SaveModemCommand { get; }
     public ICommand EditModemCommand { get; }
     public ICommand DeleteModemCommand { get; }
+    
+    public ICommand SaveModemLinksCommand { get; }
     #endregion
 
     #region Create Station Popup
@@ -174,8 +201,9 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
         OpenCreateModemPopupCommand = new RelayCommand<object>(_ => OpenCreateModemPopup());
         CloseCreateModemPopupCommand = new RelayCommand<object>(_ => IsCreateModemPopupOpen = false);
         SaveModemCommand = new RelayCommand<object>(_ => SaveModem());
-        EditModemCommand = new RelayCommand<ModemInstance>(EditModem);
-        DeleteModemCommand = new RelayCommand<ModemInstance>(DeleteModem);
+        EditModemCommand = new RelayCommand<object>(param => EditModem(param as ModemInstance));
+        DeleteModemCommand = new RelayCommand<object>(param => DeleteModem(param as ModemInstance));
+        SaveModemLinksCommand = new RelayCommand<object>(_ => SaveModemLinks());
 
         OpenCreateStationPopupCommand = new RelayCommand<object>(_ => OpenCreateStationPopup());
         CloseCreateStationPopupCommand = new RelayCommand<object>(_ => IsCreateStationPopupOpen = false);
@@ -272,6 +300,12 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
     {
         if (m == null) return;
         NetworkManager.Instance.RemoveModem(m.Id);
+    }
+
+    private void SaveModemLinks()
+    {
+        NetworkManager.Instance.SaveNetwork();
+        TerminalService.Instance.LogSuccess("Bağlantılar başarıyla kaydedildi.");
     }
 
     private void OpenCreateStationPopup()

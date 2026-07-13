@@ -1,13 +1,13 @@
 # TCP — Train Control Platform
 
-[![Version](https://img.shields.io/badge/version-TCP--2.4.0-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-TCP--2.4.1-blue.svg)](docs/CHANGELOG.md)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
 
 **TCP (Train Control Platform)**, tren kontrol sistemleri, ray yerleşim tasarımı ve donanım kartları yönetimini birleştiren tam donanımlı, profesyonel bir masaüstü (WPF) uygulamasıdır.
 
 ---
 
-## 🚀 Öne Çıkan Özellikler (v2.4.0)
+## 🚀 Öne Çıkan Özellikler (v2.4.1)
 
 Uygulama baştan aşağıya gelişmiş yetenekler ve dinamik bir arayüzle donatıldı:
 
@@ -17,6 +17,7 @@ Uygulama baştan aşağıya gelişmiş yetenekler ve dinamik bir arayüzle donat
   - Şeffaflık (Opacity) kontrolüyle katmanlı haritalar oluşturun.
   - Kaydettiğiniz özel cihazları Harita/Editör paneline ekleyin ve yerleşimlerini tasarlayın.
   - **Esnek Ağ İplikleri:** Modem, İstasyon ve Parçalar (Components) arasındaki bağlantı hiyerarşisini gösteren (Mavi, Turuncu, Gri) elastik kesik çizgiler.
+  - **Manuel Senkronizasyon ve Kayıt:** Ağ bağlantılarınızı elle anında kaydedebileceğiniz ve Editör haritasına yansıtabileceğiniz özel "Kaydet" ve "Yenile" (Refresh) özellikleri eklendi.
   - **3-Sütunlu Profesyonel Arayüz:** Sol tarafta cihaz paleti, ortada geniş çizim alanı ve sağda katmanlar ağacı ile rahat çalışma imkanı.
   - **Ağaç Yapılı (TreeView) Katmanlar:** Cihazlarınızı konumlarına göre otomatik klasörleyen gelişmiş katman paneli. Tam otomatik senkronizasyon ile silinen öğelerin anında haritadan da kaldırılması.
   - **Sağ Tık Menüsü (Context Menu):** Katman ağacındaki cihazlara sağ tıklayarak silebilir veya detaylı ayarlarını değiştirebileceğiniz "Özellikler" ekranına erişebilirsiniz.
