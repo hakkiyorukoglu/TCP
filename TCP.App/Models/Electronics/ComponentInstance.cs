@@ -7,12 +7,10 @@ using TCP.App.Models.Editor;
 namespace TCP.App.Models.Electronics;
 
 /// <summary>
-/// DeviceInstance - Represents a user-created electronic card instance.
-/// 
-/// Contains both device configuration properties (Name, IP, Port, etc.)
-/// and Editor map properties (X, Y, IsLocked).
+/// ComponentInstance - Represents an electronic component attached to a Station (Mega).
+/// E.g. Servo, RFID, Sensor.
 /// </summary>
-public class DeviceInstance : ILayerItem
+public class ComponentInstance : ILayerItem, INotifyPropertyChanged
 {
     private double _x;
     private double _y;
@@ -20,73 +18,43 @@ public class DeviceInstance : ILayerItem
     private bool _isSelected;
     private bool _isVisible = true;
 
-    /// <summary>
-    /// Unique identifier for this device instance.
-    /// </summary>
     public Guid Id { get; set; } = Guid.NewGuid();
+    
+    /// <summary>
+    /// Parent station ID
+    /// </summary>
+    public Guid StationId { get; set; }
 
     [JsonIgnore]
-    public string LayerName => CustomName;
+    public string LayerName => Name;
     
     [JsonIgnore]
-    public string LayerType => "Electronic";
+    public string LayerType => "Component";
 
     /// <summary>
-    /// The template/board name it was created from (e.g. "Arduino Mega").
+    /// Template/Type of the component (e.g. "Servo", "RFID Reader")
     /// </summary>
     public string TemplateId { get; set; } = string.Empty;
 
+    public string Name { get; set; } = string.Empty;
+    
     /// <summary>
-    /// Custom name given by the user (e.g. "Main Controller").
+    /// Which pin on the Mega is this connected to?
     /// </summary>
-    public string CustomName { get; set; } = string.Empty;
+    public string Pin { get; set; } = string.Empty;
 
-    /// <summary>
-    /// IP Address (e.g. "192.168.1.10").
-    /// </summary>
-    public string IpAddress { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Port Number (e.g. 8080).
-    /// </summary>
-    public int Port { get; set; } = 80;
-
-    /// <summary>
-    /// MAC Address (e.g. "00:1B:44:11:3A:B7").
-    /// </summary>
-    public string MacAddress { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Physical LAN cable or port identifier (e.g. "ETH-1").
-    /// </summary>
-    public string LanCable { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Physical location of the device (e.g. "Server Room 1").
-    /// </summary>
-    public string Location { get; set; } = string.Empty;
-
-    /// <summary>
-    /// X coordinate on the Editor canvas.
-    /// </summary>
     public double X
     {
         get => _x;
         set { if (_x != value) { _x = value; OnPropertyChanged(); } }
     }
 
-    /// <summary>
-    /// Y coordinate on the Editor canvas.
-    /// </summary>
     public double Y
     {
         get => _y;
         set { if (_y != value) { _y = value; OnPropertyChanged(); } }
     }
 
-    /// <summary>
-    /// Whether the device is locked in place on the Editor canvas.
-    /// </summary>
     public bool IsLocked
     {
         get => _isLocked;
@@ -105,10 +73,11 @@ public class DeviceInstance : ILayerItem
         get => _isVisible;
         set { if (_isVisible != value) { _isVisible = value; OnPropertyChanged(); } }
     }
-
+    
     /// <summary>
-    /// Type property (derived from TemplateId for UI display like "Mega", "Nano", etc.)
+    /// Derived Type property for UI display
     /// </summary>
+    [JsonIgnore]
     public string Type 
     {
         get

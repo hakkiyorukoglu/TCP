@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TCP.App.Models.Editor;
+using TCP.App.Models.Electronics;
 using TCP.App.ViewModels;
 
 namespace TCP.App.Services;
@@ -151,27 +152,61 @@ public class BoardRegistry : IBoardRegistry
     /// - "RFID Reader" -> "RFID"
     /// - "Servo Controller" -> "Servo"
     /// </summary>
+    public void Remove(BoardItem board)
+    {
+        if (board != null && _boards.Contains(board))
+        {
+            _boards.Remove(board);
+            SaveBoards();
+        }
+    }
+    
+    public void SaveBoards()
+    {
+        try
+        {
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var folder = System.IO.Path.Combine(appDataPath, "TCP");
+            if (!System.IO.Directory.Exists(folder)) System.IO.Directory.CreateDirectory(folder);
+            
+            var path = System.IO.Path.Combine(folder, "boards.json");
+            var json = System.Text.Json.JsonSerializer.Serialize(_boards);
+            System.IO.File.WriteAllText(path, json);
+        }
+        catch { }
+    }
+    
+    public void LoadBoards()
+    {
+        try
+        {
+            var path = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TCP", "boards.json");
+            if (System.IO.File.Exists(path))
+            {
+                var json = System.IO.File.ReadAllText(path);
+                var loaded = System.Text.Json.JsonSerializer.Deserialize<List<BoardItem>>(json);
+                if (loaded != null && loaded.Any())
+                {
+                    _boards.Clear();
+                    _boards.AddRange(loaded);
+                }
+            }
+        }
+        catch { }
+    }
+
     private static string ExtractTypeFromName(string name)
     {
         if (string.IsNullOrWhiteSpace(name))
-        {
             return "Unknown";
-        }
         
-        // Remove common prefixes
         var type = name;
         if (type.StartsWith("Arduino ", StringComparison.OrdinalIgnoreCase))
-        {
             type = type.Substring("Arduino ".Length);
-        }
         else if (type.EndsWith(" Reader", StringComparison.OrdinalIgnoreCase))
-        {
             type = type.Substring(0, type.Length - " Reader".Length);
-        }
         else if (type.EndsWith(" Controller", StringComparison.OrdinalIgnoreCase))
-        {
             type = type.Substring(0, type.Length - " Controller".Length);
-        }
         
         return type;
     }

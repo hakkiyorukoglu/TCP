@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -7,74 +8,36 @@ using Microsoft.Win32;
 using TCP.App.Models.Editor;
 using TCP.App.Models.Electronics;
 using TCP.App.Services;
-using System.Linq;namespace TCP.App.ViewModels;
+using System.Linq;
 
-/// <summary>
-/// EditorImageMode - Image display mode enum
-/// TCP-1.0.2: Background Image Load (Editor)
-/// </summary>
+namespace TCP.App.ViewModels;
+
+public class ConnectionLine
+{
+    public ILayerItem Source { get; set; } = null!;
+    public ILayerItem Target { get; set; } = null!;
+    public string LineType { get; set; } = "Modem";
+}
+
 public enum EditorImageMode
 {
-    /// <summary>
-    /// Fit mode: Image Stretch="Uniform", centered, no scrollbars
-    /// </summary>
     Fit,
-    
-    /// <summary>
-    /// Actual mode: ScrollViewer with Image Stretch="None", scrollbars Auto
-    /// </summary>
     Actual
 }
 
-/// <summary>
-/// EditorViewModel - Editor modülü ViewModel'i
-/// 
-/// TCP-1.0.2: Background Image Load (Editor)
-/// TCP-1.0.3: Editor: Add board boxes from registry
-/// 
-/// Bu ViewModel EditorView'un data context'idir.
-/// Editor modülü state'ini ve iş mantığını yönetir.
-/// 
-/// MVVM Pattern:
-/// - View (EditorView.xaml) sadece UI gösterir
-/// - ViewModel (EditorViewModel) tüm mantığı içerir
-/// 
-/// Single Responsibility: Editor modülü state ve iş mantığı yönetimi
-/// </summary>
 public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
 {
-    /// <summary>
-    /// Device manager - Single source of truth for user devices
-    /// </summary>
-    private readonly DeviceManager _deviceManager;
+    private readonly NetworkManager _networkManager;
     
-    /// <summary>
-    /// Viewport state - Zoom and pan transformation
-    /// TCP-1.0.4: Background Image Load with Zoom/Pan
-    /// </summary>
     public ViewportState ViewportState { get; }
-    
-    /// <summary>
-    /// Input router - Mouse input handler for viewport
-    /// TCP-1.0.4: Background Image Load with Zoom/Pan
-    /// </summary>
     public EditorInputRouter InputRouter { get; }
-    /// <summary>
-    /// PropertyChanged event - UI binding'ler için
-    /// </summary>
+
     public event PropertyChangedEventHandler? PropertyChanged;
-    
-    /// <summary>
-    /// PropertyChanged event'ini tetikler
-    /// </summary>
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
     
-    /// <summary>
-    /// Unified collection of layers (Images and Electronics)
-    /// </summary>
     public ObservableCollection<ILayerItem> Layers { get; } = new();
 
     private ILayerItem? _selectedLayerItem;
@@ -90,17 +53,12 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                 if (_selectedLayerItem != null) _selectedLayerItem.IsSelected = true;
                 
                 SelectedImage = _selectedLayerItem as EditorImage;
-                SelectedBox = _selectedLayerItem as DeviceInstance;
                 
                 OnPropertyChanged();
                 if (RemoveSelectedLayerCommand is RelayCommandWithCanExecute<object> rcmd)
-                {
                     rcmd.RaiseCanExecuteChanged();
-                }
                 if (EditLayerPropertiesCommand is RelayCommandWithCanExecute<object> ecmd)
-                {
                     ecmd.RaiseCanExecuteChanged();
-                }
             }
         }
     }
@@ -108,9 +66,6 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand RemoveSelectedLayerCommand { get; }
     public ICommand EditLayerPropertiesCommand { get; }
     
-    /// <summary>
-    /// Collection of background images on the editor
-    /// </summary>
     public ObservableCollection<EditorImage> EditorImages { get; } = new();
 
     private EditorImage? _selectedImage;
@@ -130,22 +85,15 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(HasSelectedImage));
                 if (RemoveImageCommand is RelayCommandWithCanExecute<object> cmd)
-                {
                     cmd.RaiseCanExecuteChanged();
-                }
                 if (RemoveSelectedLayerCommand is RelayCommandWithCanExecute<object> rcmd)
-                {
                     rcmd.RaiseCanExecuteChanged();
-                }
             }
         }
     }
 
     public bool HasSelectedImage => SelectedImage != null;
 
-    /// <summary>
-    /// Status text (for display in toolbar)
-    /// </summary>
     public string StatusText => "Editor Ready";
     
     public ICommand LoadImageCommand { get; }
@@ -154,89 +102,62 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand SaveLayoutCommand { get; }
     public ICommand LoadLayoutCommand { get; }
     
-    /// <summary>
-    /// Palette boards (from device manager)
-    /// </summary>
-    public ObservableCollection<DeviceInstance> PaletteBoards => _deviceManager.Devices;
+    // Palette items
+    public ObservableCollection<ILayerItem> PaletteItems { get; } = new();
     
-    /// <summary>
-    /// Selected palette board (for Add button)
-    /// </summary>
-    private DeviceInstance? _selectedPaletteBoard;
-    public DeviceInstance? SelectedPaletteBoard
+    private ILayerItem? _selectedPaletteItem;
+    public ILayerItem? SelectedPaletteItem
     {
-        get => _selectedPaletteBoard;
+        get => _selectedPaletteItem;
         set
         {
-            if (_selectedPaletteBoard != value)
+            if (_selectedPaletteItem != value)
             {
-                _selectedPaletteBoard = value;
+                _selectedPaletteItem = value;
                 OnPropertyChanged();
-                // TCP-1.0.3: Update AddBoxCommand CanExecute
                 if (AddBoxCommand is RelayCommandWithCanExecute<object> cmd)
-                {
                     cmd.RaiseCanExecuteChanged();
-                }
             }
         }
     }
     
-    /// <summary>
-    /// Placed devices on editor canvas
-    /// </summary>
-    public ObservableCollection<DeviceInstance> PlacedBoxes { get; }
+    // Items placed on canvas (Modems + Stations + Components)
+    public ObservableCollection<ILayerItem> PlacedBoxes { get; }
     
-    /// <summary>
-    /// Selected device (optional for highlight)
-    /// </summary>
-    private DeviceInstance? _selectedBox;
-    public DeviceInstance? SelectedBox
-    {
-        get => _selectedBox;
-        set
-        {
-            if (_selectedBox != value)
-            {
-                _selectedBox = value;
-                if (_selectedBox != null && SelectedLayerItem != _selectedBox)
-                {
-                    SelectedLayerItem = _selectedBox;
-                }
-                OnPropertyChanged();
-            }
-        }
-    }
+    // Daisy-chain connection lines
+    public ObservableCollection<ConnectionLine> DaisyChainLines { get; } = new();
     
-    /// <summary>
-    /// Add Box Command
-    /// TCP-1.0.3: Editor: Add board boxes from registry
-    /// </summary>
     public ICommand AddBoxCommand { get; }
     
-    /// <summary>
-    /// Constructor - Initialize commands and palette
-    /// TCP-1.0.2: Background Image Load (Editor)
-    /// TCP-1.0.3: Editor: Add board boxes from registry
-    /// </summary>
     public EditorViewModel()
     {
-        // TCP-1.0.4: Initialize viewport state and input router
         ViewportState = new ViewportState();
         InputRouter = new EditorInputRouter(ViewportState);
+        _networkManager = NetworkManager.Instance;
         
-        // TCP-Custom: Initialize device manager
-        _deviceManager = DeviceManager.Instance;
+        PlacedBoxes = new ObservableCollection<ILayerItem>();
         
-        // PlacedBoxes currently maps to Devices that are on map. For now, we can just say ALL devices are placed or they maintain their state.
-        // Let's assume all devices added to map are in PlacedBoxes.
-        PlacedBoxes = new ObservableCollection<DeviceInstance>();
-        
-        // Load initially placed boxes
-        foreach(var device in _deviceManager.Devices)
+        // Populate initially placed boxes
+        if (_networkManager.MainPc.X > 0 || _networkManager.MainPc.Y > 0 || _networkManager.MainPc.IsLocked)
         {
-            if (device.X > 0 || device.Y > 0 || device.IsLocked)
+            PlacedBoxes.Add(_networkManager.MainPc);
+        }
+
+        foreach(var modem in _networkManager.Modems)
+        {
+            if (modem.X > 0 || modem.Y > 0 || modem.IsLocked)
+                PlacedBoxes.Add(modem);
+
+            foreach(var st in modem.Stations)
             {
-                PlacedBoxes.Add(device);
+                if (st.X > 0 || st.Y > 0 || st.IsLocked)
+                    PlacedBoxes.Add(st);
+                
+                foreach(var comp in st.Components)
+                {
+                    if (comp.X > 0 || comp.Y > 0 || comp.IsLocked)
+                        PlacedBoxes.Add(comp);
+                }
             }
         }
         
@@ -246,15 +167,85 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         SaveLayoutCommand = new RelayCommand<object>(_ => SaveLayout());
         LoadLayoutCommand = new RelayCommand<object>(_ => LoadLayout());
         
-        // TCP-1.0.3: Initialize AddBoxCommand with CanExecute check
-        AddBoxCommand = new RelayCommandWithCanExecute<object>(_ => AddBox(), () => SelectedPaletteBoard != null);
+        AddBoxCommand = new RelayCommandWithCanExecute<object>(_ => AddBox(), () => SelectedPaletteItem != null);
         RemoveSelectedLayerCommand = new RelayCommand<object>(param => RemoveSelectedLayer(param as ILayerItem));
         EditLayerPropertiesCommand = new RelayCommand<object>(param => EditLayerProperties(param as ILayerItem));
 
-        // Sync layers on collection change
         EditorImages.CollectionChanged += (s, e) => SyncLayers();
         PlacedBoxes.CollectionChanged += (s, e) => SyncLayers();
+        
+        RefreshPaletteItems();
+        _networkManager.NetworkChanged += OnNetworkChanged;
+        
         SyncLayers();
+    }
+
+    private void OnNetworkChanged()
+    {
+        // 1. Refresh Palette
+        RefreshPaletteItems();
+
+        // 2. Remove Orphans
+        var activeIds = new System.Collections.Generic.HashSet<Guid>();
+        activeIds.Add(_networkManager.MainPc.Id);
+        foreach (var m in _networkManager.Modems)
+        {
+            activeIds.Add(m.Id);
+            foreach (var st in m.Stations)
+            {
+                activeIds.Add(st.Id);
+                foreach (var c in st.Components)
+                {
+                    activeIds.Add(c.Id);
+                }
+            }
+        }
+
+        var toRemove = PlacedBoxes.Where(b => !activeIds.Contains(b.Id)).ToList();
+        foreach (var item in toRemove)
+        {
+            PlacedBoxes.Remove(item);
+        }
+
+        // 3. Auto-add new stations/components if their parent modem/station is on map
+        foreach (var m in _networkManager.Modems)
+        {
+            if (PlacedBoxes.Contains(m))
+            {
+                double stOffsetX = 160;
+                foreach (var st in m.Stations)
+                {
+                    if (!PlacedBoxes.Contains(st))
+                    {
+                        st.X = m.X + stOffsetX;
+                        st.Y = m.Y + 160;
+                        PlacedBoxes.Add(st);
+                        stOffsetX += 160;
+                    }
+
+                    double cmpOffsetX = 160;
+                    foreach (var c in st.Components)
+                    {
+                        if (!PlacedBoxes.Contains(c))
+                        {
+                            c.X = st.X + cmpOffsetX;
+                            c.Y = st.Y + 160;
+                            PlacedBoxes.Add(c);
+                            cmpOffsetX += 160;
+                        }
+                    }
+                }
+            }
+        }
+
+        SyncLayers();
+    }
+
+    private void RefreshPaletteItems()
+    {
+        PaletteItems.Clear();
+        PaletteItems.Add(_networkManager.MainPc);
+        foreach(var m in _networkManager.Modems) PaletteItems.Add(m);
     }
 
     private void SyncLayers()
@@ -267,29 +258,86 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         {
             var imagesGroup = new LayerGroup("Arka Planlar");
             foreach (var img in EditorImages)
-            {
                 imagesGroup.Children.Add(img);
-            }
             Layers.Add(imagesGroup);
         }
 
-        // 2. Group Devices by Location
-        var locationGroups = PlacedBoxes.GroupBy(b => string.IsNullOrWhiteSpace(b.Location) ? "Atanmamış" : b.Location)
-                                        .OrderBy(g => g.Key);
+        // 2. Group by Modem (Ağ)
+        var grouped = PlacedBoxes
+            .Where(b => b is ModemInstance || b is StationInstance || b is ComponentInstance || b is MainPcInstance)
+            .GroupBy(b => 
+            {
+                if (b is MainPcInstance p) return $"Ağ: {p.Name}";
+                if (b is ModemInstance m) return $"Ağ: {m.Name}";
+                if (b is StationInstance s) 
+                {
+                    var parent = _networkManager.Modems.FirstOrDefault(m => m.Stations.Contains(s));
+                    return parent != null ? $"Ağ: {parent.Name}" : "Ağ: Bilinmeyen";
+                }
+                if (b is ComponentInstance c) 
+                {
+                    var parentStation = _networkManager.Modems.SelectMany(m => m.Stations).FirstOrDefault(st => st.Id == c.StationId);
+                    var parentModem = _networkManager.Modems.FirstOrDefault(m => parentStation != null && m.Stations.Contains(parentStation));
+                    return parentModem != null ? $"Ağ: {parentModem.Name}" : "Ağ: Bilinmeyen";
+                }
+                return "Diğer";
+            })
+            .OrderBy(g => g.Key);
         
-        foreach (var group in locationGroups)
+        foreach (var group in grouped)
         {
             var layerGroup = new LayerGroup(group.Key);
             foreach (var box in group)
-            {
                 layerGroup.Children.Add(box);
-            }
             Layers.Add(layerGroup);
         }
+
+        SyncDaisyChainLines();
 
         if (selectedId.HasValue)
         {
             SelectedLayerItem = FindLayerById(selectedId.Value);
+        }
+    }
+
+    private void SyncDaisyChainLines()
+    {
+        DaisyChainLines.Clear();
+        foreach (var modem in _networkManager.Modems)
+        {
+            if (modem.IncomingConnectionId.HasValue)
+            {
+                ILayerItem? source = null;
+                if (modem.IncomingConnectionId.Value == _networkManager.MainPc.Id)
+                {
+                    source = _networkManager.MainPc;
+                }
+                else
+                {
+                    source = _networkManager.Modems.FirstOrDefault(m => m.Id == modem.IncomingConnectionId.Value);
+                }
+
+                if (source != null && PlacedBoxes.Contains(source) && PlacedBoxes.Contains(modem))
+                {
+                    DaisyChainLines.Add(new ConnectionLine { Source = source, Target = modem, LineType = "Modem" });
+                }
+            }
+
+            foreach(var st in modem.Stations)
+            {
+                if (PlacedBoxes.Contains(modem) && PlacedBoxes.Contains(st))
+                {
+                    DaisyChainLines.Add(new ConnectionLine { Source = modem, Target = st, LineType = "Station" });
+                }
+
+                foreach(var c in st.Components)
+                {
+                    if (PlacedBoxes.Contains(st) && PlacedBoxes.Contains(c))
+                    {
+                        DaisyChainLines.Add(new ConnectionLine { Source = st, Target = c, LineType = "Component" });
+                    }
+                }
+            }
         }
     }
 
@@ -317,30 +365,79 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             EditorImages.Remove(img);
             if (SelectedLayerItem == img) SelectedLayerItem = null;
         }
-        else if (target is DeviceInstance dev)
+        else if (target is MainPcInstance pc)
         {
-            dev.X = 0;
-            dev.Y = 0;
-            dev.IsLocked = false;
-            PlacedBoxes.Remove(dev);
-            if (SelectedLayerItem == dev) SelectedLayerItem = null;
-            TCP.App.Services.DeviceManager.Instance.SaveDevices();
+            pc.X = 0; pc.Y = 0; pc.IsLocked = false;
+            PlacedBoxes.Remove(pc);
+            if (SelectedLayerItem == pc) SelectedLayerItem = null;
+            NetworkManager.Instance.SaveNetwork();
+        }
+        else if (target is ModemInstance m)
+        {
+            m.X = 0; m.Y = 0; m.IsLocked = false;
+            PlacedBoxes.Remove(m);
+            // Also remove its stations and components from map
+            foreach(var st in m.Stations)
+            {
+                st.X = 0; st.Y = 0; st.IsLocked = false;
+                PlacedBoxes.Remove(st);
+                foreach(var c in st.Components)
+                {
+                    c.X = 0; c.Y = 0; c.IsLocked = false;
+                    PlacedBoxes.Remove(c);
+                }
+            }
+            if (SelectedLayerItem == m) SelectedLayerItem = null;
+            NetworkManager.Instance.SaveNetwork();
+        }
+        else if (target is StationInstance st)
+        {
+            st.X = 0; st.Y = 0; st.IsLocked = false;
+            PlacedBoxes.Remove(st);
+            // Remove its components
+            foreach(var c in st.Components)
+            {
+                c.X = 0; c.Y = 0; c.IsLocked = false;
+                PlacedBoxes.Remove(c);
+            }
+            if (SelectedLayerItem == st) SelectedLayerItem = null;
+            NetworkManager.Instance.SaveModems();
+        }
+        else if (target is ComponentInstance comp)
+        {
+            comp.X = 0; comp.Y = 0; comp.IsLocked = false;
+            PlacedBoxes.Remove(comp);
+            if (SelectedLayerItem == comp) SelectedLayerItem = null;
+            NetworkManager.Instance.SaveModems();
         }
         else if (target is LayerGroup grp)
         {
             foreach(var child in grp.Children.ToList())
             {
                 if (child is EditorImage i) EditorImages.Remove(i);
-                if (child is DeviceInstance d)
+                if (child is MainPcInstance mainPc)
                 {
-                    d.X = 0;
-                    d.Y = 0;
-                    d.IsLocked = false;
-                    PlacedBoxes.Remove(d);
+                    mainPc.X = 0; mainPc.Y = 0; mainPc.IsLocked = false;
+                    PlacedBoxes.Remove(mainPc);
+                }
+                if (child is ModemInstance md)
+                {
+                    md.X = 0; md.Y = 0; md.IsLocked = false;
+                    PlacedBoxes.Remove(md);
+                }
+                if (child is StationInstance s)
+                {
+                    s.X = 0; s.Y = 0; s.IsLocked = false;
+                    PlacedBoxes.Remove(s);
+                }
+                if (child is ComponentInstance c)
+                {
+                    c.X = 0; c.Y = 0; c.IsLocked = false;
+                    PlacedBoxes.Remove(c);
                 }
             }
             if (SelectedLayerItem == grp) SelectedLayerItem = null;
-            TCP.App.Services.DeviceManager.Instance.SaveDevices();
+            NetworkManager.Instance.SaveModems();
         }
     }
 
@@ -352,9 +449,8 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         var window = new TCP.App.Views.LayerPropertiesWindow(target);
         if (window.ShowDialog() == true)
         {
-            // If location changed or name changed, sync layers to refresh tree
             SyncLayers();
-            TCP.App.Services.DeviceManager.Instance.SaveDevices();
+            NetworkManager.Instance.SaveModems();
         }
     }
     
@@ -362,7 +458,6 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     {
         try
         {
-            TerminalService.Instance.LogInfo("Opening image selection dialog...");
             var dialog = new OpenFileDialog
             {
                 Filter = "Image Files (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg|All Files (*.*)|*.*",
@@ -374,10 +469,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             {
                 var filePath = dialog.FileName;
                 var fileName = System.IO.Path.GetFileName(filePath);
-                TerminalService.Instance.LogInfo($"Loading image {fileName} (Sync MemoryStream)...");
                 
-                // Read fully into memory on UI thread. This avoids ALL MTA thread deadlocks 
-                // and WPF internal background downloader deadlocks.
                 byte[] imageBytes = System.IO.File.ReadAllBytes(filePath);
                 using var stream = new System.IO.MemoryStream(imageBytes);
                 
@@ -395,16 +487,11 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                     ImageSource = bitmap,
                     Width = bitmap.PixelWidth,
                     Height = bitmap.PixelHeight,
-                    X = 0,
-                    Y = 0,
-                    Opacity = 1.0,
-                    IsLocked = false
+                    X = 0, Y = 0, Opacity = 1.0, IsLocked = false
                 };
                 
                 EditorImages.Add(newImage);
                 SelectedImage = newImage;
-                
-                TerminalService.Instance.LogSuccess($"Image loaded successfully: {newImage.Name}");
             }
         }
         catch (Exception ex)
@@ -451,72 +538,134 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             if (state != null)
             {
                 EditorImages.Clear();
-                foreach (var img in state.Images)
-                {
-                    EditorImages.Add(img);
-                }
+                foreach (var img in state.Images) EditorImages.Add(img);
 
                 PlacedBoxes.Clear();
-                foreach (var devState in state.PlacedDevices)
+                foreach (var stState in state.PlacedItems)
                 {
-                    var globalDev = _deviceManager.Devices.FirstOrDefault(d => d.Id == devState.DeviceId);
-                    if (globalDev != null)
+                    // Look for MainPc
+                    if (_networkManager.MainPc.Id == stState.ItemId)
                     {
-                        globalDev.X = devState.X;
-                        globalDev.Y = devState.Y;
-                        globalDev.IsLocked = devState.IsLocked;
-                        PlacedBoxes.Add(globalDev);
+                        _networkManager.MainPc.X = stState.X; _networkManager.MainPc.Y = stState.Y; _networkManager.MainPc.IsLocked = stState.IsLocked;
+                        PlacedBoxes.Add(_networkManager.MainPc);
+                        continue;
+                    }
+
+                    // Look for Modems
+                    var modem = _networkManager.Modems.FirstOrDefault(m => m.Id == stState.ItemId);
+                    if (modem != null)
+                    {
+                        modem.X = stState.X; modem.Y = stState.Y; modem.IsLocked = stState.IsLocked;
+                        PlacedBoxes.Add(modem);
+                        continue;
+                    }
+                    
+                    // Look for Stations
+                    var st = _networkManager.Modems.SelectMany(m => m.Stations).FirstOrDefault(s => s.Id == stState.ItemId);
+                    if (st != null)
+                    {
+                        st.X = stState.X; st.Y = stState.Y; st.IsLocked = stState.IsLocked;
+                        PlacedBoxes.Add(st);
+                        continue;
+                    }
+                    
+                    // Look for Components
+                    foreach(var m in _networkManager.Modems)
+                    {
+                        foreach(var station in m.Stations)
+                        {
+                            var comp = station.Components.FirstOrDefault(c => c.Id == stState.ItemId);
+                            if (comp != null)
+                            {
+                                comp.X = stState.X; comp.Y = stState.Y; comp.IsLocked = stState.IsLocked;
+                                PlacedBoxes.Add(comp);
+                                break;
+                            }
+                        }
                     }
                 }
                 
                 SelectedImage = null;
-                SelectedBox = null;
+                SelectedLayerItem = null;
             }
         }
     }
     
-    /// <summary>
-    /// Add Box command implementation
-    /// TCP-1.0.3: Editor: Add board boxes from registry
-    /// 
-    /// Adds a new PlacedBoardBox centered in the visible editor area (X,Y = 0,0 for now).
-    /// </summary>
     private void AddBox()
     {
         try
         {
-            // TCP-1.0.3: Safety guard - require selected palette board
-            if (SelectedPaletteBoard == null)
+            if (SelectedPaletteItem == null)
             {
-                TerminalService.Instance.LogWarning("Select a board first: Please select a board from the palette before adding.");
+                TerminalService.Instance.LogWarning("Lütfen paletten bir öğe seçin.");
                 return;
             }
-            
-            if (PlacedBoxes.Contains(SelectedPaletteBoard))
+
+            double offsetX = 100.0;
+            double offsetY = 100.0;
+            int addedCount = 0;
+
+            if (SelectedPaletteItem is MainPcInstance pc)
             {
-                TerminalService.Instance.LogWarning("Device is already on the map.");
-                return;
+                if (!PlacedBoxes.Contains(pc))
+                {
+                    pc.X = offsetX;
+                    pc.Y = offsetY;
+                    PlacedBoxes.Add(pc);
+                    addedCount++;
+                }
             }
-            
-            // Set initial position if not already placed
-            if (SelectedPaletteBoard.X == 0 && SelectedPaletteBoard.Y == 0)
+            else if (SelectedPaletteItem is ModemInstance m)
             {
-                SelectedPaletteBoard.X = 100.0;
-                SelectedPaletteBoard.Y = 100.0;
+                if (!PlacedBoxes.Contains(m))
+                {
+                    m.X = offsetX;
+                    m.Y = offsetY;
+                    PlacedBoxes.Add(m);
+                    addedCount++;
+                    offsetX += 160;
+                }
+
+                foreach (var st in m.Stations)
+                {
+                    if (!PlacedBoxes.Contains(st))
+                    {
+                        st.X = offsetX;
+                        st.Y = offsetY;
+                        PlacedBoxes.Add(st);
+                        addedCount++;
+                        offsetX += 160;
+                    }
+                    
+                    foreach (var comp in st.Components)
+                    {
+                        if (!PlacedBoxes.Contains(comp))
+                        {
+                            comp.X = offsetX;
+                            comp.Y = offsetY;
+                            PlacedBoxes.Add(comp);
+                            addedCount++;
+                            offsetX += 160;
+                        }
+                    }
+                }
             }
-            
-            // Add to collection
-            PlacedBoxes.Add(SelectedPaletteBoard);
-            DeviceManager.Instance.SaveDevices();
-            
-            TerminalService.Instance.LogSuccess($"Added to map: {SelectedPaletteBoard.CustomName}");
+
+            if (addedCount > 0)
+            {
+                NetworkManager.Instance.SaveNetwork();
+                string itemName = SelectedPaletteItem is MainPcInstance mainPcInst ? mainPcInst.Name : 
+                                 (SelectedPaletteItem is ModemInstance mdInst ? mdInst.Name : "Bilinmeyen");
+                TerminalService.Instance.LogSuccess($"{addedCount} öğe haritaya eklendi ({itemName})");
+            }
+            else
+            {
+                TerminalService.Instance.LogWarning("Bu ağdaki tüm öğeler zaten haritada bulunuyor.");
+            }
         }
         catch (Exception ex)
         {
-            // TCP-1.0.3: Safety - show error toast (no crash)
-            TerminalService.Instance.LogError($"Failed to add box: {ex.Message}");
+            TerminalService.Instance.LogError($"Modem eklenemedi: {ex.Message}");
         }
     }
 }
-
-

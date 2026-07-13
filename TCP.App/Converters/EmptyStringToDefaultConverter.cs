@@ -4,17 +4,16 @@ using System.Windows.Data;
 
 namespace TCP.App.Converters;
 
-public class LayerTypeToIconConverter : IValueConverter
+public class EmptyStringToDefaultConverter : IValueConverter
 {
+    public string DefaultValue { get; set; } = "Atanmamış";
+
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is string type)
-        {
-            if (type == "Image") return "🖼";
-            if (type == "Electronic" || type == "Component") return "🔌";
-            if (type == "Station") return "💻";
-        }
-        return "📄";
+        if (value == null || string.IsNullOrWhiteSpace(value.ToString()))
+            return DefaultValue;
+
+        return value.ToString();
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

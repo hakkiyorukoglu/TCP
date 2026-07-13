@@ -5,84 +5,55 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
              xmlns:local="clr-namespace:TCP.App"
-             xmlns:components="clr-namespace:TCP.App.UI.Components"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="600" d:DesignWidth="1000"
              Background="Transparent">
     <UserControl.Resources>
         <local:IsNullToVisibilityConverter x:Key="IsNullToVisibilityConverter"/>
-        <local:ThicknessConverter x:Key="ThicknessConverter"/>
-        <local:CornerRadiusConverter x:Key="CornerRadiusConverter"/>
     </UserControl.Resources>
-    <!--
-        ElectronicsView.xaml - Electronics modülü view
-        
-        TCP-0.5: Electronics Page Skeleton
-        
-        Layout: 3 panel horizontal split
-        1. LEFT: Board List (fixed width ~240px)
-        2. RIGHT TOP: Board Details (Card-style)
-        3. RIGHT BOTTOM: Code Editor Placeholder
-        
-        MVVM Pattern: Sadece UI, hiçbir mantık içermez.
-        Tüm data ViewModel'den gelir.
-    -->
+
     <UserControl.DataContext>
         <viewmodels:ElectronicsViewModel/>
     </UserControl.DataContext>
     
     <Grid>
         <Grid.ColumnDefinitions>
-            <!-- LEFT: Board List (fixed width) -->
-            <ColumnDefinition Width="240"/>
-            <!-- RIGHT: Board Details + Code Editor (split vertically) -->
+            <!-- LEFT: Modems and Templates List -->
+            <ColumnDefinition Width="280"/>
+            <!-- RIGHT: Selected Modem Details, Stations and Components -->
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         
-        <Grid.RowDefinitions>
-            <!-- RIGHT TOP: Board Details -->
-            <RowDefinition Height="*"/>
-            <!-- RIGHT BOTTOM: Code Editor -->
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        
-        <!--
-            LEFT PANEL - Board List
-            Fixed width vertical list of electronics boards
-        -->
+        <!-- LEFT PANEL - Modem List -->
         <Border Grid.Column="0"
-                Grid.RowSpan="2"
                 Background="{DynamicResource Brush.Surface}"
                 BorderBrush="{DynamicResource Brush.Border}"
                 BorderThickness="0,0,1,0">
             <Grid>
                 <Grid.RowDefinitions>
-                    <!-- Header -->
                     <RowDefinition Height="Auto"/>
-                    <!-- Board List -->
                     <RowDefinition Height="*"/>
-                    <!-- My Devices Header -->
                     <RowDefinition Height="Auto"/>
-                    <!-- My Devices List -->
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 
-                <!-- Header -->
                 <TextBlock Grid.Row="0"
-                           Text="Templates"
+                           Text="Ağ Yönetimi (Modemler)"
                            FontSize="{DynamicResource Font.Heading.Medium}"
                            FontWeight="SemiBold"
                            Foreground="{DynamicResource Brush.Text.Primary}"
-                           Margin="15,15,15,10"/>
+                           Margin="15,15,15,5"/>
                 
-                <!-- Board List -->
+                <!-- Modem Listesi -->
                 <ListBox Grid.Row="1"
-                         ItemsSource="{Binding Boards}"
-                         SelectedItem="{Binding SelectedBoard}"
+                         ItemsSource="{Binding Modems}"
+                         SelectedItem="{Binding SelectedModem}"
                          BorderThickness="0"
                          Background="Transparent"
-                         Margin="10,0,10,10">
+                         Margin="10,0,10,5">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <Border x:Name="ItemBorder"
@@ -90,21 +61,120 @@
                                     BorderBrush="{DynamicResource Brush.Border}"
                                     BorderThickness="1"
                                     CornerRadius="4"
-                                    Margin="0,5,0,0"
+                                    Margin="0,2,0,2"
                                     Padding="10,8">
-                                <StackPanel Orientation="Horizontal">
-                                    <!-- Icon placeholder -->
-                                    <TextBlock Text="⚡"
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="📶"
                                                FontSize="{DynamicResource Font.Heading.Medium}"
-                                               Foreground="{DynamicResource Brush.Accent.Primary}"
+                                               Foreground="{DynamicResource Brush.Palette.Orange}"
                                                VerticalAlignment="Center"
                                                Margin="0,0,8,0"/>
-                                    <!-- Board name -->
-                                    <TextBlock Text="{Binding Name}"
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}"
                                                FontSize="{DynamicResource Font.Body}"
                                                Foreground="{DynamicResource Brush.Text.Primary}"
                                                VerticalAlignment="Center"/>
-                                </StackPanel>
+                                </Grid>
+                            </Border>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                    <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{DynamicResource Brush.Palette.Orange}"/>
+                                    <Setter TargetName="ItemBorder" Property="BorderThickness" Value="2"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="0"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+
+                <ui:Button Grid.Row="2"
+                           Content="+ Modem Ekle (Switch)"
+                           Command="{Binding OpenCreateModemPopupCommand}"
+                           Appearance="Primary"
+                           HorizontalAlignment="Stretch"
+                           Margin="15,5,15,10"/>
+                           
+                <!-- Temel Elektronikler Başlık -->
+                <TextBlock Grid.Row="3"
+                           Text="Temel Elektronikler"
+                           FontSize="{DynamicResource Font.Heading.Medium}"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource Brush.Text.Primary}"
+                           Margin="15,10,15,5"/>
+                           
+                <!-- Temel Elektronikler Listesi -->
+                <ListBox Grid.Row="4"
+                         ItemsSource="{Binding Templates}"
+                         SelectedItem="{Binding SelectedTemplate}"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         Margin="10,0,10,5">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="ItemBorder"
+                                    Background="{DynamicResource Brush.Background.Primary}"
+                                    BorderBrush="{DynamicResource Brush.Border}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Margin="0,2,0,2"
+                                    Padding="10,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <TextBlock Grid.Column="0" Text="🔌"
+                                               FontSize="{DynamicResource Font.Heading.Medium}"
+                                               Foreground="{DynamicResource Brush.Text.Secondary}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,8,0"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                               FontSize="{DynamicResource Font.Body}"
+                                               Foreground="{DynamicResource Brush.Text.Primary}"
+                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                               
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <ui:Button Appearance="Secondary"
+                                                   Command="{Binding DataContext.EditTemplateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   CommandParameter="{Binding}"
+                                                   Padding="4" Margin="0,0,4,0" ToolTip="Ayarlar">
+                                            <TextBlock Text="⚙" FontSize="12"/>
+                                        </ui:Button>
+                                        <ui:Button Appearance="Danger"
+                                                   Command="{Binding DataContext.DeleteTemplateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                   CommandParameter="{Binding}"
+                                                   Padding="4" ToolTip="Sil">
+                                            <TextBlock Text="✖" FontSize="12"/>
+                                        </ui:Button>
+                                    </StackPanel>
+                                </Grid>
                             </Border>
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
@@ -127,14 +197,6 @@
                                                 Padding="{TemplateBinding Padding}">
                                             <ContentPresenter/>
                                         </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsSelected" Value="True">
-                                                <Setter Property="Background" Value="Transparent"/>
-                                            </Trigger>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="Transparent"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>
@@ -147,173 +209,235 @@
                     </ListBox.ItemContainerStyle>
                 </ListBox>
 
-                <!-- My Devices Header -->
-                <TextBlock Grid.Row="2"
-                           Text="My Devices"
-                           FontSize="{DynamicResource Font.Heading.Medium}"
-                           FontWeight="SemiBold"
-                           Foreground="{DynamicResource Brush.Text.Primary}"
-                           Margin="15,15,15,10"/>
-                
-                <!-- My Devices List -->
-                <ListBox Grid.Row="3"
-                         ItemsSource="{Binding MyDevices}"
-                         BorderThickness="0"
-                         Background="Transparent"
-                         Margin="10,0,10,10">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Border x:Name="ItemBorder"
-                                    Background="{DynamicResource Brush.Background.Primary}"
-                                    BorderBrush="{DynamicResource Brush.Border}"
-                                    BorderThickness="1"
-                                    CornerRadius="4"
-                                    Margin="0,5,0,0"
-                                    Padding="10,8">
-                                <StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="💻"
-                                                   FontSize="{DynamicResource Font.Heading.Medium}"
-                                                   Foreground="{DynamicResource Brush.Accent.Primary}"
-                                                   VerticalAlignment="Center"
-                                                   Margin="0,0,8,0"/>
-                                        <TextBlock Text="{Binding CustomName}"
-                                                   FontSize="{DynamicResource Font.Body}"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource Brush.Text.Primary}"
-                                                   VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                    <TextBlock Text="{Binding Type}"
-                                               FontSize="{DynamicResource Font.Caption}"
-                                               Foreground="{DynamicResource Brush.Text.Secondary}"
-                                               Margin="32,2,0,0"/>
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="Padding" Value="0"/>
-                            <Setter Property="Margin" Value="0"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ListBoxItem">
-                                        <Border Background="{TemplateBinding Background}"
-                                                BorderBrush="{TemplateBinding BorderBrush}"
-                                                BorderThickness="0"
-                                                Padding="{TemplateBinding Padding}">
-                                            <ContentPresenter/>
-                                        </Border>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                </ListBox>
+                <ui:Button Grid.Row="5"
+                           Content="Elektronik Ekle"
+                           Command="{Binding AddTemplateCommand}"
+                           Appearance="Secondary"
+                           HorizontalAlignment="Stretch"
+                           Margin="15,5,15,15"/>
             </Grid>
         </Border>
         
-        <!--
-            RIGHT TOP PANEL - Board Summary Cards
-            TCP-0.6.0: Summary cards showing board connection details
-        -->
+        <!-- RIGHT PANEL - Seçili Modem Detayları -->
         <Border Grid.Column="1"
-                Grid.Row="0"
-                Background="{DynamicResource Brush.Surface}"
-                BorderBrush="{DynamicResource Brush.Border}"
-                BorderThickness="0,0,0,1"
-                Margin="10,10,10,5">
+                Background="{DynamicResource Brush.Surface}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="20">
-                    <!-- Board Name and Create Button -->
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0"
-                                   Text="{Binding SelectedBoard.Name, FallbackValue='No board selected'}"
-                                   FontSize="{DynamicResource Font.Heading.Large}"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource Brush.Text.Primary}"/>
-                        <ui:Button Grid.Column="1"
-                                   Content="Create Device"
-                                   Command="{Binding OpenCreatePopupCommand}"
-                                   Appearance="Primary"
-                                   Cursor="Hand"/>
-                    </Grid>
                     
-                    <!-- Summary Cards using reusable components -->
-                    <!-- TCP-0.6.1: Using BoardDetailCard and KeyValueRow components -->
-                    <StackPanel>
-                        <!-- Connection Info Card -->
-                        <components:BoardDetailCard Title="Connection Info"
-                                                    Margin="0,0,0,12">
-                            <components:BoardDetailCard.Content>
-                                <StackPanel>
-                                    <ItemsControl ItemsSource="{Binding SelectedBoardSummaryData}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <components:KeyValueRow Key="{Binding Key}"
-                                                                        Value="{Binding Value}"
-                                                                        Margin="0,0,0,8"/>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </StackPanel>
-                            </components:BoardDetailCard.Content>
-                        </components:BoardDetailCard>
-                    </StackPanel>
-                    
-                    <!-- Fallback message when no board selected -->
-                    <TextBlock Text="Select a board to view details"
-                               FontSize="{DynamicResource Font.Body}"
+                    <!-- Fallback message -->
+                    <TextBlock Text="Lütfen sol taraftan bir Modem seçin veya yeni Modem ekleyin."
+                               FontSize="{DynamicResource Font.Heading.Medium}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"
-                               TextWrapping="Wrap"
-                               Margin="0,16,0,0">
+                               TextAlignment="Center"
+                               Margin="0,50,0,0">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedBoard}" Value="{x:Null}">
+                                    <DataTrigger Binding="{Binding SelectedModem}" Value="{x:Null}">
                                         <Setter Property="Visibility" Value="Visible"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-                </StackPanel>
-            </ScrollViewer>
-        </Border>
-        
-        <!--
-            RIGHT BOTTOM PANEL - Code Editor Panel
-            TCP-0.6.2: Electronics "Edit Code" Panel UI
-        -->
-        <Border Grid.Column="1"
-                Grid.Row="1"
-                Background="{DynamicResource Brush.Surface}"
-                BorderBrush="{DynamicResource Brush.Border}"
-                BorderThickness="0,1,0,0"
-                Margin="10,5,10,10">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel Margin="20">
-                    <!-- Code Editor Panel using reusable component -->
-                    <components:BoardDetailCard Title="Edit Board Code">
-                        <components:BoardDetailCard.Content>
-                            <components:CodeEditorPanel/>
-                        </components:BoardDetailCard.Content>
-                    </components:BoardDetailCard>
+
+                    <!-- Content (Only visible when modem is selected) -->
+                    <StackPanel>
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedModem}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+
+                        <Grid Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding SelectedModem.Name}"
+                                       FontSize="{DynamicResource Font.Heading.Large}"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Brush.Palette.Orange}"
+                                       VerticalAlignment="Center"/>
+                            <ui:Button Grid.Column="1" 
+                                       Appearance="Secondary"
+                                       Command="{Binding EditModemCommand}"
+                                       CommandParameter="{Binding SelectedModem}"
+                                       Padding="8,6" Margin="0,0,10,0" ToolTip="Modem Ayarları">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="⚙" FontSize="14" Margin="0,0,6,0"/>
+                                    <TextBlock Text="Ayarlar" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </ui:Button>
+                            <ui:Button Grid.Column="2" 
+                                       Appearance="Danger"
+                                       Command="{Binding DeleteModemCommand}"
+                                       CommandParameter="{Binding SelectedModem}"
+                                       Padding="8,6" ToolTip="Modemi Sil">
+                                <TextBlock Text="Sil" VerticalAlignment="Center"/>
+                            </ui:Button>
+                        </Grid>
+
+                        <TextBlock Text="Bu modem TP-Link LS1005G (5-Port) olup 1 Giriş, 1 Çıkış(Daisy-Chain) ve en fazla 3 İstasyon destekler."
+                                   Foreground="{DynamicResource Brush.Text.Secondary}" Margin="0,0,0,20"/>
+
+                        <!-- Daisy-Chain Connections -->
+                        <Grid Margin="0,0,0,20">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Gelen Bağlantı:" Margin="0,0,0,4"/>
+                            <ComboBox Grid.Row="1" Grid.Column="0"
+                                      ItemsSource="{Binding AvailableConnections}"
+                                      SelectedValue="{Binding SelectedIncomingId}"
+                                      SelectedValuePath="Id"
+                                      DisplayMemberPath="Name" />
+
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Giden Bağlantı:" Margin="0,0,0,4"/>
+                            <ComboBox Grid.Row="1" Grid.Column="2"
+                                      ItemsSource="{Binding AvailableConnections}"
+                                      SelectedValue="{Binding SelectedOutgoingId}"
+                                      SelectedValuePath="Id"
+                                      DisplayMemberPath="Name" />
+                        </Grid>
+
+                        <!-- Stations Section (Owned by Modem) -->
+                        <Grid Margin="0,0,0,10">
+                            <TextBlock Text="Bağlı İstasyonlar (Megalar)"
+                                       FontSize="{DynamicResource Font.Heading.Medium}"
+                                       FontWeight="SemiBold"/>
+                            <ui:Button Content="+ İstasyon Ekle"
+                                       Command="{Binding OpenCreateStationPopupCommand}"
+                                       Appearance="Primary"
+                                       HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <ItemsControl ItemsSource="{Binding SelectedModem.Stations}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource Brush.Background.Secondary}"
+                                            BorderBrush="{DynamicResource Brush.Border}"
+                                            BorderThickness="1"
+                                            CornerRadius="8"
+                                            Padding="15"
+                                            Margin="0,0,0,15">
+                                        <StackPanel>
+                                            <Grid Margin="0,0,0,10">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                                    <TextBlock Text="💻" FontSize="20" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                                    <TextBlock Text="{Binding Name}" FontSize="{DynamicResource Font.Heading.Small}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                </StackPanel>
+
+                                                <TextBlock Grid.Column="1" Text="{Binding IpAddress}" Foreground="{DynamicResource Brush.Text.Secondary}" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                                                
+                                                <ui:Button Grid.Column="2" Appearance="Secondary"
+                                                           Command="{Binding DataContext.EditStationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                           CommandParameter="{Binding}"
+                                                           Padding="6" Margin="0,0,8,0" ToolTip="İstasyon Ayarları">
+                                                    <TextBlock Text="⚙" FontSize="14"/>
+                                                </ui:Button>
+                                                <ui:Button Grid.Column="3" Appearance="Danger"
+                                                           Command="{Binding DataContext.DeleteStationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                           CommandParameter="{Binding}"
+                                                           Padding="6">
+                                                    <TextBlock Text="Sil"/>
+                                                </ui:Button>
+                                            </Grid>
+
+                                            <!-- Components Inside Station -->
+                                            <Border Background="{DynamicResource Brush.Background.Primary}" CornerRadius="4" Padding="10">
+                                                <StackPanel>
+                                                    <Grid Margin="0,0,0,10">
+                                                        <TextBlock Text="Bileşenler" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                                        <ui:Button Content="+ Bileşen" 
+                                                                   Command="{Binding DataContext.OpenCreateComponentPopupCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                   CommandParameter="{Binding}"
+                                                                   Appearance="Transparent"
+                                                                   HorizontalAlignment="Right" Padding="4"/>
+                                                    </Grid>
+                                                    
+                                                    <ItemsControl ItemsSource="{Binding Components}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Border BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1" Padding="5,5,5,5">
+                                                                    <Grid>
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="Auto"/>
+                                                                            <ColumnDefinition Width="*"/>
+                                                                            <ColumnDefinition Width="Auto"/>
+                                                                            <ColumnDefinition Width="Auto"/>
+                                                                        </Grid.ColumnDefinitions>
+                                                                        
+                                                                        <TextBlock Grid.Column="0" Text="🔌" FontSize="14" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                                        
+                                                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                                                                            <TextBlock Text="{Binding Type}" FontSize="11" Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                                                        </StackPanel>
+
+                                                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,15,0">
+                                                                            <TextBlock Text="Pin:" Foreground="{DynamicResource Brush.Text.Secondary}" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                                                            <TextBlock Text="{Binding Pin}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                                        </StackPanel>
+
+                                                                        <StackPanel Grid.Column="3" Orientation="Horizontal">
+                                                                            <ui:Button Appearance="Secondary"
+                                                                                       Command="{Binding DataContext.EditComponentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                                       CommandParameter="{Binding}"
+                                                                                       Padding="4" Margin="0,0,4,0" ToolTip="Ayarlar">
+                                                                                <TextBlock Text="⚙" FontSize="12"/>
+                                                                            </ui:Button>
+                                                                            <ui:Button Appearance="Danger"
+                                                                                       Command="{Binding DataContext.DeleteComponentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                                       CommandParameter="{Binding}"
+                                                                                       Padding="4">
+                                                                                <TextBlock Text="✖" FontSize="12"/>
+                                                                            </ui:Button>
+                                                                        </StackPanel>
+                                                                    </Grid>
+                                                                </Border>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                            </Border>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </Border>
 
-        <!-- CREATE DEVICE POPUP OVERLAY -->
+        <!-- CREATE MODEM POPUP -->
         <Border Grid.ColumnSpan="2"
-                Grid.RowSpan="2"
                 Background="#80000000"
                 Panel.ZIndex="100"
-                Visibility="{Binding IsCreatePopupOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+                Visibility="{Binding IsCreateModemPopupOpen, Converter={StaticResource BoolToVisibilityConverter}}">
             <Border Background="{DynamicResource Brush.Surface}"
                     BorderBrush="{DynamicResource Brush.Border}"
                     BorderThickness="1"
@@ -329,31 +453,110 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     
-                    <TextBlock Grid.Row="0" Text="Create New Device" FontSize="{DynamicResource Font.Heading.Medium}" FontWeight="SemiBold" Margin="0,0,0,20"/>
+                    <TextBlock Grid.Row="0" Text="Yeni Modem Ekle (Switch)" FontSize="{DynamicResource Font.Heading.Medium}" FontWeight="SemiBold" Margin="0,0,0,20"/>
                     
                     <StackPanel Grid.Row="1" Margin="0,0,0,20">
-                        <TextBlock Text="Device Name:" Margin="0,0,0,4"/>
-                        <ui:TextBox Text="{Binding NewDeviceName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                        <TextBlock Text="Modem Adı:" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewModemName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
                         
-                        <TextBlock Text="IP Address:" Margin="0,0,0,4"/>
-                        <ui:TextBox Text="{Binding NewDeviceIp, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                        <TextBlock Text="Ağ/IP Adresi:" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewModemIp, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
                         
-                        <TextBlock Text="Port:" Margin="0,0,0,4"/>
-                        <ui:TextBox Text="{Binding NewDevicePort, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
-                        
-                        <TextBlock Text="MAC Address:" Margin="0,0,0,4"/>
-                        <ui:TextBox Text="{Binding NewDeviceMac, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
-                        
-                        <TextBlock Text="LAN Cable:" Margin="0,0,0,4"/>
-                        <ui:TextBox Text="{Binding NewDeviceLanCable, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
-                        
-                        <TextBlock Text="Location:" Margin="0,0,0,4"/>
-                        <ui:TextBox Text="{Binding NewDeviceLocation, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                        <TextBlock Text="MAC Adresi:" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewModemMac, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
                     </StackPanel>
                     
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <ui:Button Content="Cancel" Command="{Binding CloseCreatePopupCommand}" Margin="0,0,10,0"/>
-                        <ui:Button Content="Save" Command="{Binding SaveDeviceCommand}" Appearance="Primary"/>
+                        <ui:Button Content="İptal" Command="{Binding CloseCreateModemPopupCommand}" Margin="0,0,10,0"/>
+                        <ui:Button Content="Kaydet" Command="{Binding SaveModemCommand}" Appearance="Primary"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Border>
+
+        <!-- CREATE STATION POPUP OVERLAY -->
+        <Border Grid.ColumnSpan="2"
+                Background="#80000000"
+                Panel.ZIndex="100"
+                Visibility="{Binding IsCreateStationPopupOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Background="{DynamicResource Brush.Surface}"
+                    BorderBrush="{DynamicResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Width="400"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Text="Yeni İstasyon Ekle (Mega)" FontSize="{DynamicResource Font.Heading.Medium}" FontWeight="SemiBold" Margin="0,0,0,20"/>
+                    
+                    <StackPanel Grid.Row="1" Margin="0,0,0,20">
+                        <TextBlock Text="İstasyon Adı (Masa):" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewStationName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                        
+                        <TextBlock Text="IP Adresi:" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewStationIp, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                        
+                        <TextBlock Text="Port:" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewStationPort, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                        
+                        <TextBlock Text="MAC Adresi:" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewStationMac, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <ui:Button Content="İptal" Command="{Binding CloseCreateStationPopupCommand}" Margin="0,0,10,0"/>
+                        <ui:Button Content="Kaydet" Command="{Binding SaveStationCommand}" Appearance="Primary"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Border>
+
+        <!-- CREATE COMPONENT POPUP OVERLAY -->
+        <Border Grid.ColumnSpan="2"
+                Background="#80000000"
+                Panel.ZIndex="101"
+                Visibility="{Binding IsCreateComponentPopupOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Background="{DynamicResource Brush.Surface}"
+                    BorderBrush="{DynamicResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Width="400"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Text="İstasyona Bileşen Ekle" FontSize="{DynamicResource Font.Heading.Medium}" FontWeight="SemiBold" Margin="0,0,0,20"/>
+                    
+                    <StackPanel Grid.Row="1" Margin="0,0,0,20">
+                        <TextBlock Text="Bileşen Tipi Seçin:" Margin="0,0,0,4"/>
+                        <ComboBox ItemsSource="{Binding Templates}" 
+                                  SelectedItem="{Binding SelectedTemplate}" 
+                                  DisplayMemberPath="Name" 
+                                  Margin="0,0,0,12"/>
+
+                        <TextBlock Text="Bileşen Adı:" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewComponentName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                        
+                        <TextBlock Text="Mega Üzerindeki Pin:" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewComponentPin, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <ui:Button Content="İptal" Command="{Binding CloseCreateComponentPopupCommand}" Margin="0,0,10,0"/>
+                        <ui:Button Content="Kaydet" Command="{Binding SaveComponentCommand}" Appearance="Primary"/>
                     </StackPanel>
                 </Grid>
             </Border>

@@ -18,7 +18,7 @@ public class EditorLayoutService
     /// <summary>
     /// Saves the current layout state to a JSON file.
     /// </summary>
-    public void SaveLayout(string filePath, IEnumerable<EditorImage> images, IEnumerable<DeviceInstance> devices)
+    public void SaveLayout(string filePath, IEnumerable<EditorImage> images, IEnumerable<ILayerItem> placedItems)
     {
         try
         {
@@ -40,14 +40,26 @@ public class EditorLayoutService
                 });
             }
 
-            foreach (var dev in devices)
+            foreach (var item in placedItems)
             {
-                state.PlacedDevices.Add(new PlacedDeviceState
+                double x = 0, y = 0;
+                bool isLocked = false;
+
+                if (item is StationInstance st)
                 {
-                    DeviceId = dev.Id,
-                    X = dev.X,
-                    Y = dev.Y,
-                    IsLocked = dev.IsLocked
+                    x = st.X; y = st.Y; isLocked = st.IsLocked;
+                }
+                else if (item is ComponentInstance comp)
+                {
+                    x = comp.X; y = comp.Y; isLocked = comp.IsLocked;
+                }
+
+                state.PlacedItems.Add(new PlacedItemState
+                {
+                    ItemId = item.Id,
+                    X = x,
+                    Y = y,
+                    IsLocked = isLocked
                 });
             }
 

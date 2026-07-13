@@ -181,23 +181,42 @@ public partial class EditorView : UserControl
 
     private bool _isBoxDragging;
     private System.Windows.Point _boxClickPosition;
-    private TCP.App.Models.Electronics.DeviceInstance? _draggedBoxData;
+    private object? _draggedBoxData;
 
-    private void Box_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    private void Box_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (sender is System.Windows.FrameworkElement el && el.DataContext is TCP.App.Models.Electronics.DeviceInstance device)
+        if (sender is System.Windows.FrameworkElement el)
         {
-            if (device.IsLocked) return;
+            if (el.DataContext is TCP.App.Models.Electronics.MainPcInstance pc)
+            {
+                if (pc.IsLocked) return;
+                _draggedBoxData = pc;
+            }
+            else if (el.DataContext is TCP.App.Models.Electronics.ModemInstance modem)
+            {
+                if (modem.IsLocked) return;
+                _draggedBoxData = modem;
+            }
+            else if (el.DataContext is TCP.App.Models.Electronics.StationInstance station)
+            {
+                if (station.IsLocked) return;
+                _draggedBoxData = station;
+            }
+            else if (el.DataContext is TCP.App.Models.Electronics.ComponentInstance component)
+            {
+                if (component.IsLocked) return;
+                _draggedBoxData = component;
+            }
+            else return;
 
             _isBoxDragging = true;
-            _draggedBoxData = device;
             _boxClickPosition = e.GetPosition(ViewportCanvas);
             el.CaptureMouse();
             e.Handled = true;
         }
     }
 
-    private void Box_MouseMove(object sender, MouseEventArgs e)
+    private void Box_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
     {
         if (!_isBoxDragging || _draggedBoxData == null || sender is not System.Windows.FrameworkElement el) return;
 
@@ -205,26 +224,54 @@ public partial class EditorView : UserControl
         var transformX = currentPosition.X - _boxClickPosition.X;
         var transformY = currentPosition.Y - _boxClickPosition.Y;
 
-        _draggedBoxData.X += transformX;
-        _draggedBoxData.Y += transformY;
+        double newX = 0, newY = 0;
+
+        if (_draggedBoxData is TCP.App.Models.Electronics.MainPcInstance pc)
+        {
+            pc.X += transformX;
+            pc.Y += transformY;
+            newX = pc.X;
+            newY = pc.Y;
+        }
+        else if (_draggedBoxData is TCP.App.Models.Electronics.ModemInstance modem)
+        {
+            modem.X += transformX;
+            modem.Y += transformY;
+            newX = modem.X;
+            newY = modem.Y;
+        }
+        else if (_draggedBoxData is TCP.App.Models.Electronics.StationInstance station)
+        {
+            station.X += transformX;
+            station.Y += transformY;
+            newX = station.X;
+            newY = station.Y;
+        }
+        else if (_draggedBoxData is TCP.App.Models.Electronics.ComponentInstance component)
+        {
+            component.X += transformX;
+            component.Y += transformY;
+            newX = component.X;
+            newY = component.Y;
+        }
 
         System.Windows.DependencyObject parent = System.Windows.Media.VisualTreeHelper.GetParent(el);
-        while (parent != null && !(parent is ContentPresenter))
+        while (parent != null && !(parent is System.Windows.Controls.ContentPresenter))
         {
             parent = System.Windows.Media.VisualTreeHelper.GetParent(parent);
         }
         
-        if (parent is ContentPresenter cp)
+        if (parent is System.Windows.Controls.ContentPresenter cp)
         {
-            Canvas.SetLeft(cp, _draggedBoxData.X);
-            Canvas.SetTop(cp, _draggedBoxData.Y);
+            System.Windows.Controls.Canvas.SetLeft(cp, newX);
+            System.Windows.Controls.Canvas.SetTop(cp, newY);
         }
 
         _boxClickPosition = currentPosition;
         e.Handled = true;
     }
 
-    private void Box_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private void Box_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         if (!_isBoxDragging) return;
         _isBoxDragging = false;
@@ -234,7 +281,7 @@ public partial class EditorView : UserControl
             el.ReleaseMouseCapture();
         }
         
-        TCP.App.Services.DeviceManager.Instance.SaveDevices();
+        TCP.App.Services.NetworkManager.Instance.SaveNetwork();
         e.Handled = true;
     }
 

@@ -27,6 +27,8 @@
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
         <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
         <converters:LayerTypeToIconConverter x:Key="LayerTypeToIconConverter"/>
+        <converters:ConnectionPathConverter x:Key="ConnectionPathConverter"/>
+        <converters:LedColorConverter x:Key="LedColorConverter"/>
     </UserControl.Resources>
     <UserControl.DataContext>
         <viewmodels:EditorViewModel/>
@@ -144,7 +146,7 @@
                             BorderBrush="{DynamicResource Brush.Border}"
                             BorderThickness="0,0,0,1"
                             Padding="16,12">
-                        <TextBlock Text="Palette"
+                        <TextBlock Text="Palette (Masalar)"
                                    FontSize="{DynamicResource Font.Heading.Small}"
                                    FontFamily="{DynamicResource Font.Primary}"
                                    FontWeight="SemiBold"
@@ -153,8 +155,8 @@
                     
                     <!-- Board List -->
                     <ListBox Grid.Row="1"
-                             ItemsSource="{Binding PaletteBoards, Mode=OneWay}"
-                             SelectedItem="{Binding SelectedPaletteBoard, Mode=TwoWay}"
+                             ItemsSource="{Binding PaletteItems, Mode=OneWay}"
+                             SelectedItem="{Binding SelectedPaletteItem, Mode=TwoWay}"
                              BorderThickness="0"
                              Background="Transparent"
                              ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -164,36 +166,19 @@
                                 <Border Background="{DynamicResource Brush.Background.Primary}"
                                         BorderThickness="0"
                                         Padding="12,8"
-                                        Margin="2">
-                                    <StackPanel>
-                                        <!-- CustomName (bold) -->
-                                        <TextBlock Text="{Binding CustomName, Mode=OneWay}"
+                                        Margin="2"
+                                        CornerRadius="4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="📶"
+                                                   FontSize="{DynamicResource Font.Body}"
+                                                   Margin="0,0,8,0"
+                                                   VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Name}"
                                                    FontSize="{DynamicResource Font.Body}"
                                                    FontFamily="{DynamicResource Font.Primary}"
                                                    FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource Brush.Text.Primary}"/>
-                                        <!-- Type + Status line -->
-                                        <StackPanel Orientation="Horizontal"
-                                                    Margin="0,4,0,0">
-                                            <!-- Type badge -->
-                                            <Border Background="{DynamicResource Brush.Background.Secondary}"
-                                                    BorderBrush="{DynamicResource Brush.Border}"
-                                                    BorderThickness="1"
-                                                    CornerRadius="2"
-                                                    Padding="4,2"
-                                                    Margin="0,0,8,0">
-                                                <TextBlock Text="{Binding Type, Mode=OneWay}"
-                                                           FontSize="{DynamicResource Font.Caption}"
-                                                           FontFamily="{DynamicResource Font.Primary}"
-                                                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
-                                            </Border>
-                                            <!-- Status -->
-                                            <TextBlock Text="{Binding IpAddress, Mode=OneWay, StringFormat='IP: {0}'}"
-                                                       FontSize="{DynamicResource Font.Caption}"
-                                                       FontFamily="{DynamicResource Font.Primary}"
-                                                       Foreground="{DynamicResource Brush.Text.Secondary}"
-                                                       VerticalAlignment="Center"/>
-                                        </StackPanel>
+                                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                                   VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </Border>
                             </DataTemplate>
@@ -288,8 +273,8 @@
                                     <Setter Property="ContextMenu">
                                         <Setter.Value>
                                             <ContextMenu>
-                                                <MenuItem Header="Özellikler" Command="{Binding PlacementTarget.Tag.EditLayerPropertiesCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding}"/>
-                                                <MenuItem Header="Sil" Command="{Binding PlacementTarget.Tag.RemoveSelectedLayerCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding}"/>
+                                                <MenuItem Header="Özellikler" Command="{Binding PlacementTarget.Tag.EditLayerPropertiesCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                <MenuItem Header="Sil" Command="{Binding PlacementTarget.Tag.RemoveSelectedLayerCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                             </ContextMenu>
                                         </Setter.Value>
                                     </Setter>
@@ -332,8 +317,8 @@
                                     </Grid>
                                 </HierarchicalDataTemplate>
                                 
-                                <!-- DataTemplate for ILayerItem (Device/Image) -->
-                                <DataTemplate DataType="{x:Type electronics:DeviceInstance}">
+                                <!-- DataTemplate for StationInstance -->
+                                <DataTemplate DataType="{x:Type electronics:StationInstance}">
                                     <Grid Width="210">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/> <!-- Visibility -->
@@ -343,22 +328,53 @@
                                         </Grid.ColumnDefinitions>
                                         
                                         <ToggleButton Grid.Column="0" IsChecked="{Binding IsVisible, Mode=TwoWay}" 
-                                                      Background="Transparent" BorderThickness="0" Padding="4" Margin="0,0,4,0" Cursor="Hand">
-                                            <TextBlock Text="👁" FontSize="12" Opacity="{Binding IsVisible, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                                      Background="Transparent" BorderThickness="0" Padding="8" Margin="0,0,4,0" Cursor="Hand">
+                                            <TextBlock Text="👁" FontSize="16" Opacity="{Binding IsVisible, Converter={StaticResource BoolToOpacityConverter}}"/>
                                         </ToggleButton>
                                         
-                                        <TextBlock Grid.Column="1" Text="🔌" 
-                                                   VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12" Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                        <TextBlock Grid.Column="1" Text="💻" 
+                                                   VerticalAlignment="Center" Margin="0,0,8,0" FontSize="14" Foreground="{DynamicResource Brush.Text.Secondary}"/>
                                         
-                                        <TextBlock Grid.Column="2" Text="{Binding CustomName}" 
+                                        <TextBlock Grid.Column="2" Text="{Binding Name}" 
                                                    FontSize="{DynamicResource Font.Body}"
                                                    FontFamily="{DynamicResource Font.Primary}"
                                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                                    VerticalAlignment="Center"/>
                                                    
                                         <ToggleButton Grid.Column="3" IsChecked="{Binding IsLocked, Mode=TwoWay}" 
-                                                      Background="Transparent" BorderThickness="0" Padding="4" Margin="0,0,4,0" Cursor="Hand">
-                                            <TextBlock Text="🔒" FontSize="12" Opacity="{Binding IsLocked, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                                      Background="Transparent" BorderThickness="0" Padding="8" Margin="0,0,4,0" Cursor="Hand">
+                                            <TextBlock Text="🔒" FontSize="16" Opacity="{Binding IsLocked, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                        </ToggleButton>
+                                    </Grid>
+                                </DataTemplate>
+
+                                <!-- DataTemplate for ComponentInstance -->
+                                <DataTemplate DataType="{x:Type electronics:ComponentInstance}">
+                                    <Grid Width="210">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/> <!-- Visibility -->
+                                            <ColumnDefinition Width="Auto"/> <!-- Icon -->
+                                            <ColumnDefinition Width="*"/>    <!-- Name -->
+                                            <ColumnDefinition Width="Auto"/> <!-- Lock -->
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <ToggleButton Grid.Column="0" IsChecked="{Binding IsVisible, Mode=TwoWay}" 
+                                                      Background="Transparent" BorderThickness="0" Padding="8" Margin="0,0,4,0" Cursor="Hand">
+                                            <TextBlock Text="👁" FontSize="16" Opacity="{Binding IsVisible, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                        </ToggleButton>
+                                        
+                                        <TextBlock Grid.Column="1" Text="🔌" 
+                                                   VerticalAlignment="Center" Margin="0,0,8,0" FontSize="14" Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                        
+                                        <TextBlock Grid.Column="2" Text="{Binding Name}" 
+                                                   FontSize="{DynamicResource Font.Body}"
+                                                   FontFamily="{DynamicResource Font.Primary}"
+                                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                                   VerticalAlignment="Center"/>
+                                                   
+                                        <ToggleButton Grid.Column="3" IsChecked="{Binding IsLocked, Mode=TwoWay}" 
+                                                      Background="Transparent" BorderThickness="0" Padding="8" Margin="0,0,4,0" Cursor="Hand">
+                                            <TextBlock Text="🔒" FontSize="16" Opacity="{Binding IsLocked, Converter={StaticResource BoolToOpacityConverter}}"/>
                                         </ToggleButton>
                                     </Grid>
                                 </DataTemplate>
@@ -547,11 +563,111 @@
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                         
-                        <!-- Placed Boxes Overlay (Z-Index 1) -->
+                        <!-- Daisy-Chain Connections Overlay (Z-Index 0.5) -->
+                        <ItemsControl ItemsSource="{Binding DaisyChainLines}" Panel.ZIndex="0">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Path>
+                                        <Path.Style>
+                                            <Style TargetType="Path">
+                                                <Setter Property="Stroke" Value="#00FFFF" /> <!-- Neon Blue -->
+                                                <Setter Property="StrokeThickness" Value="6" />
+                                                <Setter Property="Opacity" Value="0.9" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding LineType}" Value="Station">
+                                                        <Setter Property="Stroke" Value="#FFA500" /> <!-- Orange -->
+                                                        <Setter Property="StrokeThickness" Value="4" />
+                                                        <Setter Property="StrokeDashArray" Value="2,2" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding LineType}" Value="Component">
+                                                        <Setter Property="Stroke" Value="#AAAAAA" /> <!-- Gray -->
+                                                        <Setter Property="StrokeThickness" Value="2" />
+                                                        <Setter Property="StrokeDashArray" Value="4,4" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Path.Style>
+                                        <Path.Data>
+                                            <MultiBinding Converter="{StaticResource ConnectionPathConverter}">
+                                                <Binding Path="Source.X"/>
+                                                <Binding Path="Source.Y"/>
+                                                <Binding Path="Target.X"/>
+                                                <Binding Path="Target.Y"/>
+                                            </MultiBinding>
+                                        </Path.Data>
+                                    </Path>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Connections Overlay (Z-Index 1) -->
+                        <ItemsControl ItemsSource="{Binding PaletteItems}" Panel.ZIndex="1">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Canvas>
+                                        <!-- Lines from Modem to Station -->
+                                        <ItemsControl ItemsSource="{Binding Stations}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate><Canvas/></ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Canvas>
+                                                        <Path Stroke="Orange" StrokeThickness="4" Opacity="0.8">
+                                                            <Path.Data>
+                                                                <MultiBinding Converter="{StaticResource ConnectionPathConverter}">
+                                                                    <Binding Path="DataContext.X" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
+                                                                    <Binding Path="DataContext.Y" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
+                                                                    <Binding Path="X"/>
+                                                                    <Binding Path="Y"/>
+                                                                </MultiBinding>
+                                                            </Path.Data>
+                                                        </Path>
+
+                                                        <!-- Lines from Station to Component -->
+                                                        <ItemsControl ItemsSource="{Binding Components}">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate><Canvas/></ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <Path Stroke="{DynamicResource Brush.Text.Secondary}" StrokeThickness="3" Opacity="0.6">
+                                                                        <Path.Data>
+                                                                            <MultiBinding Converter="{StaticResource ConnectionPathConverter}">
+                                                                                <Binding Path="DataContext.X" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
+                                                                                <Binding Path="DataContext.Y" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
+                                                                                <Binding Path="X"/>
+                                                                                <Binding Path="Y"/>
+                                                                            </MultiBinding>
+                                                                        </Path.Data>
+                                                                    </Path>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                    </Canvas>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </Canvas>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Placed Boxes Overlay (Z-Index 2) -->
                         <!-- TCP-1.0.3: Boxes drawn on top of background image -->
                         <!-- TCP-1.0.4: Boxes move WITH the viewport transform -->
                         <ItemsControl ItemsSource="{Binding PlacedBoxes, Mode=OneWay}"
-                                      Panel.ZIndex="1">
+                                      Panel.ZIndex="2">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <Canvas/>
@@ -566,8 +682,6 @@
                             </ItemsControl.ItemContainerStyle>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <!-- Box Card -->
-                                    <!-- TCP-1.0.3: Box card with DisplayName, Type, Status -->
                                     <Border Background="{DynamicResource Brush.Background.Primary}"
                                             BorderBrush="{DynamicResource Brush.Border}"
                                             BorderThickness="2"
@@ -594,21 +708,43 @@
                                                     <ColumnDefinition Width="*"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="{Binding CustomName, Mode=OneWay}"
+                                                <TextBlock Grid.Column="0" Text="{Binding Name, Mode=OneWay}"
                                                            FontSize="{DynamicResource Font.Body}"
                                                            FontFamily="{DynamicResource Font.Primary}"
                                                            FontWeight="SemiBold"
                                                            Foreground="{DynamicResource Brush.Text.Primary}"/>
                                                 <ToggleButton Grid.Column="1" 
                                                               IsChecked="{Binding IsLocked, Mode=TwoWay}"
-                                                              Padding="4" Margin="4,0,0,0" Cursor="Hand" Background="Transparent" BorderThickness="0">
-                                                    <TextBlock Text="🔒" FontSize="10"/>
+                                                              Padding="10" Margin="4,-4,-4,0" Cursor="Hand" 
+                                                              Background="Transparent" BorderThickness="0"
+                                                              MinWidth="44" MinHeight="44"
+                                                              ToolTip="Kilitle/Aç">
+                                                    <TextBlock FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Text" Value="🔓"/>
+                                                                <Setter Property="Opacity" Value="0.5"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsLocked}" Value="True">
+                                                                        <Setter Property="Text" Value="🔒"/>
+                                                                        <Setter Property="Opacity" Value="1.0"/>
+                                                                    </DataTrigger>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter Property="Opacity" Value="1.0"/>
+                                                                    </Trigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
                                                 </ToggleButton>
                                             </Grid>
                                             <!-- Type + Status line -->
-                                            <StackPanel Orientation="Horizontal"
-                                                        Margin="0,4,0,0">
-                                                <!-- Type badge -->
+                                            <StackPanel Orientation="Horizontal">
+                                                <!-- LED Indicator -->
+                                                <Ellipse Width="10" Height="10" 
+                                                         Fill="{Binding ., Converter={StaticResource LedColorConverter}}"
+                                                         Margin="0,0,6,0" VerticalAlignment="Center" />
+                                                <TextBlock Text="{Binding LayerType, Converter={StaticResource LayerTypeToIconConverter}}" Margin="0,0,8,0" VerticalAlignment="Center"/>
                                                 <Border Background="{DynamicResource Brush.Background.Secondary}"
                                                         BorderBrush="{DynamicResource Brush.Border}"
                                                         BorderThickness="1"

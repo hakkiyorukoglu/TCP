@@ -2,246 +2,385 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using System.Linq;
 using TCP.App.Models.Electronics;
 using TCP.App.Services;
+using System;
 
 namespace TCP.App.ViewModels;
 
-/// <summary>
-/// ElectronicsViewModel - Electronics modülü ViewModel'i
-/// 
-/// TCP-0.5: Electronics Page Skeleton
-/// 
-/// Bu ViewModel ElectronicsView'un data context'idir.
-/// Electronics modülü state'ini ve iş mantığını yönetir.
-/// 
-/// MVVM Pattern:
-/// - View (ElectronicsView.xaml) sadece UI gösterir
-/// - ViewModel (ElectronicsViewModel) tüm mantığı içerir
-/// 
-/// Single Responsibility: Electronics modülü state ve iş mantığı yönetimi
-/// </summary>
+public class ConnectionOption
+{
+    public Guid? Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+}
+
 public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
 {
-    /// <summary>
-    /// PropertyChanged event - UI binding'ler için
-    /// </summary>
     public event PropertyChangedEventHandler? PropertyChanged;
-    
-    /// <summary>
-    /// PropertyChanged event'ini tetikler
-    /// </summary>
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
     
-    /// <summary>
-    /// Board listesi - ObservableCollection MVVM binding için
-    /// </summary>
-    public ObservableCollection<BoardItem> Boards { get; }
-    
-    /// <summary>
-    /// Seçili board - UI binding için
-    /// </summary>
-    private BoardItem? _selectedBoard;
-    public BoardItem? SelectedBoard
+    public ObservableCollection<BoardItem> Templates { get; }
+    private BoardItem? _selectedTemplate;
+    public BoardItem? SelectedTemplate
     {
-        get => _selectedBoard;
+        get => _selectedTemplate;
+        set { _selectedTemplate = value; OnPropertyChanged(); }
+    }
+
+    // Modems List
+    public ObservableCollection<ModemInstance> Modems => NetworkManager.Instance.Modems;
+
+    private ModemInstance? _selectedModem;
+    public ModemInstance? SelectedModem
+    {
+        get => _selectedModem;
+        set 
+        { 
+            _selectedModem = value; 
+            UpdateAvailableConnections();
+            OnPropertyChanged(); 
+            OnPropertyChanged(nameof(SelectedIncomingId));
+            OnPropertyChanged(nameof(SelectedOutgoingId));
+        }
+    }
+
+    public ObservableCollection<ConnectionOption> AvailableConnections { get; } = new();
+
+    public Guid? SelectedIncomingId
+    {
+        get => SelectedModem?.IncomingConnectionId;
         set
         {
-            if (_selectedBoard != value)
+            if (SelectedModem != null)
             {
-                _selectedBoard = value;
+                NetworkManager.Instance.LinkModems(value, SelectedModem.Id);
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(SelectedBoardSummaryData)); // Summary data'yı da güncelle
+                OnPropertyChanged(nameof(SelectedOutgoingId));
             }
         }
     }
-    
-    /// <summary>
-    /// Selected board summary data as KeyValuePair list for ItemsControl binding
-    /// TCP-0.6.0: Summary cards support
-    /// </summary>
-    public ObservableCollection<KeyValuePair<string, string>> SelectedBoardSummaryData
+
+    public Guid? SelectedOutgoingId
     {
-        get
+        get => SelectedModem?.OutgoingConnectionId;
+        set
         {
-            var collection = new ObservableCollection<KeyValuePair<string, string>>();
-            if (SelectedBoard?.SummaryData != null)
+            if (SelectedModem != null)
             {
-                foreach (var kvp in SelectedBoard.SummaryData)
-                {
-                    collection.Add(kvp);
-                }
+                NetworkManager.Instance.LinkModems(SelectedModem.Id, value);
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(SelectedIncomingId));
             }
-            return collection;
         }
     }
+
+    private void UpdateAvailableConnections()
+    {
+        AvailableConnections.Clear();
+        AvailableConnections.Add(new ConnectionOption { Id = null, Name = "Yok" });
+
+        bool mainPcTaken = NetworkManager.Instance.Modems.Any(m => m.IncomingConnectionId == NetworkManager.Instance.MainPc.Id && m.Id != SelectedModem?.Id);
+        if (!mainPcTaken)
+        {
+            AvailableConnections.Add(new ConnectionOption { Id = NetworkManager.Instance.MainPc.Id, Name = NetworkManager.Instance.MainPc.Name });
+        }
+
+        foreach (var m in NetworkManager.Instance.Modems)
+        {
+            if (SelectedModem == null || m.Id != SelectedModem.Id)
+            {
+                AvailableConnections.Add(new ConnectionOption { Id = m.Id, Name = m.Name });
+            }
+        }
+    }
+
+    #region Create Modem Popup
+    private bool _isCreateModemPopupOpen;
+    public bool IsCreateModemPopupOpen { get => _isCreateModemPopupOpen; set { _isCreateModemPopupOpen = value; OnPropertyChanged(); } }
     
-    /// <summary>
-    /// Board registry - Single source of truth for board definitions
-    /// TCP-0.6.0: Electronics Board Registry
-    /// </summary>
-    private readonly IBoardRegistry _boardRegistry;
+    private string _newModemName = "Yeni Modem";
+    public string NewModemName { get => _newModemName; set { _newModemName = value; OnPropertyChanged(); } }
     
-    /// <summary>
-    /// Constructor - Initialize boards from registry
-    /// TCP-0.6.0: Board Registry (Single Source of Truth)
-    /// </summary>
+    private string _newModemIp = "192.168.1.1";
+    public string NewModemIp { get => _newModemIp; set { _newModemIp = value; OnPropertyChanged(); } }
+    
+    private string _newModemMac = "00:00:00:00:00:00";
+    public string NewModemMac { get => _newModemMac; set { _newModemMac = value; OnPropertyChanged(); } }
+
+    public ICommand OpenCreateModemPopupCommand { get; }
+    public ICommand CloseCreateModemPopupCommand { get; }
+    public ICommand SaveModemCommand { get; }
+    public ICommand EditModemCommand { get; }
+    public ICommand DeleteModemCommand { get; }
+    #endregion
+
+    #region Create Station Popup
+    private bool _isCreateStationPopupOpen;
+    public bool IsCreateStationPopupOpen { get => _isCreateStationPopupOpen; set { _isCreateStationPopupOpen = value; OnPropertyChanged(); } }
+    
+    private string _newStationName = "Yeni İstasyon";
+    public string NewStationName { get => _newStationName; set { _newStationName = value; OnPropertyChanged(); } }
+    
+    private string _newStationIp = "192.168.1.10";
+    public string NewStationIp { get => _newStationIp; set { _newStationIp = value; OnPropertyChanged(); } }
+    
+    private int _newStationPort = 80;
+    public int NewStationPort { get => _newStationPort; set { _newStationPort = value; OnPropertyChanged(); } }
+    
+    private string _newStationMac = "00:00:00:00:00:00";
+    public string NewStationMac { get => _newStationMac; set { _newStationMac = value; OnPropertyChanged(); } }
+
+    public ICommand OpenCreateStationPopupCommand { get; }
+    public ICommand CloseCreateStationPopupCommand { get; }
+    public ICommand SaveStationCommand { get; }
+    public ICommand EditStationCommand { get; }
+    public ICommand DeleteStationCommand { get; }
+    #endregion
+
+    #region Create Component Popup
+    private bool _isCreateComponentPopupOpen;
+    public bool IsCreateComponentPopupOpen { get => _isCreateComponentPopupOpen; set { _isCreateComponentPopupOpen = value; OnPropertyChanged(); } }
+
+    private StationInstance? _stationForNewComponent;
+    public StationInstance? StationForNewComponent { get => _stationForNewComponent; set { _stationForNewComponent = value; OnPropertyChanged(); } }
+
+    private string _newComponentName = "Yeni Bileşen";
+    public string NewComponentName { get => _newComponentName; set { _newComponentName = value; OnPropertyChanged(); } }
+    
+    private string _newComponentPin = "D2";
+    public string NewComponentPin { get => _newComponentPin; set { _newComponentPin = value; OnPropertyChanged(); } }
+
+    public ICommand OpenCreateComponentPopupCommand { get; }
+    public ICommand CloseCreateComponentPopupCommand { get; }
+    public ICommand SaveComponentCommand { get; }
+    
+    public ICommand DeleteComponentCommand { get; }
+    public ICommand EditComponentCommand { get; }
+    #endregion
+
+    public ICommand AddTemplateCommand { get; }
+    public ICommand EditTemplateCommand { get; }
+    public ICommand DeleteTemplateCommand { get; }
+
     public ElectronicsViewModel()
     {
-        // Get board registry instance
-        _boardRegistry = BoardRegistry.Instance;
+        Templates = new ObservableCollection<BoardItem>(BoardRegistry.Instance.GetAll());
+        SelectedTemplate = Templates.FirstOrDefault();
+
+        OpenCreateModemPopupCommand = new RelayCommand<object>(_ => OpenCreateModemPopup());
+        CloseCreateModemPopupCommand = new RelayCommand<object>(_ => IsCreateModemPopupOpen = false);
+        SaveModemCommand = new RelayCommand<object>(_ => SaveModem());
+        EditModemCommand = new RelayCommand<ModemInstance>(EditModem);
+        DeleteModemCommand = new RelayCommand<ModemInstance>(DeleteModem);
+
+        OpenCreateStationPopupCommand = new RelayCommand<object>(_ => OpenCreateStationPopup());
+        CloseCreateStationPopupCommand = new RelayCommand<object>(_ => IsCreateStationPopupOpen = false);
+        SaveStationCommand = new RelayCommand<object>(_ => SaveStation());
+        EditStationCommand = new RelayCommand<StationInstance>(EditStation);
+        DeleteStationCommand = new RelayCommand<StationInstance>(DeleteStation);
+
+        OpenCreateComponentPopupCommand = new RelayCommand<StationInstance>(OpenCreateComponentPopup);
+        CloseCreateComponentPopupCommand = new RelayCommand<object>(_ => IsCreateComponentPopupOpen = false);
+        SaveComponentCommand = new RelayCommand<object>(_ => SaveComponent());
         
-        // Load boards from registry
-        Boards = new ObservableCollection<BoardItem>(_boardRegistry.GetAll());
+        DeleteComponentCommand = new RelayCommand<ComponentInstance>(DeleteComponent);
+        EditComponentCommand = new RelayCommand<ComponentInstance>(EditComponent);
         
-        // Default selection: İlk board
-        SelectedBoard = Boards.Count > 0 ? Boards[0] : null;
-
-        // TCP Custom Device Logic
-        OpenCreatePopupCommand = new RelayCommand<object>(_ => { if (SelectedBoard != null) OpenCreatePopup(); });
-        CloseCreatePopupCommand = new RelayCommand<object>(_ => CloseCreatePopup());
-        SaveDeviceCommand = new RelayCommand<object>(_ => { if (CanSaveDevice()) SaveDevice(); });
+        AddTemplateCommand = new RelayCommand<object>(_ => AddTemplate());
+        EditTemplateCommand = new RelayCommand<BoardItem>(EditTemplate);
+        DeleteTemplateCommand = new RelayCommand<BoardItem>(DeleteTemplate);
     }
-
-    /// <summary>
-    /// User's saved devices list
-    /// </summary>
-    public ObservableCollection<DeviceInstance> MyDevices => DeviceManager.Instance.Devices;
-
-    #region Create Device Popup State & Properties
-
-    private bool _isCreatePopupOpen;
-    public bool IsCreatePopupOpen
+    
+    public void RefreshTemplates()
     {
-        get => _isCreatePopupOpen;
-        set { _isCreatePopupOpen = value; OnPropertyChanged(); }
+        Templates.Clear();
+        foreach(var t in BoardRegistry.Instance.GetAll())
+            Templates.Add(t);
+        if (SelectedTemplate == null || !Templates.Contains(SelectedTemplate))
+            SelectedTemplate = Templates.FirstOrDefault();
     }
-
-    private string _newDeviceName = string.Empty;
-    public string NewDeviceName
+    
+    private void AddTemplate()
     {
-        get => _newDeviceName;
-        set
+        var newBoard = new BoardItem { Name = $"Yeni Elektronik {Templates.Count + 1}", Status = "Offline" };
+        var window = new TCP.App.Views.LayerPropertiesWindow(newBoard);
+        if (window.ShowDialog() == true)
         {
-            _newDeviceName = value;
-            OnPropertyChanged();
+            BoardRegistry.Instance.Register(newBoard);
+            BoardRegistry.Instance.SaveBoards();
+            RefreshTemplates();
+            SelectedTemplate = newBoard;
+        }
+    }
+    
+    private void EditTemplate(BoardItem? item)
+    {
+        if (item == null) return;
+        var window = new TCP.App.Views.LayerPropertiesWindow(item);
+        if (window.ShowDialog() == true)
+        {
+            BoardRegistry.Instance.SaveBoards();
+            RefreshTemplates();
+        }
+    }
+    
+    private void DeleteTemplate(BoardItem? item)
+    {
+        if (item == null) return;
+        BoardRegistry.Instance.Remove(item);
+        RefreshTemplates();
+    }
+
+    private void OpenCreateModemPopup()
+    {
+        NewModemName = $"Modem {Modems.Count + 1}";
+        NewModemIp = "192.168.1.1";
+        NewModemMac = "00:00:00:00:00:00";
+        IsCreateModemPopupOpen = true;
+    }
+
+    private void SaveModem()
+    {
+        if (string.IsNullOrWhiteSpace(NewModemName)) return;
+        var m = new ModemInstance
+        {
+            Name = NewModemName,
+            IpAddress = NewModemIp,
+            MacAddress = NewModemMac
+        };
+        NetworkManager.Instance.AddModem(m);
+        SelectedModem = m;
+        IsCreateModemPopupOpen = false;
+    }
+
+    private void EditModem(ModemInstance? m)
+    {
+        if (m == null) return;
+        var window = new TCP.App.Views.LayerPropertiesWindow(m);
+        if (window.ShowDialog() == true)
+        {
+            NetworkManager.Instance.SaveModems();
+            OnPropertyChanged(nameof(Modems));
         }
     }
 
-    private string _newDeviceIp = string.Empty;
-    public string NewDeviceIp
+    private void DeleteModem(ModemInstance? m)
     {
-        get => _newDeviceIp;
-        set { _newDeviceIp = value; OnPropertyChanged(); }
+        if (m == null) return;
+        NetworkManager.Instance.RemoveModem(m.Id);
     }
 
-    private int _newDevicePort = 80;
-    public int NewDevicePort
+    private void OpenCreateStationPopup()
     {
-        get => _newDevicePort;
-        set { _newDevicePort = value; OnPropertyChanged(); }
-    }
-
-    private string _newDeviceMac = string.Empty;
-    public string NewDeviceMac
-    {
-        get => _newDeviceMac;
-        set { _newDeviceMac = value; OnPropertyChanged(); }
-    }
-
-    private string _newDeviceLanCable = string.Empty;
-    public string NewDeviceLanCable
-    {
-        get => _newDeviceLanCable;
-        set { _newDeviceLanCable = value; OnPropertyChanged(); }
-    }
-
-    private string _newDeviceLocation = string.Empty;
-    public string NewDeviceLocation
-    {
-        get => _newDeviceLocation;
-        set { _newDeviceLocation = value; OnPropertyChanged(); }
-    }
-
-    public ICommand OpenCreatePopupCommand { get; }
-    public ICommand CloseCreatePopupCommand { get; }
-    public ICommand SaveDeviceCommand { get; }
-
-    private void OpenCreatePopup()
-    {
-        if (SelectedBoard == null) return;
-        
-        NewDeviceName = $"{SelectedBoard.Name} Instance";
-        NewDeviceIp = "192.168.1.10";
-        NewDevicePort = 80;
-        NewDeviceMac = "00:00:00:00:00:00";
-        NewDeviceLanCable = "ETH-1";
-        NewDeviceLocation = "Lab";
-        IsCreatePopupOpen = true;
-    }
-
-    private void CloseCreatePopup()
-    {
-        IsCreatePopupOpen = false;
-    }
-
-    private bool CanSaveDevice()
-    {
-        return !string.IsNullOrWhiteSpace(NewDeviceName);
-    }
-
-    private void SaveDevice()
-    {
-        if (SelectedBoard == null || string.IsNullOrWhiteSpace(NewDeviceName)) return;
-
-        var device = new DeviceInstance
+        if (SelectedModem == null) return;
+        if (SelectedModem.Stations.Count >= 3)
         {
-            TemplateId = SelectedBoard.Name,
-            CustomName = NewDeviceName,
-            IpAddress = NewDeviceIp,
-            Port = NewDevicePort,
-            MacAddress = NewDeviceMac,
-            LanCable = NewDeviceLanCable,
-            Location = NewDeviceLocation
-        };
-
-        DeviceManager.Instance.AddDevice(device);
-        TerminalService.Instance.LogSuccess($"Device created: {NewDeviceName}");
-        IsCreatePopupOpen = false;
+            TerminalService.Instance.LogWarning("Bir modem en fazla 3 istasyon yönetebilir!");
+            return;
+        }
+        NewStationName = $"İstasyon {SelectedModem.Stations.Count + 1}";
+        NewStationIp = "192.168.1.10";
+        NewStationPort = 80;
+        NewStationMac = "00:00:00:00:00:00";
+        IsCreateStationPopupOpen = true;
     }
 
-    #endregion
-}
+    private void SaveStation()
+    {
+        if (SelectedModem == null || string.IsNullOrWhiteSpace(NewStationName)) return;
+        if (SelectedModem.Stations.Count >= 3)
+        {
+            TerminalService.Instance.LogWarning("Bir modem en fazla 3 istasyon yönetebilir!");
+            IsCreateStationPopupOpen = false;
+            return;
+        }
 
-/// <summary>
-/// BoardItem - Board model class
-/// 
-/// TCP-0.6.0: Electronics Board Registry
-/// Extended with summary card data
-/// </summary>
-public class BoardItem
-{
-    /// <summary>
-    /// Board adı
-    /// </summary>
-    public string Name { get; set; } = string.Empty;
+        var st = new StationInstance
+        {
+            Name = NewStationName,
+            IpAddress = NewStationIp,
+            Port = NewStationPort,
+            MacAddress = NewStationMac,
+            RouterPort = $"Port {SelectedModem.Stations.Count + 1}"
+        };
+        SelectedModem.Stations.Add(st);
+        NetworkManager.Instance.SaveModems();
+        IsCreateStationPopupOpen = false;
+    }
+
+    private void EditStation(StationInstance? st)
+    {
+        if (st == null) return;
+        var window = new TCP.App.Views.LayerPropertiesWindow(st);
+        if (window.ShowDialog() == true)
+        {
+            NetworkManager.Instance.SaveModems();
+        }
+    }
+
+    private void DeleteStation(StationInstance? st)
+    {
+        if (st == null || SelectedModem == null) return;
+        SelectedModem.Stations.Remove(st);
+        NetworkManager.Instance.SaveModems();
+    }
+
+    private void OpenCreateComponentPopup(StationInstance? st)
+    {
+        if (st == null || SelectedTemplate == null) return;
+        StationForNewComponent = st;
+        NewComponentName = $"{SelectedTemplate.Name} 1";
+        NewComponentPin = "D2";
+        IsCreateComponentPopupOpen = true;
+    }
+
+    private void SaveComponent()
+    {
+        if (StationForNewComponent == null || SelectedTemplate == null || string.IsNullOrWhiteSpace(NewComponentName)) return;
+        
+        if (StationForNewComponent.Components.Any(c => c.Pin == NewComponentPin))
+        {
+            TerminalService.Instance.LogWarning($"Hata: {NewComponentPin} pini bu istasyonda zaten kullanılıyor!");
+            return;
+        }
+
+        var comp = new ComponentInstance
+        {
+            StationId = StationForNewComponent.Id,
+            TemplateId = SelectedTemplate.Name,
+            Name = NewComponentName,
+            Pin = NewComponentPin
+        };
+        StationForNewComponent.Components.Add(comp);
+        NetworkManager.Instance.SaveModems();
+        IsCreateComponentPopupOpen = false;
+    }
     
-    /// <summary>
-    /// Board açıklaması
-    /// </summary>
-    public string Description { get; set; } = string.Empty;
-    
-    /// <summary>
-    /// Board durumu (Offline/Online)
-    /// </summary>
-    public string Status { get; set; } = "Offline";
-    
-    /// <summary>
-    /// Summary card data - Key/Value pairs for summary cards
-    /// TCP-0.6.0: Summary cards support
-    /// </summary>
-    public Dictionary<string, string> SummaryData { get; set; } = new();
+    private void DeleteComponent(ComponentInstance? comp)
+    {
+        if (comp == null || SelectedModem == null) return;
+        foreach (var st in SelectedModem.Stations)
+        {
+            if (st.Components.Contains(comp))
+            {
+                st.Components.Remove(comp);
+                NetworkManager.Instance.SaveModems();
+                break;
+            }
+        }
+    }
+
+    private void EditComponent(ComponentInstance? comp)
+    {
+        if (comp == null) return;
+        var window = new TCP.App.Views.LayerPropertiesWindow(comp);
+        if (window.ShowDialog() == true)
+        {
+            NetworkManager.Instance.SaveModems();
+        }
+    }
 }

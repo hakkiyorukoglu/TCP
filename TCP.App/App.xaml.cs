@@ -5,6 +5,7 @@ using System.Windows;
 using TCP.App.Services;
 using TCP.App.ViewModels;
 using TCP.App.Models;
+using TCP.App.Models.Electronics;
 using System.Collections.Generic;
 
 namespace TCP.App;
@@ -161,9 +162,12 @@ public partial class App : Application
         
         // TCP-0.6.0: Initialize BoardRegistry with hardcoded board data
         var boardRegistry = BoardRegistry.Instance;
+        boardRegistry.LoadBoards();
         
-        // Register Arduino Mega
-        boardRegistry.Register(new BoardItem
+        if (!boardRegistry.GetAll().Any())
+        {
+            // Register Arduino Mega
+            boardRegistry.Register(new BoardItem
         {
             Name = "Arduino Mega",
             Description = "ATmega2560 microcontroller board with 54 digital I/O pins",
@@ -217,6 +221,7 @@ public partial class App : Application
                 { "Status", "Offline" }
             }
         });
+        }
     }
     
     /// <summary>
