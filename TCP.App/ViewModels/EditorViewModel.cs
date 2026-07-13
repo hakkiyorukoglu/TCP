@@ -147,6 +147,28 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                             comp.IsPowered = (val == 1); // 1 is HIGH
                         });
                     }
+                },
+                OnRfidAvailable = (pin) =>
+                {
+                    var reader = components.FirstOrDefault(c => c.StationId == station.Id && c.ConnectedPin == pin);
+                    if (reader != null)
+                    {
+                        var tag = PlacedBoxes.OfType<RfidTagInstance>().FirstOrDefault(t => 
+                            Math.Abs(t.X - reader.X) < 60 && Math.Abs(t.Y - reader.Y) < 60);
+                        return tag != null;
+                    }
+                    return false;
+                },
+                OnReadRfid = (pin) =>
+                {
+                    var reader = components.FirstOrDefault(c => c.StationId == station.Id && c.ConnectedPin == pin);
+                    if (reader != null)
+                    {
+                        var tag = PlacedBoxes.OfType<RfidTagInstance>().FirstOrDefault(t => 
+                            Math.Abs(t.X - reader.X) < 60 && Math.Abs(t.Y - reader.Y) < 60);
+                        return tag != null ? tag.Uid : "";
+                    }
+                    return "";
                 }
             };
 
@@ -162,7 +184,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         
         foreach (var engine in _activeEngines)
         {
-            engine.StopSimulation();
+            engine.Dispose();
         }
         _activeEngines.Clear();
         
@@ -394,6 +416,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         
         RefreshPaletteItems();
         _networkManager.NetworkChanged += OnNetworkChanged;
+        ProjectManager.Instance.ScenarioLoaded += StopSimulation;
         
         SyncLayers();
     }
@@ -423,6 +446,10 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                     activeIds.Add(c.Id);
                 }
             }
+        }
+        foreach (var rfid in _networkManager.RfidTags)
+        {
+            activeIds.Add(rfid.Id);
         }
 
         var toRemove = PlacedBoxes.Where(b => !activeIds.Contains(b.Id)).ToList();
@@ -470,6 +497,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         PaletteItems.Clear();
         PaletteItems.Add(_networkManager.MainPc);
         foreach(var m in _networkManager.Modems) PaletteItems.Add(m);
+        foreach(var rfid in _networkManager.RfidTags) PaletteItems.Add(rfid);
     }
 
     private void SyncLayers()
@@ -497,7 +525,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
 
         // 2. Group by Modem (Ağ)
         var grouped = PlacedBoxes
-            .Where(b => b is ModemInstance || b is StationInstance || b is ComponentInstance || b is MainPcInstance)
+            .Where(b => b is ModemInstance || b is StationInstance || b is ComponentInstance || b is MainPcInstance || b is RfidTagInstance)
             .GroupBy(b => 
             {
                 if (b is MainPcInstance p) return $"Ağ: {p.Name}";
@@ -513,6 +541,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                     var parentModem = _networkManager.Modems.FirstOrDefault(m => parentStation != null && m.Stations.Contains(parentStation));
                     return parentModem != null ? $"Ağ: {parentModem.Name}" : "Ağ: Bilinmeyen";
                 }
+                if (b is RfidTagInstance) return "RFID Etiketler";
                 return "Diğer";
             })
             .OrderBy(g => g.Key);
@@ -639,6 +668,13 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             if (SelectedLayerItem == comp) SelectedLayerItem = null;
             NetworkManager.Instance.SaveModems();
         }
+        else if (target is RfidTagInstance rfid)
+        {
+            rfid.X = 0; rfid.Y = 0; rfid.IsLocked = false;
+            PlacedBoxes.Remove(rfid);
+            if (SelectedLayerItem == rfid) SelectedLayerItem = null;
+            NetworkManager.Instance.SaveNetwork();
+        }
         else if (target is LayerGroup grp)
         {
             foreach(var child in grp.Children.ToList())
@@ -663,6 +699,11 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                 {
                     c.X = 0; c.Y = 0; c.IsLocked = false;
                     PlacedBoxes.Remove(c);
+                }
+                if (child is RfidTagInstance r)
+                {
+                    r.X = 0; r.Y = 0; r.IsLocked = false;
+                    PlacedBoxes.Remove(r);
                 }
             }
             if (SelectedLayerItem == grp) SelectedLayerItem = null;
@@ -792,6 +833,15 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                         }
                     }
                 }
+                
+                // Look for RFID Tags
+                var rfid = _networkManager.RfidTags.FirstOrDefault(r => r.Id == stState.ItemId);
+                if (rfid != null)
+                {
+                    rfid.X = stState.X; rfid.Y = stState.Y; rfid.IsLocked = stState.IsLocked;
+                    PlacedBoxes.Add(rfid);
+                    continue;
+                }
             }
             
             SelectedImage = null;
@@ -853,9 +903,20 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                             comp.Y = offsetY;
                             PlacedBoxes.Add(comp);
                             addedCount++;
-                            offsetX += 160;
+                            offsetX += 20;
+                            offsetY += 20;
                         }
                     }
+                }
+            }
+            else if (SelectedPaletteItem is RfidTagInstance rfid)
+            {
+                if (!PlacedBoxes.Contains(rfid))
+                {
+                    rfid.X = offsetX;
+                    rfid.Y = offsetY;
+                    PlacedBoxes.Add(rfid);
+                    addedCount++;
                 }
             }
 
@@ -863,7 +924,8 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             {
                 NetworkManager.Instance.SaveNetwork();
                 string itemName = SelectedPaletteItem is MainPcInstance mainPcInst ? mainPcInst.Name : 
-                                 (SelectedPaletteItem is ModemInstance mdInst ? mdInst.Name : "Bilinmeyen");
+                                 (SelectedPaletteItem is ModemInstance mdInst ? mdInst.Name : 
+                                 (SelectedPaletteItem is RfidTagInstance rfidInst ? rfidInst.Name : "Bilinmeyen"));
                 TerminalService.Instance.LogSuccess($"{addedCount} öğe haritaya eklendi ({itemName})");
             }
             else

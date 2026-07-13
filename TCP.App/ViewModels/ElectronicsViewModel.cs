@@ -31,8 +31,9 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
         set { _selectedTemplate = value; OnPropertyChanged(); }
     }
 
-    // Modems List
+    // Collections
     public ObservableCollection<ModemInstance> Modems => NetworkManager.Instance.Modems;
+    public ObservableCollection<RfidTagInstance> RfidTags => NetworkManager.Instance.RfidTags;
 
     private ModemInstance? _selectedModem;
     public ModemInstance? SelectedModem
@@ -240,6 +241,9 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand EditTemplateCommand { get; }
     public ICommand DeleteTemplateCommand { get; }
 
+    public ICommand AddRfidTagCommand { get; }
+    public ICommand DeleteRfidTagCommand { get; }
+
     public ElectronicsViewModel()
     {
         Templates = new ObservableCollection<BoardItem>(BoardRegistry.Instance.GetAll());
@@ -273,6 +277,9 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
         AddTemplateCommand = new RelayCommand<object>(_ => AddTemplate());
         EditTemplateCommand = new RelayCommand<BoardItem>(EditTemplate);
         DeleteTemplateCommand = new RelayCommand<BoardItem>(DeleteTemplate);
+
+        AddRfidTagCommand = new RelayCommand<object>(_ => AddRfidTag());
+        DeleteRfidTagCommand = new RelayCommand<RfidTagInstance>(DeleteRfidTag);
     }
     
     public void RefreshTemplates()
@@ -494,6 +501,26 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
         {
             ProjectManager.Instance.SaveCustomCode(_currentScriptTargetId, ScriptEditorCode);
             IsScriptEditorOpen = false;
+        }
+    }
+
+    private void AddRfidTag()
+    {
+        var tag = new RfidTagInstance 
+        { 
+            Name = $"RFID Etiket {RfidTags.Count + 1}",
+            Uid = Guid.NewGuid().ToString().Substring(0, 8).ToUpper() 
+        };
+        NetworkManager.Instance.AddRfidTag(tag);
+        NetworkManager.Instance.SaveModems();
+    }
+
+    private void DeleteRfidTag(RfidTagInstance? tag)
+    {
+        if (tag != null)
+        {
+            NetworkManager.Instance.RemoveRfidTag(tag.Id);
+            NetworkManager.Instance.SaveModems();
         }
     }
 }

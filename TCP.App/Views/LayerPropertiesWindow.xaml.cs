@@ -6,7 +6,7 @@ namespace TCP.App.Views;
 
 public partial class LayerPropertiesWindow : Window
 {
-    private ILayerItem _item;
+    private ILayerItem? _item;
 
     public LayerPropertiesWindow(ILayerItem item)
     {

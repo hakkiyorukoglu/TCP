@@ -173,7 +173,10 @@ public class ProjectManager
 
     public void SaveScenario()
     {
-        if (_currentScenario == null) return;
+        if (_currentScenario == null)
+        {
+            _currentScenario = new ScenarioDb { Name = "Otomatik Kayıt", Id = Guid.NewGuid() };
+        }
 
         try
         {
@@ -231,7 +234,14 @@ public class ProjectManager
 
     public void SaveCustomCode(Guid targetNodeId, string codeContent)
     {
-        if (_currentScenario == null) return;
+        // TCP-0.8.3: Fix for silent custom code loss when scenario is not explicitly saved yet.
+        if (_currentScenario == null)
+        {
+            SaveScenario();
+        }
+
+        if (_currentScenario == null) return; // Should not happen, but safety check
+        
         try
         {
             using var db = CreateDbContext();

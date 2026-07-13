@@ -47,6 +47,22 @@ public class BoardRegistry : IBoardRegistry
     /// </summary>
     private BoardRegistry()
     {
+        // Add defaults
+        RegisterDefault("Sarı Led", "Component", "Sarı LED bileşeni");
+        RegisterDefault("Turuncu Led", "Component", "Turuncu LED bileşeni");
+        RegisterDefault("Yeşil Led", "Component", "Yeşil LED bileşeni");
+        RegisterDefault("RFID Etiket", "RFID Tag", "Bağımsız RFID Etiket");
+        RegisterDefault("RFID Okuyucu", "Component", "RFID Okuyucu Modülü");
+    }
+
+    private void RegisterDefault(string name, string type, string description)
+    {
+        _boards.Add(new BoardItem 
+        { 
+            Name = name, 
+            Status = "Online", 
+            Description = description 
+        });
     }
     
     /// <summary>

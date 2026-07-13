@@ -349,6 +349,27 @@
                             VerticalAlignment="Center"
                             Margin="0,0,10,0">
                     
+                        <!-- Save icon -->
+                        <TextBlock Text="💾"
+                                   FontSize="{DynamicResource Icon.Size.Medium}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   Foreground="{DynamicResource Brush.Text.Secondary}"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,0"
+                                   Cursor="Hand"
+                                   ToolTip="Projeyi Kaydet"
+                                   MouseLeftButtonDown="SaveIcon_MouseLeftButtonDown">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Primary}"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
                         <!-- Settings icon -->
                         <TextBlock Text="⚙"
                                    FontSize="{DynamicResource Icon.Size.Medium}"

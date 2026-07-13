@@ -1,9 +1,13 @@
 using System;
+using System.Threading;
 
 namespace TCP.App.Services;
 
 public class ArduinoGlobals
 {
+    // Added token for cancellable delays
+    public CancellationToken CancellationToken { get; set; }
+
     // Common Arduino constants
     public int HIGH = 1;
     public int LOW = 0;
@@ -33,7 +37,32 @@ public class ArduinoGlobals
 
     public void delay(int ms)
     {
-        // Standard Arduino delay
-        System.Threading.Thread.Sleep(ms);
+        // Use WaitOne with cancellation token to allow immediate abort
+        if (CancellationToken != CancellationToken.None)
+        {
+            if (CancellationToken.WaitHandle.WaitOne(ms))
+            {
+                // WaitOne returns true if the handle was signaled (i.e., cancelled)
+                throw new OperationCanceledException(CancellationToken);
+            }
+        }
+        else
+        {
+            Thread.Sleep(ms);
+        }
+    }
+
+    // --- MFRC522 (RFID) Benzeri API ---
+    public Func<int, bool>? OnRfidAvailable { get; set; }
+    public Func<int, string>? OnReadRfid { get; set; }
+
+    public bool rfidAvailable(int pin)
+    {
+        return OnRfidAvailable?.Invoke(pin) ?? false;
+    }
+
+    public string readRfid(int pin)
+    {
+        return OnReadRfid?.Invoke(pin) ?? "";
     }
 }

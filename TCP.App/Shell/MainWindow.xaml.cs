@@ -262,6 +262,15 @@ public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
     }
     
     /// <summary>
+    /// Navigation: Save icon click handler
+    /// TCP-0.8.3: Save project manually
+    /// </summary>
+    private void SaveIcon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        ProjectManager.Instance.SaveScenario();
+    }
+
+    /// <summary>
     /// Navigation: Settings icon click handler
     /// TCP-0.8.0.1: Settings Navigation Enabled
     /// TCP-0.8.1: Settings Persistence v1 (Local) - Route save edilir

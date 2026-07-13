@@ -12,6 +12,7 @@ public class NetworkState
 {
     public MainPcInstance MainPc { get; set; } = new();
     public ObservableCollection<ModemInstance> Modems { get; set; } = new();
+    public ObservableCollection<RfidTagInstance> RfidTags { get; set; } = new();
 }
 
 /// <summary>
@@ -36,15 +37,18 @@ public class NetworkManager
     private readonly string _saveFilePath;
     private MainPcInstance _mainPc;
     private readonly ObservableCollection<ModemInstance> _modems;
+    private readonly ObservableCollection<RfidTagInstance> _rfidTags;
 
     public MainPcInstance MainPc => _mainPc;
     public ObservableCollection<ModemInstance> Modems => _modems;
+    public ObservableCollection<RfidTagInstance> RfidTags => _rfidTags;
 
     public event Action? NetworkChanged;
 
     private NetworkManager()
     {
         _modems = new ObservableCollection<ModemInstance>();
+        _rfidTags = new ObservableCollection<RfidTagInstance>();
         _mainPc = new MainPcInstance();
         
         var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TCP");
@@ -60,13 +64,14 @@ public class NetworkManager
     public void ClearNetwork()
     {
         _modems.Clear();
+        _rfidTags.Clear();
         _mainPc = new MainPcInstance();
         NetworkChanged?.Invoke();
     }
 
     public string GetJsonState()
     {
-        var state = new NetworkState { MainPc = _mainPc, Modems = _modems };
+        var state = new NetworkState { MainPc = _mainPc, Modems = _modems, RfidTags = _rfidTags };
         return JsonSerializer.Serialize(state);
     }
 
@@ -84,10 +89,15 @@ public class NetworkManager
             if (state != null)
             {
                 _modems.Clear();
+                _rfidTags.Clear();
                 _mainPc = state.MainPc ?? new MainPcInstance();
                 if (state.Modems != null)
                 {
                     foreach (var m in state.Modems) _modems.Add(m);
+                }
+                if (state.RfidTags != null)
+                {
+                    foreach (var r in state.RfidTags) _rfidTags.Add(r);
                 }
                 NetworkChanged?.Invoke();
             }
@@ -102,6 +112,22 @@ public class NetworkManager
     {
         _modems.Add(modem);
         NetworkChanged?.Invoke();
+    }
+
+    public void AddRfidTag(RfidTagInstance tag)
+    {
+        _rfidTags.Add(tag);
+        NetworkChanged?.Invoke();
+    }
+
+    public void RemoveRfidTag(Guid id)
+    {
+        var tag = _rfidTags.FirstOrDefault(t => t.Id == id);
+        if (tag != null)
+        {
+            _rfidTags.Remove(tag);
+            NetworkChanged?.Invoke();
+        }
     }
 
     public void RemoveModem(Guid id)

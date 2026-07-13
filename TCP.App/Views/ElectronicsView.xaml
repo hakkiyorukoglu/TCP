@@ -33,12 +33,14 @@
                 BorderThickness="0,0,1,0">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/> <!-- Ağ Yönetimi Başlık -->
+                    <RowDefinition Height="*"/>    <!-- Modem Listesi -->
+                    <RowDefinition Height="Auto"/> <!-- Bağımsız Cihazlar Başlık -->
+                    <RowDefinition Height="Auto"/> <!-- RFID Etiket Listesi -->
+                    <RowDefinition Height="Auto"/> <!-- Modem/RFID Ekle Butonları -->
+                    <RowDefinition Height="Auto"/> <!-- Temel Elektronikler Başlık -->
+                    <RowDefinition Height="*"/>    <!-- Templates Listesi -->
+                    <RowDefinition Height="Auto"/> <!-- Template Butonları -->
                 </Grid.RowDefinitions>
                 
                 <TextBlock Grid.Row="0"
@@ -98,30 +100,74 @@
                                         <Border Background="{TemplateBinding Background}"
                                                 BorderBrush="{TemplateBinding BorderBrush}"
                                                 BorderThickness="0"
-                                                Padding="{TemplateBinding Padding}">
+                                                SnapsToDevicePixels="True">
                                             <ContentPresenter/>
                                         </Border>
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>
-                            <Style.Triggers>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Background" Value="Transparent"/>
-                                </Trigger>
-                            </Style.Triggers>
                         </Style>
                     </ListBox.ItemContainerStyle>
                 </ListBox>
 
-                <ui:Button Grid.Row="2"
-                           Content="+ Modem Ekle (Switch)"
-                           Command="{Binding OpenCreateModemPopupCommand}"
-                           Appearance="Primary"
-                           HorizontalAlignment="Stretch"
-                           Margin="15,5,15,10"/>
+                <TextBlock Grid.Row="2"
+                           Text="Bağımsız Cihazlar"
+                           FontSize="{DynamicResource Font.Heading.Medium}"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource Brush.Text.Primary}"
+                           Margin="15,15,15,5"/>
+
+                <ListBox Grid.Row="3"
+                         ItemsSource="{Binding RfidTags}"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         Margin="10,0,10,5">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="ItemBorder"
+                                    Background="{DynamicResource Brush.Background.Primary}"
+                                    BorderBrush="{DynamicResource Brush.Border}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Margin="0,2,0,2"
+                                    Padding="10,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="💳"
+                                               FontSize="{DynamicResource Font.Heading.Medium}"
+                                               Foreground="{DynamicResource Brush.Palette.Blue}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,8,0"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}"
+                                               FontSize="{DynamicResource Font.Body}"
+                                               Foreground="{DynamicResource Brush.Text.Primary}"
+                                               VerticalAlignment="Center"/>
+                                    <Button Grid.Column="2" Content="🗑" 
+                                            Command="{Binding DataContext.DeleteRfidTagCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                            CommandParameter="{Binding}"
+                                            Background="Transparent" BorderThickness="0" Foreground="Red" Padding="4"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10">
+                    <ui:Button Content="+ Modem Ekle"
+                               Command="{Binding OpenCreateModemPopupCommand}"
+                               Appearance="Primary"
+                               Margin="0,0,10,0"/>
+                    <ui:Button Content="+ RFID Etiket"
+                               Command="{Binding AddRfidTagCommand}"
+                               Appearance="Secondary"/>
+                </StackPanel>
                            
                 <!-- Temel Elektronikler Başlık -->
-                <TextBlock Grid.Row="3"
+                <TextBlock Grid.Row="5"
                            Text="Temel Elektronikler"
                            FontSize="{DynamicResource Font.Heading.Medium}"
                            FontWeight="SemiBold"
@@ -129,7 +175,7 @@
                            Margin="15,10,15,5"/>
                            
                 <!-- Temel Elektronikler Listesi -->
-                <ListBox Grid.Row="4"
+                <ListBox Grid.Row="6"
                          ItemsSource="{Binding Templates}"
                          SelectedItem="{Binding SelectedTemplate}"
                          BorderThickness="0"
@@ -210,7 +256,7 @@
                     </ListBox.ItemContainerStyle>
                 </ListBox>
 
-                <ui:Button Grid.Row="5"
+                <ui:Button Grid.Row="7"
                            Content="Elektronik Ekle"
                            Command="{Binding AddTemplateCommand}"
                            Appearance="Secondary"
@@ -579,6 +625,50 @@
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
                         <ui:Button Content="İptal" Command="{Binding CloseCreateComponentPopupCommand}" Margin="0,0,10,0"/>
                         <ui:Button Content="Kaydet" Command="{Binding SaveComponentCommand}" Appearance="Primary"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Border>
+
+        <!-- SCRIPT EDITOR POPUP OVERLAY -->
+        <Border Grid.ColumnSpan="2"
+                Background="#80000000"
+                Panel.ZIndex="200"
+                Visibility="{Binding IsScriptEditorOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Background="{DynamicResource Brush.Surface}"
+                    BorderBrush="{DynamicResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Width="800"
+                    Height="600"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Text="{Binding ScriptEditorTitle}" FontSize="{DynamicResource Font.Heading.Medium}" FontWeight="SemiBold" Margin="0,0,0,20"/>
+                    
+                    <TextBox Grid.Row="1" 
+                             Text="{Binding ScriptEditorCode, UpdateSourceTrigger=PropertyChanged}" 
+                             AcceptsReturn="True" 
+                             AcceptsTab="True" 
+                             FontFamily="Consolas" 
+                             FontSize="14" 
+                             HorizontalScrollBarVisibility="Auto" 
+                             VerticalScrollBarVisibility="Auto" 
+                             Margin="0,0,0,20" 
+                             Padding="10"
+                             Background="{DynamicResource Brush.Background.Secondary}"
+                             Foreground="{DynamicResource Brush.Text.Primary}"/>
+                    
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <ui:Button Content="İptal" Command="{Binding CloseScriptEditorCommand}" Margin="0,0,10,0"/>
+                        <ui:Button Content="Kaydet" Command="{Binding SaveScriptCommand}" Appearance="Primary"/>
                     </StackPanel>
                 </Grid>
             </Border>

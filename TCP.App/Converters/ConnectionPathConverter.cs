@@ -42,7 +42,8 @@ public class ConnectionPathConverter : IMultiValueConverter
             var connectedPinProp = targetItem.GetType().GetProperty("ConnectedPin");
             if (connectedPinProp != null)
             {
-                pin = (int)connectedPinProp.GetValue(targetItem);
+                var val = connectedPinProp.GetValue(targetItem);
+                pin = val != null ? (int)val : 1;
                 if (pin < 1) pin = 1;
                 if (pin > 16) pin = 16;
             }

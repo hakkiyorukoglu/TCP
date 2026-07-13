@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TCP.App.Services;
 
-public class HardwareSimulationEngine
+public class HardwareSimulationEngine : IDisposable
 {
     private CancellationTokenSource? _cts;
     private Task? _simulationTask;
@@ -16,7 +16,11 @@ public class HardwareSimulationEngine
         if (string.IsNullOrWhiteSpace(scriptCode))
             return;
 
+        // Ensure any previous run is stopped before starting a new one
+        StopSimulation();
+
         _cts = new CancellationTokenSource();
+        globals.CancellationToken = _cts.Token; // Bind the token for cancellable delay()
 
         var options = ScriptOptions.Default
             .WithImports("System", "System.Threading", "System.Threading.Tasks");
@@ -46,6 +50,10 @@ public class HardwareSimulationEngine
             {
                 // Task was stopped normally
             }
+            catch (OperationCanceledException)
+            {
+                // Task was stopped normally via our own delay() exception
+            }
             catch (Exception ex)
             {
                 Console.WriteLine("Simülasyon Hatası: " + ex.Message);
@@ -55,6 +63,16 @@ public class HardwareSimulationEngine
 
     public void StopSimulation()
     {
-        _cts?.Cancel();
+        if (_cts != null)
+        {
+            _cts.Cancel();
+            _cts.Dispose();
+            _cts = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        StopSimulation();
     }
 }

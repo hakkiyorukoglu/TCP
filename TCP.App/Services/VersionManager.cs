@@ -15,11 +15,11 @@ public static class VersionManager
     /// <summary>
     /// Mevcut versiyon
     /// Semantic versioning formatında: TCP-Major.Minor.Patch
-    /// TCP-2.1.0: Editor Background & Transparency Features
+    /// TCP-2.8.0: Logic Fixes & Data Integrity
     /// 
     /// IMPORTANT: Bu değer tek yerden güncellenir - tüm UI otomatik güncellenir
     /// </summary>
-    public static string CurrentVersion => "TCP-2.1.0";
+    public static string CurrentVersion => "TCP-2.8.0";
     
     /// <summary>
     /// Build time
@@ -31,7 +31,7 @@ public static class VersionManager
     /// Stage adı
     /// Mevcut geliştirme aşaması
     /// </summary>
-    public static string StageName => "Editor Background & Transparency Features";
+    public static string StageName => "Logic Fixes & Data Integrity";
     
     /// <summary>
     /// Display versiyon

@@ -440,6 +440,36 @@
                                         </ToggleButton>
                                     </Grid>
                                 </DataTemplate>
+                                <!-- DataTemplate for RfidTagInstance -->
+                                <DataTemplate DataType="{x:Type electronics:RfidTagInstance}">
+                                    <Grid Width="210">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/> <!-- Visibility -->
+                                            <ColumnDefinition Width="Auto"/> <!-- Icon -->
+                                            <ColumnDefinition Width="*"/>    <!-- Name -->
+                                            <ColumnDefinition Width="Auto"/> <!-- Lock -->
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <ToggleButton Grid.Column="0" IsChecked="{Binding IsVisible, Mode=TwoWay}" 
+                                                      Background="Transparent" BorderThickness="0" Padding="8" Margin="0,0,4,0" Cursor="Hand">
+                                            <TextBlock Text="👁" FontSize="16" Opacity="{Binding IsVisible, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                        </ToggleButton>
+                                        
+                                        <TextBlock Grid.Column="1" Text="💳" 
+                                                   VerticalAlignment="Center" Margin="0,0,8,0" FontSize="14" Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                        
+                                        <TextBlock Grid.Column="2" Text="{Binding Name}" 
+                                                   FontSize="{DynamicResource Font.Body}"
+                                                   FontFamily="{DynamicResource Font.Primary}"
+                                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                                   VerticalAlignment="Center"/>
+                                                   
+                                        <ToggleButton Grid.Column="3" IsChecked="{Binding IsLocked, Mode=TwoWay}" 
+                                                      Background="Transparent" BorderThickness="0" Padding="8" Margin="0,0,4,0" Cursor="Hand">
+                                            <TextBlock Text="🔒" FontSize="16" Opacity="{Binding IsLocked, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                        </ToggleButton>
+                                    </Grid>
+                                </DataTemplate>
                                 
                                 <DataTemplate DataType="{x:Type models:EditorImage}">
                                     <Grid Width="210">

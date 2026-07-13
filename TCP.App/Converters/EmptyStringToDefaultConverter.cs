@@ -13,7 +13,7 @@ public class EmptyStringToDefaultConverter : IValueConverter
         if (value == null || string.IsNullOrWhiteSpace(value.ToString()))
             return DefaultValue;
 
-        return value.ToString();
+        return value.ToString() ?? "";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
