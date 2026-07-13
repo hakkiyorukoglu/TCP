@@ -43,8 +43,7 @@ public class HardwareSimulationEngine : IDisposable
             }
             catch (CompilationErrorException ex)
             {
-                // In a real scenario we could log this to the UI
-                Console.WriteLine("Derleme Hatası: " + string.Join(Environment.NewLine, ex.Diagnostics));
+                TerminalService.Instance.LogError("Derleme Hatası: " + string.Join(Environment.NewLine, ex.Diagnostics));
             }
             catch (TaskCanceledException)
             {
@@ -56,7 +55,7 @@ public class HardwareSimulationEngine : IDisposable
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Simülasyon Hatası: " + ex.Message);
+                TerminalService.Instance.LogError("Simülasyon Hatası: " + ex.Message);
             }
         }, _cts.Token);
     }

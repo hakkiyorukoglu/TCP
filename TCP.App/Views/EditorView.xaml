@@ -799,7 +799,8 @@
                             </ItemsControl.ItemContainerStyle>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Background="{DynamicResource Brush.Background.Primary}"
+                                    <StackPanel>
+                                        <Border x:Name="DefaultBox" Background="{DynamicResource Brush.Background.Primary}"
                                             BorderBrush="{DynamicResource Brush.Border}"
                                             BorderThickness="2"
                                             CornerRadius="4"
@@ -905,7 +906,89 @@
                                                 </ItemsControl.ItemTemplate>
                                             </ItemsControl>
                                         </Grid>
-                                    </Border>
+                                        </Border>
+                                        
+                                        <!-- NEON LED BOX -->
+                                        <Grid x:Name="NeonBox" Visibility="Collapsed" Width="60" Height="80"
+                                              Cursor="SizeAll"
+                                              MouseLeftButtonDown="Box_MouseLeftButtonDown"
+                                              MouseMove="Box_MouseMove"
+                                              MouseLeftButtonUp="Box_MouseLeftButtonUp"
+                                              Background="Transparent">
+                                            
+                                            <Grid.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Sil" Command="{Binding PlacementTarget.Tag.RemoveSelectedLayerCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                </ContextMenu>
+                                            </Grid.ContextMenu>
+
+                                            <!-- Base Bulb (unpowered) -->
+                                            <Path Data="M 30,10 C 10,10 10,40 22,50 L 22,65 C 22,68 38,68 38,65 L 38,50 C 50,40 50,10 30,10 Z" 
+                                                  Fill="Transparent" Stroke="{Binding ., Converter={StaticResource LedColorConverter}}" StrokeThickness="2" Opacity="0.5" />
+                                            <!-- Socket -->
+                                            <Path Data="M 20,65 L 40,65 L 36,75 L 24,75 Z" Fill="#555" />
+                                            <Path Data="M 26,75 L 34,75 L 32,80 L 28,80 Z" Fill="#333" />
+                                            
+                                            <!-- Powered State -->
+                                            <Grid x:Name="NeonGlowGrid" Visibility="Collapsed">
+                                                <!-- Glow 1 (Outer) -->
+                                                <Path Data="M 30,10 C 10,10 10,40 22,50 L 22,65 C 22,68 38,68 38,65 L 38,50 C 50,40 50,10 30,10 Z" 
+                                                      Fill="{Binding ., Converter={StaticResource LedColorConverter}}">
+                                                    <Path.Effect>
+                                                        <BlurEffect Radius="25" />
+                                                    </Path.Effect>
+                                                </Path>
+                                                <!-- Glow 2 (Inner) -->
+                                                <Path Data="M 30,10 C 10,10 10,40 22,50 L 22,65 C 22,68 38,68 38,65 L 38,50 C 50,40 50,10 30,10 Z" 
+                                                      Fill="{Binding ., Converter={StaticResource LedColorConverter}}">
+                                                    <Path.Effect>
+                                                        <BlurEffect Radius="10" />
+                                                    </Path.Effect>
+                                                </Path>
+                                                <!-- Bright Center -->
+                                                <Path Data="M 30,10 C 10,10 10,40 22,50 L 22,65 C 22,68 38,68 38,65 L 38,50 C 50,40 50,10 30,10 Z" 
+                                                      Fill="#FFFFFFFF" Opacity="0.8">
+                                                </Path>
+                                            </Grid>
+
+                                            <TextBlock Text="{Binding Name}" Foreground="{DynamicResource Brush.Text.Primary}" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-15,0,0"/>
+                                        </Grid>
+                                        
+                                        <!-- Terminal Overlay -->
+                                        <Border x:Name="StationConsole" Width="160" Height="60" Margin="0,4,0,0" 
+                                                Background="#0f0f0f" CornerRadius="4" 
+                                                BorderBrush="#333" BorderThickness="1"
+                                                Visibility="Collapsed">
+                                            <ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+                                                <ItemsControl ItemsSource="{Binding ConsoleLogs, FallbackValue={x:Null}}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock Text="{Binding}" Foreground="#00FF00" FontFamily="Consolas" FontSize="10" TextWrapping="Wrap"/>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                        </Border>
+                                    </StackPanel>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding LayerType}" Value="Station">
+                                            <Setter TargetName="StationConsole" Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding LayerType}" Value="MainPC">
+                                            <Setter TargetName="StationConsole" Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsLed}" Value="True">
+                                            <Setter TargetName="DefaultBox" Property="Visibility" Value="Collapsed" />
+                                            <Setter TargetName="NeonBox" Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding IsLed}" Value="True"/>
+                                                <Condition Binding="{Binding IsPowered}" Value="True"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter TargetName="NeonGlowGrid" Property="Visibility" Value="Visible" />
+                                        </MultiDataTrigger>
+                                    </DataTemplate.Triggers>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>

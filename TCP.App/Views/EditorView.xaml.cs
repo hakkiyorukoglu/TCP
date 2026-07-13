@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Input;
 using TCP.App.ViewModels;
@@ -196,31 +198,41 @@ public partial class EditorView : UserControl
 
     private void Box_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (DataContext is EditorViewModel vm && vm.IsLiveMode) return;
+        bool isLiveMode = DataContext is EditorViewModel vm && vm.IsLiveMode;
 
         if (sender is System.Windows.FrameworkElement el)
         {
-            if (el.DataContext is TCP.App.Models.Electronics.MainPcInstance pc)
+            if (el.DataContext is TCP.App.Models.Electronics.RfidTagInstance rfidTag)
             {
-                if (pc.IsLocked) return;
-                _draggedBoxData = pc;
+                if (rfidTag.IsLocked) return;
+                _draggedBoxData = rfidTag;
             }
-            else if (el.DataContext is TCP.App.Models.Electronics.ModemInstance modem)
+            else
             {
-                if (modem.IsLocked) return;
-                _draggedBoxData = modem;
+                if (isLiveMode) return;
+
+                if (el.DataContext is TCP.App.Models.Electronics.MainPcInstance pc)
+                {
+                    if (pc.IsLocked) return;
+                    _draggedBoxData = pc;
+                }
+                else if (el.DataContext is TCP.App.Models.Electronics.ModemInstance modem)
+                {
+                    if (modem.IsLocked) return;
+                    _draggedBoxData = modem;
+                }
+                else if (el.DataContext is TCP.App.Models.Electronics.StationInstance station)
+                {
+                    if (station.IsLocked) return;
+                    _draggedBoxData = station;
+                }
+                else if (el.DataContext is TCP.App.Models.Electronics.ComponentInstance component)
+                {
+                    if (component.IsLocked) return;
+                    _draggedBoxData = component;
+                }
+                else return;
             }
-            else if (el.DataContext is TCP.App.Models.Electronics.StationInstance station)
-            {
-                if (station.IsLocked) return;
-                _draggedBoxData = station;
-            }
-            else if (el.DataContext is TCP.App.Models.Electronics.ComponentInstance component)
-            {
-                if (component.IsLocked) return;
-                _draggedBoxData = component;
-            }
-            else return;
 
             _isBoxDragging = true;
             _boxClickPosition = e.GetPosition(ViewportCanvas);
@@ -267,6 +279,13 @@ public partial class EditorView : UserControl
             newX = component.X;
             newY = component.Y;
         }
+        else if (_draggedBoxData is TCP.App.Models.Electronics.RfidTagInstance rfidTag)
+        {
+            rfidTag.X += transformX;
+            rfidTag.Y += transformY;
+            newX = rfidTag.X;
+            newY = rfidTag.Y;
+        }
 
         System.Windows.DependencyObject parent = System.Windows.Media.VisualTreeHelper.GetParent(el);
         while (parent != null && !(parent is System.Windows.Controls.ContentPresenter))
@@ -294,6 +313,23 @@ public partial class EditorView : UserControl
             el.ReleaseMouseCapture();
         }
         
+        if (DataContext is EditorViewModel vm && vm.IsLiveMode && _draggedBoxData is TCP.App.Models.Electronics.RfidTagInstance rfid)
+        {
+            // Check intersection with any RFID Reader
+            var readers = vm.PlacedBoxes.OfType<TCP.App.Models.Electronics.ComponentInstance>().Where(c => c.TemplateId.Contains("RFID", StringComparison.OrdinalIgnoreCase));
+            foreach (var reader in readers)
+            {
+                // Simple distance check
+                double dx = reader.X - rfid.X;
+                double dy = reader.Y - rfid.Y;
+                if (Math.Sqrt(dx * dx + dy * dy) < 80.0) // 80 units radius for easier drop
+                {
+                    vm.OnRfidScanned(rfid.Uid);
+                    break;
+                }
+            }
+        }
+
         TCP.App.Services.NetworkManager.Instance.SaveNetwork();
         e.Handled = true;
     }

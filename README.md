@@ -1,17 +1,19 @@
 # TCP — Train Control Platform
 
-[![Version](https://img.shields.io/badge/version-TCP--2.8.0-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-TCP--2.9.0-blue.svg)](docs/CHANGELOG.md)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
 
 **TCP (Train Control Platform)**, tren kontrol sistemleri, ray yerleşim tasarımı ve donanım kartları yönetimini birleştiren tam donanımlı, profesyonel bir masaüstü (WPF) uygulamasıdır.
 
 ---
 
-## 🚀 Öne Çıkan Özellikler (v2.8.0)
+## 🚀 Öne Çıkan Özellikler (v2.9.0)
 
 Uygulama baştan aşağıya gelişmiş yetenekler, dinamik bir arayüz ve uç nokta donanım yönetimiyle donatıldı:
 
 - 🛡️ **Kararlılık ve Veri Bütünlüğü**: Simülasyon gecikmelerinin anında iptal edilebilir yapısı (cancellationToken), arka planda çalışan hayalet (zombie) process'lerin `IDisposable` ile engellenmesi. Kaydedilmeyen kodların sessizce çöpe gitmesini önleyen veri kaybı korumaları.
+- 🧬 **C# Scripting & Simülasyon Ağı**: Donanım simülasyonu motoru güncellendi. İstasyonlar ve Ana PC artık entegre bir Ağ Kuyruğu (Network Bus) üzerinden `send()` ve `inMsg()` ile iletişim kurabiliyor.
+- 🚦 **Sensör Mantığı ve Neon Çizimler**: Gerçekçi okuma sıçrama engelleme (Debounce) ile kilitlenmeyen RFID yönetimi ve enerji durumuna göre tepki veren pürüzsüz Neon Glow LED simülasyonları.
 - 🗄️ **SQLite & EF Core Entegrasyonu**: Tüm ağ, istasyon ve harita tasarımlarını güvenli ve kalıcı olarak kaydetmenizi sağlayan Entity Framework tabanlı veritabanı altyapısı.
 - 🧪 **Birim Testleri (xUnit & Moq)**: Veritabanı ve state yönetimi gibi kritik çekirdek parçalar endüstri standartlarındaki birim testleriyle koruma altında.
 - 🛤️ **Rota (Spline) Çizimi**: Editör üzerinde serbestçe tren hatları ve rotaları (TrackRoute) çizebilme.

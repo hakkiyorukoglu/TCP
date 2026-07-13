@@ -46,6 +46,18 @@ public class StationInstance : ILayerItem, INotifyPropertyChanged
     [JsonIgnore]
     public System.Collections.Generic.IEnumerable<int> Pins => System.Linq.Enumerable.Range(1, PinCount);
 
+    [JsonIgnore]
+    public ObservableCollection<string> ConsoleLogs { get; } = new();
+
+    public void Log(string message)
+    {
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            ConsoleLogs.Insert(0, $"{DateTime.Now:HH:mm:ss} - {message}");
+            if (ConsoleLogs.Count > 5) ConsoleLogs.RemoveAt(ConsoleLogs.Count - 1);
+        });
+    }
+
     public double X
     {
         get => _x;

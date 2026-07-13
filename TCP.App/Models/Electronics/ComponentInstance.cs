@@ -35,14 +35,70 @@ public class ComponentInstance : ILayerItem, INotifyPropertyChanged
     /// <summary>
     /// Template/Type of the component (e.g. "Servo", "RFID Reader")
     /// </summary>
-    public string TemplateId { get; set; } = string.Empty;
+    private string _templateId = string.Empty;
+    public string TemplateId
+    {
+        get => _templateId;
+        set
+        {
+            if (_templateId != value)
+            {
+                _templateId = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsLed));
+                OnPropertyChanged(nameof(LedColor));
+            }
+        }
+    }
 
-    public string Name { get; set; } = string.Empty;
+    private string _name = string.Empty;
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            if (_name != value)
+            {
+                _name = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(LayerName));
+                OnPropertyChanged(nameof(IsLed));
+                OnPropertyChanged(nameof(LedColor));
+            }
+        }
+    }
     
     /// <summary>
     /// Description of the component
     /// </summary>
     public string Description { get; set; } = "Sensör / Modül";
+
+    [JsonIgnore]
+    public bool IsLed
+    {
+        get
+        {
+            var lowerName = Name?.ToLowerInvariant() ?? "";
+            var lowerTemplate = TemplateId?.ToLowerInvariant() ?? "";
+            var lowerDesc = Description?.ToLowerInvariant() ?? "";
+            return lowerName.Contains("led") || lowerTemplate.Contains("led") || lowerDesc.Contains("led");
+        }
+    }
+
+    [JsonIgnore]
+    public string LedColor
+    {
+        get
+        {
+            var lower = Name?.ToLowerInvariant() ?? "";
+            if (lower.Contains("kırmızı")) return "#FF0000";
+            if (lower.Contains("yeşil")) return "#00FF00";
+            if (lower.Contains("sarı")) return "#FFFF00";
+            if (lower.Contains("turuncu")) return "#FFA500";
+            if (lower.Contains("mavi")) return "#0000FF";
+            return "#FFFFFF";
+        }
+    }
 
     private string _pin = string.Empty;
     public string Pin

@@ -118,15 +118,20 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand StopSimulationCommand { get; }
 
     private System.Collections.Generic.List<HardwareSimulationEngine> _activeEngines = new();
+    private System.Collections.Generic.List<ArduinoGlobals> _activeGlobals = new();
 
     private void StartSimulation()
     {
         if (IsSimulationRunning) return;
         IsSimulationRunning = true;
         _activeEngines.Clear();
+        _activeGlobals.Clear();
 
-        var stations = Layers.OfType<StationInstance>().ToList();
-        var components = Layers.OfType<ComponentInstance>().ToList();
+        var stations = PlacedBoxes.OfType<StationInstance>().ToList();
+        var components = PlacedBoxes.OfType<ComponentInstance>().ToList();
+
+        // Basit bir Ağ kuyruğu (Şimdilik tüm cihazlar aynı kuyruğu paylaşıyor)
+        var networkBus = new System.Collections.Concurrent.ConcurrentQueue<string>();
 
         foreach (var station in stations)
         {
@@ -134,8 +139,22 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             if (string.IsNullOrWhiteSpace(code)) continue;
 
             var engine = new HardwareSimulationEngine();
+            string lastTag = null; // Debounce state for RFID
+            
             var globals = new ArduinoGlobals
             {
+                OnLog = (msg) => 
+                {
+                    station.Log(msg);
+                },
+                OnSend = (msg) => 
+                {
+                    networkBus.Enqueue(msg);
+                },
+                OnReceive = () => 
+                {
+                    return networkBus.TryDequeue(out var m) ? m : "";
+                },
                 OnDigitalWrite = (pin, val) =>
                 {
                     // Find connected component
@@ -145,6 +164,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                         System.Windows.Application.Current.Dispatcher.Invoke(() =>
                         {
                             comp.IsPowered = (val == 1); // 1 is HIGH
+                            station.Log($"OUT: {comp.Name} ({pin}) -> {(val == 1 ? "HIGH" : "LOW")}");
                         });
                     }
                 },
@@ -154,8 +174,9 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                     if (reader != null)
                     {
                         var tag = PlacedBoxes.OfType<RfidTagInstance>().FirstOrDefault(t => 
-                            Math.Abs(t.X - reader.X) < 60 && Math.Abs(t.Y - reader.Y) < 60);
-                        return tag != null;
+                            Math.Abs(t.X - reader.X) < 50 && Math.Abs(t.Y - reader.Y) < 50);
+                        if (tag == null) { lastTag = null; return false; }
+                        return lastTag != tag.Uid;
                     }
                     return false;
                 },
@@ -165,17 +186,71 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                     if (reader != null)
                     {
                         var tag = PlacedBoxes.OfType<RfidTagInstance>().FirstOrDefault(t => 
-                            Math.Abs(t.X - reader.X) < 60 && Math.Abs(t.Y - reader.Y) < 60);
-                        return tag != null ? tag.Uid : "";
+                            Math.Abs(t.X - reader.X) < 50 && Math.Abs(t.Y - reader.Y) < 50);
+                        if (tag == null) 
+                        {
+                            lastTag = null;
+                            return "";
+                        }
+                        if (lastTag != tag.Uid)
+                        {
+                            lastTag = tag.Uid;
+                            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                            {
+                                station.Log($"IN: RFID ({pin}) <- {tag.Uid}");
+                            });
+                            return tag.Uid;
+                        }
                     }
                     return "";
                 }
             };
-
+            
+            _activeGlobals.Add(globals);
             _activeEngines.Add(engine);
-            // Fire and forget
             engine.StartSimulation(code, globals);
+            TerminalService.Instance.LogSuccess($"Simülasyon başlatıldı: {station.Name}");
         }
+
+        // Also start Main PC script if it exists
+        var mainPc = PlacedBoxes.OfType<MainPcInstance>().FirstOrDefault();
+        if (mainPc != null)
+        {
+            var code = ProjectManager.Instance.GetCustomCode(mainPc.Id);
+            if (!string.IsNullOrWhiteSpace(code))
+            {
+                var engine = new HardwareSimulationEngine();
+                var globals = new ArduinoGlobals
+                {
+                    OnLog = (msg) => 
+                    {
+                        mainPc.Log(msg);
+                    },
+                    OnSend = (msg) => 
+                    {
+                        networkBus.Enqueue(msg);
+                    },
+                    OnReceive = () => 
+                    {
+                        return networkBus.TryDequeue(out var m) ? m : "";
+                    }
+                };
+                
+                _activeGlobals.Add(globals);
+                _activeEngines.Add(engine);
+                engine.StartSimulation(code, globals);
+                TerminalService.Instance.LogSuccess($"Simülasyon başlatıldı: {mainPc.Name}");
+            }
+        }
+    }
+
+    public void OnRfidScanned(string uid)
+    {
+        foreach (var globals in _activeGlobals)
+        {
+            globals.InjectRfidScan(uid);
+        }
+        TerminalService.Instance.LogSuccess($"RFID Okundu: {uid}");
     }
 
     private void StopSimulation()
@@ -187,15 +262,18 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             engine.Dispose();
         }
         _activeEngines.Clear();
+        _activeGlobals.Clear();
+        _activeEngines.Clear();
         
         // Reset all components to unpowered
-        var components = Layers.OfType<ComponentInstance>().ToList();
+        var components = PlacedBoxes.OfType<ComponentInstance>().ToList();
         foreach (var comp in components)
         {
             comp.IsPowered = false;
         }
 
         IsSimulationRunning = false;
+        TerminalService.Instance.LogSystem("Simülasyon durduruldu.");
     }
     #endregion
 

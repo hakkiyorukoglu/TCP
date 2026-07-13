@@ -63,6 +63,10 @@ public class EditorLayoutService
                 {
                     x = m.X; y = m.Y; isLocked = m.IsLocked;
                 }
+                else if (item is RfidTagInstance rfid)
+                {
+                    x = rfid.X; y = rfid.Y; isLocked = rfid.IsLocked;
+                }
 
                 state.PlacedItems.Add(new PlacedItemState
                 {

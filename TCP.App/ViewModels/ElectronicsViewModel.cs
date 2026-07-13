@@ -34,6 +34,7 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
     // Collections
     public ObservableCollection<ModemInstance> Modems => NetworkManager.Instance.Modems;
     public ObservableCollection<RfidTagInstance> RfidTags => NetworkManager.Instance.RfidTags;
+    public MainPcInstance MainPc => NetworkManager.Instance.MainPc;
 
     private ModemInstance? _selectedModem;
     public ModemInstance? SelectedModem
@@ -232,6 +233,7 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
     private Guid _currentScriptTargetId;
 
     public ICommand OpenStationScriptCommand { get; }
+    public ICommand OpenMainPcScriptCommand { get; }
     public ICommand OpenComponentScriptCommand { get; }
     public ICommand CloseScriptEditorCommand { get; }
     public ICommand SaveScriptCommand { get; }
@@ -270,6 +272,7 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
         EditComponentCommand = new RelayCommand<ComponentInstance>(EditComponent);
         
         OpenStationScriptCommand = new RelayCommand<StationInstance>(OpenStationScript);
+        OpenMainPcScriptCommand = new RelayCommand<MainPcInstance>(OpenMainPcScript);
         OpenComponentScriptCommand = new RelayCommand<ComponentInstance>(OpenComponentScript);
         CloseScriptEditorCommand = new RelayCommand<object>(_ => IsScriptEditorOpen = false);
         SaveScriptCommand = new RelayCommand<object>(_ => SaveScript());
@@ -483,6 +486,15 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
         _currentScriptTargetId = st.Id;
         ScriptEditorTitle = $"{st.Name} - Yazılım (C#)";
         ScriptEditorCode = ProjectManager.Instance.GetCustomCode(st.Id);
+        IsScriptEditorOpen = true;
+    }
+
+    private void OpenMainPcScript(MainPcInstance? pc)
+    {
+        if (pc == null) return;
+        _currentScriptTargetId = pc.Id;
+        ScriptEditorTitle = $"{pc.Name} - Yazılım (C#)";
+        ScriptEditorCode = ProjectManager.Instance.GetCustomCode(pc.Id);
         IsScriptEditorOpen = true;
     }
 

@@ -93,7 +93,17 @@ public class NetworkManager
                 _mainPc = state.MainPc ?? new MainPcInstance();
                 if (state.Modems != null)
                 {
-                    foreach (var m in state.Modems) _modems.Add(m);
+                    foreach (var m in state.Modems)
+                    {
+                        foreach(var st in m.Stations)
+                        {
+                            foreach(var c in st.Components)
+                            {
+                                c.StationId = st.Id;
+                            }
+                        }
+                        _modems.Add(m);
+                    }
                 }
                 if (state.RfidTags != null)
                 {

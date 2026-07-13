@@ -43,12 +43,24 @@
                     <RowDefinition Height="Auto"/> <!-- Template Butonları -->
                 </Grid.RowDefinitions>
                 
-                <TextBlock Grid.Row="0"
-                           Text="Ağ Yönetimi (Modemler)"
-                           FontSize="{DynamicResource Font.Heading.Medium}"
-                           FontWeight="SemiBold"
-                           Foreground="{DynamicResource Brush.Text.Primary}"
-                           Margin="15,15,15,5"/>
+                <Grid Grid.Row="0" Margin="15,15,15,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Ağ Yönetimi (Modemler)"
+                               FontSize="{DynamicResource Font.Heading.Medium}"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource Brush.Text.Primary}"
+                               VerticalAlignment="Center"/>
+                    
+                    <ui:Button Grid.Column="1" Appearance="Primary"
+                               Command="{Binding OpenMainPcScriptCommand}"
+                               CommandParameter="{Binding MainPc}"
+                               Padding="6,4" ToolTip="Ana PC Yazılımı">
+                        <TextBlock Text="💻 Ana PC Kod" FontSize="11"/>
+                    </ui:Button>
+                </Grid>
                 
                 <!-- Modem Listesi -->
                 <ListBox Grid.Row="1"

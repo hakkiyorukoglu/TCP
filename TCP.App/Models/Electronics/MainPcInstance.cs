@@ -63,9 +63,45 @@ public class MainPcInstance : ILayerItem, INotifyPropertyChanged
         set { if (_isVisible != value) { _isVisible = value; OnPropertyChanged(); } }
     }
 
+    private bool _isPowered;
+    [JsonIgnore]
+    public bool IsPowered
+    {
+        get => _isPowered;
+        set { if (_isPowered != value) { _isPowered = value; OnPropertyChanged(); } }
+    }
+
+    private string _terminalOutput = string.Empty;
+    [JsonIgnore]
+    public System.Collections.ObjectModel.ObservableCollection<string> ConsoleLogs { get; } = new();
+
+    private string _script = string.Empty;
+    public string Script
+    {
+        get => _script;
+        set { if (_script != value) { _script = value; OnPropertyChanged(); } }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void Log(string message)
+    {
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            ConsoleLogs.Insert(0, $"{DateTime.Now:HH:mm:ss} - {message}");
+            if (ConsoleLogs.Count > 5) ConsoleLogs.RemoveAt(ConsoleLogs.Count - 1);
+        });
+    }
+
+    public void ClearTerminal()
+    {
+        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+        {
+            ConsoleLogs.Clear();
+        });
     }
 }
