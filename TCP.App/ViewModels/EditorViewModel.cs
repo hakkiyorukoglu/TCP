@@ -73,6 +73,31 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     }
     
     /// <summary>
+    /// Unified collection of layers (Images and Electronics)
+    /// </summary>
+    public ObservableCollection<ILayerItem> Layers { get; } = new();
+
+    private ILayerItem? _selectedLayerItem;
+    public ILayerItem? SelectedLayerItem
+    {
+        get => _selectedLayerItem;
+        set
+        {
+            if (_selectedLayerItem != value)
+            {
+                if (_selectedLayerItem != null) _selectedLayerItem.IsSelected = false;
+                _selectedLayerItem = value;
+                if (_selectedLayerItem != null) _selectedLayerItem.IsSelected = true;
+                
+                SelectedImage = _selectedLayerItem as EditorImage;
+                SelectedBox = _selectedLayerItem as DeviceInstance;
+                
+                OnPropertyChanged();
+            }
+        }
+    }
+    
+    /// <summary>
     /// Collection of background images on the editor
     /// </summary>
     public ObservableCollection<EditorImage> EditorImages { get; } = new();
@@ -85,9 +110,11 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         {
             if (_selectedImage != value)
             {
-                if (_selectedImage != null) _selectedImage.IsSelected = false;
                 _selectedImage = value;
-                if (_selectedImage != null) _selectedImage.IsSelected = true;
+                if (_selectedImage != null && SelectedLayerItem != _selectedImage)
+                {
+                    SelectedLayerItem = _selectedImage;
+                }
                 
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(HasSelectedImage));
@@ -156,6 +183,10 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             if (_selectedBox != value)
             {
                 _selectedBox = value;
+                if (_selectedBox != null && SelectedLayerItem != _selectedBox)
+                {
+                    SelectedLayerItem = _selectedBox;
+                }
                 OnPropertyChanged();
             }
         }
@@ -202,6 +233,23 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         
         // TCP-1.0.3: Initialize AddBoxCommand with CanExecute check
         AddBoxCommand = new RelayCommandWithCanExecute<object>(_ => AddBox(), () => SelectedPaletteBoard != null);
+
+        // Sync layers on collection change
+        EditorImages.CollectionChanged += (s, e) => SyncLayers();
+        PlacedBoxes.CollectionChanged += (s, e) => SyncLayers();
+        SyncLayers();
+    }
+
+    private void SyncLayers()
+    {
+        var selectedId = SelectedLayerItem?.Id;
+        Layers.Clear();
+        foreach (var img in EditorImages) Layers.Add(img);
+        foreach (var box in PlacedBoxes) Layers.Add(box);
+        if (selectedId.HasValue)
+        {
+            SelectedLayerItem = Layers.FirstOrDefault(l => l.Id == selectedId.Value);
+        }
     }
     
     private void LoadImage()

@@ -10,7 +10,7 @@ namespace TCP.App.Models.Editor;
 /// EditorImage - Represents a background or reference image placed on the editor canvas.
 /// Supports multiple images, aspect ratio preservation, opacity, and locking.
 /// </summary>
-public class EditorImage : INotifyPropertyChanged
+public class EditorImage : ILayerItem
 {
     private double _x;
     private double _y;
@@ -19,8 +19,15 @@ public class EditorImage : INotifyPropertyChanged
     private double _opacity = 1.0;
     private bool _isLocked;
     private bool _isSelected;
+    private bool _isVisible = true;
 
     public Guid Id { get; set; } = Guid.NewGuid();
+
+    [JsonIgnore]
+    public string LayerName => Name;
+    
+    [JsonIgnore]
+    public string LayerType => "Image";
 
     /// <summary>
     /// Path to the original image file (used for saving/loading states)
@@ -70,6 +77,12 @@ public class EditorImage : INotifyPropertyChanged
     {
         get => _isSelected;
         set { if (_isSelected != value) { _isSelected = value; OnPropertyChanged(); } }
+    }
+
+    public bool IsVisible
+    {
+        get => _isVisible;
+        set { if (_isVisible != value) { _isVisible = value; OnPropertyChanged(); } }
     }
 
     /// <summary>

@@ -2,6 +2,19 @@
 
 All notable changes to TCP (Train Control Platform) are documented in this file.
 
+## TCP-2.2.0 — Editor Layers Panel
+
+**Release Date**: [Current Date]
+
+### Added
+
+- **Photoshop-style Layers Panel**: A unified layers tree list on the right side of the editor.
+- **Unified Layering**: Both Editor Images and custom Electronic Devices share the same `ILayerItem` abstraction.
+- **Visibility & Locking**: Toggle visibility (Eye icon) and edit-locking (Lock icon) for any layer directly from the layers list.
+- **Canvas Synchronization**: Bi-directional selection state synchronization between the canvas objects and the layers panel.
+- **Selection Highlights**: Selected placed electronic boxes show a clear blue border (`Brush.Accent.Primary`) for visual feedback.
+
+
 ## TCP-2.1.0 — Editor Background & Transparency Features
 
 **Release Date**: [Current Date]

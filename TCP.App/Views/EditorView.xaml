@@ -6,6 +6,7 @@
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:local="clr-namespace:TCP.App"
              xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
+             xmlns:converters="clr-namespace:TCP.App.Converters"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              Background="Transparent">
@@ -22,6 +23,8 @@
     -->
     <UserControl.Resources>
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
+        <converters:LayerTypeToIconConverter x:Key="LayerTypeToIconConverter"/>
     </UserControl.Resources>
     <UserControl.DataContext>
         <viewmodels:EditorViewModel/>
@@ -107,22 +110,28 @@
         </Border>
         
         <!-- Main Content: Palette + Editor Area -->
-        <!-- TCP-1.0.3: 2-column layout (Palette left, Editor right) -->
+        <!-- TCP-1.0.3: 2-column layout (Editor left, Palette+Layers right) -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <!-- Left: Palette (fixed width) -->
-                <ColumnDefinition Width="240"/>
-                <!-- Right: Editor Area (star) -->
+                <!-- Left: Editor Area (star) -->
                 <ColumnDefinition Width="*"/>
+                <!-- Right: Palette and Layers (fixed width) -->
+                <ColumnDefinition Width="260"/>
             </Grid.ColumnDefinitions>
             
-            <!-- Left: Palette Panel -->
-            <!-- TCP-1.0.3: Palette sourced from BoardRegistry -->
-            <Border Grid.Column="0"
+            <!-- Right: Palette + Layers Panel -->
+            <Grid Grid.Column="1" Margin="0,0,16,16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/> <!-- Palette -->
+                    <RowDefinition Height="1*"/> <!-- Layers -->
+                </Grid.RowDefinitions>
+            
+                <!-- Top Right: Palette Panel -->
+                <Border Grid.Row="0"
                     Background="{DynamicResource Brush.Surface}"
                     BorderBrush="{DynamicResource Brush.Border}"
-                    BorderThickness="0,0,1,0"
-                    Margin="16,0,0,16">
+                    BorderThickness="1"
+                    Margin="16,0,0,8">
                 <Grid>
                     <Grid.RowDefinitions>
                         <!-- Header -->
@@ -230,13 +239,119 @@
                                Cursor="Hand"/>
                 </Grid>
             </Border>
+
+            <!-- Bottom Right: Layers Panel -->
+            <Border Grid.Row="1"
+                    Background="{DynamicResource Brush.Surface}"
+                    BorderBrush="{DynamicResource Brush.Border}"
+                    BorderThickness="1"
+                    Margin="16,8,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <!-- Header -->
+                        <RowDefinition Height="Auto"/>
+                        <!-- Layers List -->
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Header: Layers -->
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource Brush.Background.Secondary}"
+                            BorderBrush="{DynamicResource Brush.Border}"
+                            BorderThickness="0,0,0,1"
+                            Padding="16,12">
+                        <TextBlock Text="Layers"
+                                   FontSize="{DynamicResource Font.Heading.Small}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"/>
+                    </Border>
+                    
+                    <!-- Layers List -->
+                    <ListBox Grid.Row="1"
+                             ItemsSource="{Binding Layers}"
+                             SelectedItem="{Binding SelectedLayerItem, Mode=TwoWay}"
+                             BorderThickness="0"
+                             Background="Transparent"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                             Margin="0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{DynamicResource Brush.Background.Primary}"
+                                        BorderThickness="0"
+                                        Padding="12,8"
+                                        Margin="2">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/> <!-- Visibility -->
+                                            <ColumnDefinition Width="Auto"/> <!-- Icon -->
+                                            <ColumnDefinition Width="*"/>    <!-- Name -->
+                                            <ColumnDefinition Width="Auto"/> <!-- Lock -->
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <!-- Visibility Toggle -->
+                                        <ToggleButton Grid.Column="0" IsChecked="{Binding IsVisible, Mode=TwoWay}" 
+                                                      Background="Transparent" BorderThickness="0" Padding="4" Margin="0,0,4,0" Cursor="Hand">
+                                            <TextBlock Text="👁" FontSize="12" Opacity="{Binding IsVisible, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                        </ToggleButton>
+                                        
+                                        <!-- Type Icon -->
+                                        <TextBlock Grid.Column="1" Text="{Binding LayerType, Converter={StaticResource LayerTypeToIconConverter}}" 
+                                                   VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12" Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                        
+                                        <!-- Layer Name -->
+                                        <TextBlock Grid.Column="2" Text="{Binding LayerName, Mode=OneWay}"
+                                                   FontSize="{DynamicResource Font.Body}"
+                                                   FontFamily="{DynamicResource Font.Primary}"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Center"
+                                                   Foreground="{DynamicResource Brush.Text.Primary}"/>
+                                        
+                                        <!-- Lock Toggle -->
+                                        <ToggleButton Grid.Column="3" IsChecked="{Binding IsLocked, Mode=TwoWay}" 
+                                                      Background="Transparent" BorderThickness="0" Padding="4" Margin="4,0,0,0" Cursor="Hand">
+                                            <TextBlock Text="🔒" FontSize="12" Opacity="{Binding IsLocked, Converter={StaticResource BoolToOpacityConverter}}"/>
+                                        </ToggleButton>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ListBoxItem">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderThickness="0"
+                                                    Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="{DynamicResource Brush.Border}"/>
+                                                </Trigger>
+                                                <Trigger Property="IsSelected" Value="True">
+                                                    <Setter Property="Background" Value="{DynamicResource Brush.Accent.Primary}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </Grid>
+            </Border>
+            </Grid>
             
-            <!-- Right: Editor Area -->
+            <!-- Left: Editor Area -->
             <!-- TCP-1.0.2: Editor area with background image display -->
             <!-- TCP-1.0.3: Canvas overlay for placed boxes -->
             <!-- TCP-1.0.4: Viewport transform integration (Zoom/Pan) -->
             <Border x:Name="ViewportContainer"
-                    Grid.Column="1"
+                    Grid.Column="0"
                     Background="{DynamicResource Brush.Surface}"
                     BorderBrush="{DynamicResource Brush.Border}"
                     BorderThickness="1"
@@ -291,6 +406,7 @@
                                 <Style TargetType="ContentPresenter">
                                     <Setter Property="Canvas.Left" Value="{Binding X}"/>
                                     <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+                                    <Setter Property="Visibility" Value="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                 </Style>
                             </ItemsControl.ItemContainerStyle>
                             <ItemsControl.ItemTemplate>
@@ -393,6 +509,7 @@
                                 <Style TargetType="ContentPresenter">
                                     <Setter Property="Canvas.Left" Value="{Binding X, Mode=OneWay}"/>
                                     <Setter Property="Canvas.Top" Value="{Binding Y, Mode=OneWay}"/>
+                                    <Setter Property="Visibility" Value="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                 </Style>
                             </ItemsControl.ItemContainerStyle>
                             <ItemsControl.ItemTemplate>
@@ -410,6 +527,15 @@
                                             MouseLeftButtonDown="Box_MouseLeftButtonDown"
                                             MouseMove="Box_MouseMove"
                                             MouseLeftButtonUp="Box_MouseLeftButtonUp">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Accent.Primary}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
                                         <StackPanel>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>

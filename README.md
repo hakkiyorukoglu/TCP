@@ -1,6 +1,6 @@
 # TCP — Train Control Platform
 
-[![Version](https://img.shields.io/badge/version-TCP--2.1.0-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-TCP--2.2.0-blue.svg)](docs/CHANGELOG.md)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
 
 **TCP (Train Control Platform)**, tren kontrol sistemleri, ray yerleşim tasarımı ve donanım kartları yönetimini birleştiren tam donanımlı, profesyonel bir masaüstü (WPF) uygulamasıdır.
@@ -17,6 +17,7 @@ Uygulama baştan aşağıya gelişmiş yetenekler ve dinamik bir arayüzle donat
   - Şeffaflık (Opacity) kontrolüyle katmanlı haritalar oluşturun.
   - Resimlerin orijinal çözünürlükleri ve en/boy oranları akıllı bellek yöntemiyle korunur.
   - Kaydettiğiniz özel cihazları Harita/Editör paneline ekleyin ve yerleşimlerini tasarlayın.
+  - **Yeni! Katmanlar Paneli:** Photoshop benzeri sağ panel ile haritaya eklenen resimleri ve elektronik cihazları yönetin. Tek tıkla gizleyin (Göz ikonu), kilitleyin (Kilit ikonu) ve seçin.
   - Editör sayfa durumunu **Save Page** ve **Load Page** ile kaydedip geri yükleyin.
 - 🌍 **Dinamik Dil Desteği:** Tek tıkla tamamen **İngilizce** ve **Türkçe** dilleri arasında geçiş yapın. Tüm sistem anında çevrilir.
 - 🌓 **Tema Motoru:** Akıcı ve estetik bir arayüz ile **Karanlık (Dark)** ve **Aydınlık (Light)** temalar arasında geçiş imkanı.

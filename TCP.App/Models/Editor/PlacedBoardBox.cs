@@ -1,3 +1,8 @@
+using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
+
 namespace TCP.App.Models.Editor;
 
 /// <summary>
@@ -9,13 +14,27 @@ namespace TCP.App.Models.Editor;
 /// 
 /// Single Responsibility: Placed box data model
 /// </summary>
-public class PlacedBoardBox
+public class PlacedBoardBox : ILayerItem
 {
+    private double _x;
+    private double _y;
+    private bool _isSelected;
+    private bool _isLocked;
+    private bool _isVisible = true;
+
     /// <summary>
     /// Box ID (immutable, unique identifier)
-    /// TCP-1.0.3: Editor: Add board boxes from registry
     /// </summary>
     public Guid BoxId { get; init; } = Guid.NewGuid();
+    
+    [JsonIgnore]
+    public Guid Id => BoxId;
+    
+    [JsonIgnore]
+    public string LayerName => DisplayName;
+    
+    [JsonIgnore]
+    public string LayerType => "Electronic";
     
     /// <summary>
     /// Board ID (references BoardDefinition.Id)
@@ -43,14 +62,45 @@ public class PlacedBoardBox
     
     /// <summary>
     /// X coordinate (world coords)
-    /// TCP-1.0.3: Editor: Add board boxes from registry
     /// </summary>
-    public double X { get; set; }
+    public double X
+    {
+        get => _x;
+        set { if (_x != value) { _x = value; OnPropertyChanged(); } }
+    }
     
     /// <summary>
     /// Y coordinate (world coords)
-    /// TCP-1.0.3: Editor: Add board boxes from registry
     /// </summary>
-    public double Y { get; set; }
+    public double Y
+    {
+        get => _y;
+        set { if (_y != value) { _y = value; OnPropertyChanged(); } }
+    }
+
+    [JsonIgnore]
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set { if (_isSelected != value) { _isSelected = value; OnPropertyChanged(); } }
+    }
+
+    public bool IsLocked
+    {
+        get => _isLocked;
+        set { if (_isLocked != value) { _isLocked = value; OnPropertyChanged(); } }
+    }
+
+    public bool IsVisible
+    {
+        get => _isVisible;
+        set { if (_isVisible != value) { _isVisible = value; OnPropertyChanged(); } }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }
 
