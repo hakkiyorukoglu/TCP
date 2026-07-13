@@ -98,6 +98,85 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     
     public ICommand LoadImageCommand { get; }
     public ICommand RemoveImageCommand { get; }
+
+    #region Simulation
+    private bool _isSimulationRunning;
+    public bool IsSimulationRunning
+    {
+        get => _isSimulationRunning;
+        set
+        {
+            if (_isSimulationRunning != value)
+            {
+                _isSimulationRunning = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public ICommand StartSimulationCommand { get; }
+    public ICommand StopSimulationCommand { get; }
+
+    private System.Collections.Generic.List<HardwareSimulationEngine> _activeEngines = new();
+
+    private void StartSimulation()
+    {
+        if (IsSimulationRunning) return;
+        IsSimulationRunning = true;
+        _activeEngines.Clear();
+
+        var stations = Layers.OfType<StationInstance>().ToList();
+        var components = Layers.OfType<ComponentInstance>().ToList();
+
+        foreach (var station in stations)
+        {
+            var code = ProjectManager.Instance.GetCustomCode(station.Id);
+            if (string.IsNullOrWhiteSpace(code)) continue;
+
+            var engine = new HardwareSimulationEngine();
+            var globals = new ArduinoGlobals
+            {
+                OnDigitalWrite = (pin, val) =>
+                {
+                    // Find connected component
+                    var comp = components.FirstOrDefault(c => c.StationId == station.Id && c.ConnectedPin == pin);
+                    if (comp != null)
+                    {
+                        System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            comp.IsPowered = (val == 1); // 1 is HIGH
+                        });
+                    }
+                }
+            };
+
+            _activeEngines.Add(engine);
+            // Fire and forget
+            engine.StartSimulation(code, globals);
+        }
+    }
+
+    private void StopSimulation()
+    {
+        if (!IsSimulationRunning) return;
+        
+        foreach (var engine in _activeEngines)
+        {
+            engine.StopSimulation();
+        }
+        _activeEngines.Clear();
+        
+        // Reset all components to unpowered
+        var components = Layers.OfType<ComponentInstance>().ToList();
+        foreach (var comp in components)
+        {
+            comp.IsPowered = false;
+        }
+
+        IsSimulationRunning = false;
+    }
+    #endregion
+
     public ICommand SelectImageCommand { get; }
     public ICommand SaveLayoutCommand { get; }
     public ICommand LoadLayoutCommand { get; }
@@ -233,11 +312,18 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     
     public EditorViewModel()
     {
+        _networkManager = NetworkManager.Instance;
         ViewportState = new ViewportState();
         InputRouter = new EditorInputRouter(ViewportState);
-        _networkManager = NetworkManager.Instance;
+
+        StartSimulationCommand = new RelayCommand<object>(_ => StartSimulation());
+        StopSimulationCommand = new RelayCommand<object>(_ => StopSimulation());
+
+        LoadImageCommand = new RelayCommand<object>(_ => LoadImage());
         
         PlacedBoxes = new ObservableCollection<ILayerItem>();
+        
+
         
         // Populate initially placed boxes
         if (_networkManager.MainPc.X > 0 || _networkManager.MainPc.Y > 0 || _networkManager.MainPc.IsLocked)

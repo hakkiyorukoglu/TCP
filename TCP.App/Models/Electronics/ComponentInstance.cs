@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using System.Linq;
 using TCP.App.Models.Editor;
 
 namespace TCP.App.Models.Electronics;
@@ -39,9 +40,44 @@ public class ComponentInstance : ILayerItem, INotifyPropertyChanged
     public string Name { get; set; } = string.Empty;
     
     /// <summary>
-    /// Which pin on the Mega is this connected to?
+    /// Description of the component
     /// </summary>
-    public string Pin { get; set; } = string.Empty;
+    public string Description { get; set; } = "Sensör / Modül";
+
+    private string _pin = string.Empty;
+    public string Pin
+    {
+        get => _pin;
+        set
+        {
+            _pin = value;
+            // Parse numerical part if possible, e.g. "D2" -> 2, "A0" -> 0, else random pin 1..16
+            int parsed = 0;
+            if (!string.IsNullOrEmpty(value))
+            {
+                var numStr = new string(value.Where(char.IsDigit).ToArray());
+                if (int.TryParse(numStr, out int n)) parsed = n;
+            }
+            ConnectedPin = parsed > 0 && parsed <= 16 ? parsed : 1;
+        }
+    }
+
+    private bool _isPowered;
+    [JsonIgnore]
+    public bool IsPowered
+    {
+        get => _isPowered;
+        set
+        {
+            if (_isPowered != value)
+            {
+                _isPowered = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public int ConnectedPin { get; set; } = 1;
 
     public double X
     {

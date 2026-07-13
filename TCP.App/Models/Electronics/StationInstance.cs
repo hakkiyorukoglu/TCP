@@ -41,6 +41,11 @@ public class StationInstance : ILayerItem, INotifyPropertyChanged
     /// </summary>
     public ObservableCollection<ComponentInstance> Components { get; set; } = new();
 
+    public int PinCount { get; set; } = 16;
+    
+    [JsonIgnore]
+    public System.Collections.Generic.IEnumerable<int> Pins => System.Linq.Enumerable.Range(1, PinCount);
+
     public double X
     {
         get => _x;

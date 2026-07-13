@@ -6,6 +6,7 @@
              xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
              xmlns:local="clr-namespace:TCP.App"
              xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="1000"
              Background="Transparent">
@@ -350,6 +351,7 @@
                                                     <ColumnDefinition Width="Auto"/>
                                                     <ColumnDefinition Width="Auto"/>
                                                     <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
                                                 
                                                 <StackPanel Orientation="Horizontal" Grid.Column="0">
@@ -360,12 +362,18 @@
                                                 <TextBlock Grid.Column="1" Text="{Binding IpAddress}" Foreground="{DynamicResource Brush.Text.Secondary}" VerticalAlignment="Center" Margin="0,0,15,0"/>
                                                 
                                                 <ui:Button Grid.Column="2" Appearance="Secondary"
+                                                           Command="{Binding DataContext.OpenStationScriptCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                           CommandParameter="{Binding}"
+                                                           Padding="6" Margin="0,0,8,0" ToolTip="Yazılım (Kod) Editörü">
+                                                    <TextBlock Text="&lt;/&gt;" FontSize="14"/>
+                                                </ui:Button>
+                                                <ui:Button Grid.Column="3" Appearance="Secondary"
                                                            Command="{Binding DataContext.EditStationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                            CommandParameter="{Binding}"
                                                            Padding="6" Margin="0,0,8,0" ToolTip="İstasyon Ayarları">
                                                     <TextBlock Text="⚙" FontSize="14"/>
                                                 </ui:Button>
-                                                <ui:Button Grid.Column="3" Appearance="Danger"
+                                                <ui:Button Grid.Column="4" Appearance="Danger"
                                                            Command="{Binding DataContext.DeleteStationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                            CommandParameter="{Binding}"
                                                            Padding="6">
@@ -410,6 +418,12 @@
                                                                         </StackPanel>
 
                                                                         <StackPanel Grid.Column="3" Orientation="Horizontal">
+                                                                            <ui:Button Appearance="Secondary"
+                                                                                       Command="{Binding DataContext.OpenComponentScriptCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                                       CommandParameter="{Binding}"
+                                                                                       Padding="4" Margin="0,0,4,0" ToolTip="Yazılım (Kod)">
+                                                                                <TextBlock Text="&lt;/&gt;" FontSize="12"/>
+                                                                            </ui:Button>
                                                                             <ui:Button Appearance="Secondary"
                                                                                        Command="{Binding DataContext.EditComponentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                                                        CommandParameter="{Binding}"

@@ -24,6 +24,11 @@ public class LedColorConverter : IValueConverter
         }
         else if (value is ComponentInstance comp)
         {
+            if (comp.IsPowered)
+            {
+                return new SolidColorBrush(Colors.LimeGreen); // Powered up -> Green
+            }
+
             var template = comp.TemplateId?.ToLowerInvariant() ?? "";
             if (template.Contains("servo"))
                 return new SolidColorBrush(Colors.Red); // Servo -> Red

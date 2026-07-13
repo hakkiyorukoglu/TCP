@@ -57,7 +57,8 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 
-                <!-- Buttons -->
+
+                <!-- Zoom Controls -->
                 <StackPanel Grid.Column="0"
                             Orientation="Horizontal"
                             HorizontalAlignment="Left">
@@ -134,10 +135,34 @@
                     <ui:Button Content="Load Page"
                                Command="{Binding LoadLayoutCommand}"
                                Appearance="Secondary"
-                               Margin="0,0,8,0"
+                               Margin="0,0,16,0"
                                Cursor="Hand"/>
-                </StackPanel>
-                
+                    
+                    <Border Background="{DynamicResource Brush.Background.Secondary}"
+                            BorderBrush="{DynamicResource Brush.Border}"
+                            BorderThickness="1"
+                            CornerRadius="4">
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="▶ Simülasyonu Başlat" 
+                                    Command="{Binding StartSimulationCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Foreground="LimeGreen"
+                                    FontWeight="SemiBold"
+                                    Padding="12,8"
+                                    Cursor="Hand"/>
+                            <Rectangle Width="1" Fill="{DynamicResource Brush.Border}" Margin="0,4"/>
+                            <Button Content="⏹ Durdur" 
+                                    Command="{Binding StopSimulationCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Foreground="Red"
+                                    FontWeight="SemiBold"
+                                    Padding="12,8"
+                                    Cursor="Hand"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>                
                 <!-- Status Text -->
                 <TextBlock Grid.Column="1"
                            Text="{Binding StatusText, Mode=OneWay, FallbackValue='No image loaded'}"
@@ -662,6 +687,8 @@
                                         </Path.Style>
                                         <Path.Data>
                                             <MultiBinding Converter="{StaticResource ConnectionPathConverter}">
+                                                <Binding Path="Source"/>
+                                                <Binding Path="Target"/>
                                                 <Binding Path="Source.X"/>
                                                 <Binding Path="Source.Y"/>
                                                 <Binding Path="Target.X"/>
@@ -747,8 +774,8 @@
                                             BorderThickness="2"
                                             CornerRadius="4"
                                             Padding="12,8"
-                                            MinWidth="150"
-                                            MaxWidth="200"
+                                            Width="160"
+                                            Height="110"
                                             Cursor="SizeAll"
                                             MouseLeftButtonDown="Box_MouseLeftButtonDown"
                                             MouseMove="Box_MouseMove"
@@ -768,68 +795,86 @@
                                                 <MenuItem Header="OTA Yazılım Yükle (Canlı)" Command="{Binding DataContext.OpenOtaUpdateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
                                             </ContextMenu>
                                         </Border.ContextMenu>
-                                        <StackPanel>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="{Binding Name, Mode=OneWay}"
-                                                           FontSize="{DynamicResource Font.Body}"
-                                                           FontFamily="{DynamicResource Font.Primary}"
-                                                           FontWeight="SemiBold"
-                                                           Foreground="{DynamicResource Brush.Text.Primary}"/>
-                                                <ToggleButton Grid.Column="1" 
-                                                              IsChecked="{Binding IsLocked, Mode=TwoWay}"
-                                                              Padding="10" Margin="4,-4,-4,0" Cursor="Hand" 
-                                                              Background="Transparent" BorderThickness="0"
-                                                              MinWidth="44" MinHeight="44"
-                                                              ToolTip="Kilitle/Aç">
-                                                    <TextBlock FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock">
-                                                                <Setter Property="Text" Value="🔓"/>
-                                                                <Setter Property="Opacity" Value="0.5"/>
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding IsLocked}" Value="True">
-                                                                        <Setter Property="Text" Value="🔒"/>
-                                                                        <Setter Property="Opacity" Value="1.0"/>
-                                                                    </DataTrigger>
-                                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                                        <Setter Property="Opacity" Value="1.0"/>
-                                                                    </Trigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
-                                                    </TextBlock>
-                                                </ToggleButton>
-                                            </Grid>
-                                            <!-- Type + Status line -->
-                                            <StackPanel Orientation="Horizontal">
-                                                <!-- LED Indicator -->
-                                                <Ellipse Width="10" Height="10" 
-                                                         Fill="{Binding ., Converter={StaticResource LedColorConverter}}"
-                                                         Margin="0,0,6,0" VerticalAlignment="Center" />
-                                                <TextBlock Text="{Binding LayerType, Converter={StaticResource LayerTypeToIconConverter}}" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                                <Border Background="{DynamicResource Brush.Background.Secondary}"
-                                                        BorderBrush="{DynamicResource Brush.Border}"
-                                                        BorderThickness="1"
-                                                        CornerRadius="2"
-                                                        Padding="4,2"
-                                                        Margin="0,0,8,0">
-                                                    <TextBlock Text="{Binding Type, Mode=OneWay}"
+                                        <Grid>
+                                            <StackPanel>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="{Binding Name, Mode=OneWay}"
+                                                               FontSize="{DynamicResource Font.Body}"
+                                                               FontFamily="{DynamicResource Font.Primary}"
+                                                               FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource Brush.Text.Primary}"/>
+                                                    <ToggleButton Grid.Column="1" 
+                                                                  IsChecked="{Binding IsLocked, Mode=TwoWay}"
+                                                                  Padding="10" Margin="4,-4,-4,0" Cursor="Hand" 
+                                                                  Background="Transparent" BorderThickness="0"
+                                                                  MinWidth="44" MinHeight="44"
+                                                                  ToolTip="Kilitle/Aç">
+                                                        <TextBlock FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Text" Value="🔓"/>
+                                                                    <Setter Property="Opacity" Value="0.5"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsLocked}" Value="True">
+                                                                            <Setter Property="Text" Value="🔒"/>
+                                                                            <Setter Property="Opacity" Value="1.0"/>
+                                                                        </DataTrigger>
+                                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                                            <Setter Property="Opacity" Value="1.0"/>
+                                                                        </Trigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </ToggleButton>
+                                                </Grid>
+                                                <!-- Type + Status line -->
+                                                <StackPanel Orientation="Horizontal">
+                                                    <!-- LED Indicator -->
+                                                    <Ellipse Width="10" Height="10" 
+                                                             Fill="{Binding ., Converter={StaticResource LedColorConverter}}"
+                                                             Margin="0,0,6,0" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{Binding LayerType, Converter={StaticResource LayerTypeToIconConverter}}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                                    <Border Background="{DynamicResource Brush.Background.Secondary}"
+                                                            BorderBrush="{DynamicResource Brush.Border}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="2"
+                                                            Padding="4,2"
+                                                            Margin="0,0,8,0">
+                                                        <TextBlock Text="{Binding Type, Mode=OneWay}"
+                                                                   FontSize="{DynamicResource Font.Caption}"
+                                                                   FontFamily="{DynamicResource Font.Primary}"
+                                                                   Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                                    </Border>
+                                                    <!-- Status -->
+                                                    <TextBlock Text="{Binding IpAddress, Mode=OneWay}"
                                                                FontSize="{DynamicResource Font.Caption}"
                                                                FontFamily="{DynamicResource Font.Primary}"
-                                                               Foreground="{DynamicResource Brush.Text.Secondary}"/>
-                                                </Border>
-                                                <!-- Status -->
-                                                <TextBlock Text="{Binding IpAddress, Mode=OneWay}"
-                                                           FontSize="{DynamicResource Font.Caption}"
-                                                           FontFamily="{DynamicResource Font.Primary}"
-                                                           Foreground="{DynamicResource Brush.Text.Secondary}"
-                                                           VerticalAlignment="Center"/>
+                                                               Foreground="{DynamicResource Brush.Text.Secondary}"
+                                                               VerticalAlignment="Center"/>
+                                                </StackPanel>
                                             </StackPanel>
-                                        </StackPanel>
+                                            
+                                            <!-- STATION PINS OVERLAY -->
+                                            <!-- Only visible if the item has 'Pins' property (i.e. is a StationInstance) -->
+                                            <ItemsControl ItemsSource="{Binding Pins, FallbackValue={x:Null}}" 
+                                                          HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Margin="-10,0,-10,-12">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <UniformGrid Rows="1" />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Ellipse Width="8" Height="8" Fill="#444" Stroke="#888" StrokeThickness="1" ToolTip="{Binding}" Margin="2,0"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Grid>
                                     </Border>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>

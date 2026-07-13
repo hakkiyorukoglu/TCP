@@ -218,6 +218,24 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand EditComponentCommand { get; }
     #endregion
 
+    #region Script Editor
+    private bool _isScriptEditorOpen;
+    public bool IsScriptEditorOpen { get => _isScriptEditorOpen; set { _isScriptEditorOpen = value; OnPropertyChanged(); } }
+
+    private string _scriptEditorTitle = "Kod Editörü";
+    public string ScriptEditorTitle { get => _scriptEditorTitle; set { _scriptEditorTitle = value; OnPropertyChanged(); } }
+
+    private string _scriptEditorCode = "";
+    public string ScriptEditorCode { get => _scriptEditorCode; set { _scriptEditorCode = value; OnPropertyChanged(); } }
+
+    private Guid _currentScriptTargetId;
+
+    public ICommand OpenStationScriptCommand { get; }
+    public ICommand OpenComponentScriptCommand { get; }
+    public ICommand CloseScriptEditorCommand { get; }
+    public ICommand SaveScriptCommand { get; }
+    #endregion
+
     public ICommand AddTemplateCommand { get; }
     public ICommand EditTemplateCommand { get; }
     public ICommand DeleteTemplateCommand { get; }
@@ -247,6 +265,11 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
         DeleteComponentCommand = new RelayCommand<ComponentInstance>(DeleteComponent);
         EditComponentCommand = new RelayCommand<ComponentInstance>(EditComponent);
         
+        OpenStationScriptCommand = new RelayCommand<StationInstance>(OpenStationScript);
+        OpenComponentScriptCommand = new RelayCommand<ComponentInstance>(OpenComponentScript);
+        CloseScriptEditorCommand = new RelayCommand<object>(_ => IsScriptEditorOpen = false);
+        SaveScriptCommand = new RelayCommand<object>(_ => SaveScript());
+
         AddTemplateCommand = new RelayCommand<object>(_ => AddTemplate());
         EditTemplateCommand = new RelayCommand<BoardItem>(EditTemplate);
         DeleteTemplateCommand = new RelayCommand<BoardItem>(DeleteTemplate);
@@ -444,6 +467,33 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
         if (window.ShowDialog() == true)
         {
             NetworkManager.Instance.SaveModems();
+        }
+    }
+
+    private void OpenStationScript(StationInstance? st)
+    {
+        if (st == null) return;
+        _currentScriptTargetId = st.Id;
+        ScriptEditorTitle = $"{st.Name} - Yazılım (C#)";
+        ScriptEditorCode = ProjectManager.Instance.GetCustomCode(st.Id);
+        IsScriptEditorOpen = true;
+    }
+
+    private void OpenComponentScript(ComponentInstance? comp)
+    {
+        if (comp == null) return;
+        _currentScriptTargetId = comp.Id;
+        ScriptEditorTitle = $"{comp.Name} - Yazılım (C#)";
+        ScriptEditorCode = ProjectManager.Instance.GetCustomCode(comp.Id);
+        IsScriptEditorOpen = true;
+    }
+
+    private void SaveScript()
+    {
+        if (_currentScriptTargetId != Guid.Empty)
+        {
+            ProjectManager.Instance.SaveCustomCode(_currentScriptTargetId, ScriptEditorCode);
+            IsScriptEditorOpen = false;
         }
     }
 }

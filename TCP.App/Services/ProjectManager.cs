@@ -214,6 +214,52 @@ public class ProjectManager
         }
     }
 
+    public string GetCustomCode(Guid targetNodeId)
+    {
+        if (_currentScenario == null) return string.Empty;
+        try
+        {
+            using var db = CreateDbContext();
+            var code = db.CustomCodes.FirstOrDefault(c => c.ScenarioId == _currentScenario.Id && c.TargetNodeId == targetNodeId);
+            return code?.CodeContent ?? string.Empty;
+        }
+        catch (Exception)
+        {
+            return string.Empty;
+        }
+    }
+
+    public void SaveCustomCode(Guid targetNodeId, string codeContent)
+    {
+        if (_currentScenario == null) return;
+        try
+        {
+            using var db = CreateDbContext();
+            var code = db.CustomCodes.FirstOrDefault(c => c.ScenarioId == _currentScenario.Id && c.TargetNodeId == targetNodeId);
+            if (code != null)
+            {
+                code.CodeContent = codeContent;
+                db.CustomCodes.Update(code);
+            }
+            else
+            {
+                db.CustomCodes.Add(new CustomCodeDb
+                {
+                    ScenarioId = _currentScenario.Id,
+                    TargetNodeId = targetNodeId,
+                    CodeContent = codeContent,
+                    ScriptType = "CSharp"
+                });
+            }
+            db.SaveChanges();
+            TerminalService.Instance.LogSuccess($"Custom code saved for node: {targetNodeId}");
+        }
+        catch (Exception ex)
+        {
+            TerminalService.Instance.LogError($"Failed to save custom code: {ex.Message}");
+        }
+    }
+
     /// <summary>
     /// Prompts user to save if there are unsaved changes. 
     /// Returns false if user CANCELS the operation.
