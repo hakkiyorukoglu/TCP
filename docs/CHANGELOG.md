@@ -2,6 +2,19 @@
 
 All notable changes to TCP (Train Control Platform) are documented in this file.
 
+## TCP-2.4.0 — Logical Flaws Fixes & Network Elastic Links
+
+**Release Date**: [Current Date]
+
+### Added
+
+- **Elastic Connections (Daisy-Chain)**: Visual elastic strings correctly depicting network hierarchy in Editor map. Neon blue for Modem->Modem, Orange dashed for Modem->Station, and Gray dashed for Station->Component.
+- **Auto-Sync Hierarchy**: Deleting a network item from Electronics view now safely and cleanly removes them from the Editor map. When a Modem is on the map, newly added stations/components auto-deploy to the map.
+- **Main PC Constraint**: Enforced a single outgoing connection restriction for the Main PC node.
+- **Pin Collision Prevention**: Safe check preventing the addition of multiple components to the same pin within a single Station.
+
+---
+
 ## TCP-2.3.0 — 3-Column Layout & TreeView Layer Management
 
 **Release Date**: [Current Date]

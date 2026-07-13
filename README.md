@@ -1,13 +1,13 @@
 # TCP — Train Control Platform
 
-[![Version](https://img.shields.io/badge/version-TCP--2.3.0-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-TCP--2.4.0-blue.svg)](docs/CHANGELOG.md)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
 
 **TCP (Train Control Platform)**, tren kontrol sistemleri, ray yerleşim tasarımı ve donanım kartları yönetimini birleştiren tam donanımlı, profesyonel bir masaüstü (WPF) uygulamasıdır.
 
 ---
 
-## 🚀 Öne Çıkan Özellikler (v2.3.0)
+## 🚀 Öne Çıkan Özellikler (v2.4.0)
 
 Uygulama baştan aşağıya gelişmiş yetenekler ve dinamik bir arayüzle donatıldı:
 
@@ -15,15 +15,15 @@ Uygulama baştan aşağıya gelişmiş yetenekler ve dinamik bir arayüzle donat
 - 🗺 **Gelişmiş Editör ve Haritalama:** 
   - AutoCAD tarzı grid zemin üzerine çoklu arka plan görselleri (harita veya planlar) yükleyin.
   - Şeffaflık (Opacity) kontrolüyle katmanlı haritalar oluşturun.
-  - Resimlerin orijinal çözünürlükleri ve en/boy oranları akıllı bellek yöntemiyle korunur.
   - Kaydettiğiniz özel cihazları Harita/Editör paneline ekleyin ve yerleşimlerini tasarlayın.
+  - **Esnek Ağ İplikleri:** Modem, İstasyon ve Parçalar (Components) arasındaki bağlantı hiyerarşisini gösteren (Mavi, Turuncu, Gri) elastik kesik çizgiler.
   - **3-Sütunlu Profesyonel Arayüz:** Sol tarafta cihaz paleti, ortada geniş çizim alanı ve sağda katmanlar ağacı ile rahat çalışma imkanı.
-  - **Ağaç Yapılı (TreeView) Katmanlar:** Cihazlarınızı konumlarına göre otomatik klasörleyen gelişmiş katman paneli.
+  - **Ağaç Yapılı (TreeView) Katmanlar:** Cihazlarınızı konumlarına göre otomatik klasörleyen gelişmiş katman paneli. Tam otomatik senkronizasyon ile silinen öğelerin anında haritadan da kaldırılması.
   - **Sağ Tık Menüsü (Context Menu):** Katman ağacındaki cihazlara sağ tıklayarak silebilir veya detaylı ayarlarını değiştirebileceğiniz "Özellikler" ekranına erişebilirsiniz.
   - Editör sayfa durumunu **Save Page** ve **Load Page** ile kaydedip geri yükleyin.
 - 🌍 **Dinamik Dil Desteği:** Tek tıkla tamamen **İngilizce** ve **Türkçe** dilleri arasında geçiş yapın. Tüm sistem anında çevrilir.
 - 🌓 **Tema Motoru:** Akıcı ve estetik bir arayüz ile **Karanlık (Dark)** ve **Aydınlık (Light)** temalar arasında geçiş imkanı.
-- ⌨ **Terminal ve Konsol:** Her sayfada görünen, katlanabilir ve uygulamanın arka planında olan biteni gösteren canlı terminal konsolu.
+- ⌨ **Terminal ve Konsol:** Her sayfada görünen, katlanabilir ve uygulamanın arka planında olan biteni gösteren canlı terminal konsolu. Pin çakışmaları ve donanım hataları anında burada raporlanır.
 - 🔍 **Akıllı Arama:** Uygulama içinde ne aradığınızı birkaç harfle bulmanızı sağlayan dinamik sonuçlu arama motoru.
 
 ---
