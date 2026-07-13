@@ -6,7 +6,7 @@
              xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="{DynamicResource Brush.Background.Primary}">
+             Background="Transparent">
     <!--
         HomeView.xaml - Ana sayfa view
         

@@ -16,6 +16,25 @@
     <system:String x:Key="String.Language">Language</system:String>
     <system:String x:Key="String.Appearance">Appearance</system:String>
     <system:String x:Key="String.Application">Application</system:String>
+    <system:String x:Key="String.TerminalPanel">Terminal Panel</system:String>
+    <system:String x:Key="String.ShowTerminal">Show Terminal</system:String>
+    <system:String x:Key="String.KeyboardShortcuts">Keyboard Shortcuts</system:String>
+    <system:String x:Key="String.DefaultPaths">Default Paths</system:String>
+    <system:String x:Key="String.PerformanceOptions">Performance Options</system:String>
+    <system:String x:Key="String.About">About</system:String>
+    <system:String x:Key="String.SelectCategory">Select a category to view settings</system:String>
+    <system:String x:Key="String.ThemeDesc">Theme and visual settings</system:String>
+    <system:String x:Key="String.ShortcutsDesc">Keyboard shortcuts</system:String>
+    <system:String x:Key="String.PathsDesc">Default paths and directories</system:String>
+    <system:String x:Key="String.PerfDesc">Performance options</system:String>
+    <system:String x:Key="String.AboutDesc">Application information</system:String>
+    <system:String x:Key="String.Shortcuts">Shortcuts</system:String>
+    <system:String x:Key="String.Paths">Paths</system:String>
+    <system:String x:Key="String.Performance">Performance</system:String>
+    <system:String x:Key="String.Info">Info</system:String>
+    <system:String x:Key="String.AboutTCP">About TCP</system:String>
+    <system:String x:Key="String.VersionHistory">Version History</system:String>
+    <system:String x:Key="String.Architecture">Architecture</system:String>
 
     <!-- Canvas -->
     <system:String x:Key="String.LoadImage">Load Image</system:String>

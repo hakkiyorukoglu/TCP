@@ -49,6 +49,8 @@ C:\Users\nurul\Desktop\hakkı\TCP\TCP.Theming\obj\Debug\net8.0-windows\ref\TCP.T
 C:\Users\yoruk\Desktop\TCP\TCP.Theming\bin\Debug\net8.0-windows\TCP.Theming.deps.json
 C:\Users\yoruk\Desktop\TCP\TCP.Theming\bin\Debug\net8.0-windows\TCP.Theming.dll
 C:\Users\yoruk\Desktop\TCP\TCP.Theming\bin\Debug\net8.0-windows\TCP.Theming.pdb
+C:\Users\yoruk\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\Themes\Languages\Strings.en-US.baml
+C:\Users\yoruk\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\Themes\Languages\Strings.tr-TR.baml
 C:\Users\yoruk\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\Themes\SafeDefaults.baml
 C:\Users\yoruk\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\Themes\Tokens\ThemeBrushes.baml
 C:\Users\yoruk\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\Themes\Tokens\ThemeColors.baml
@@ -70,5 +72,3 @@ C:\Users\yoruk\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\TCP.Theming.dll
 C:\Users\yoruk\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\refint\TCP.Theming.dll
 C:\Users\yoruk\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\TCP.Theming.pdb
 C:\Users\yoruk\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\ref\TCP.Theming.dll
-C:\Users\yoruk\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\Themes\Languages\Strings.en-US.baml
-C:\Users\yoruk\Desktop\TCP\TCP.Theming\obj\Debug\net8.0-windows\Themes\Languages\Strings.tr-TR.baml

@@ -80,7 +80,21 @@ public class SettingsViewModel : ViewModelBase, INotifyPropertyChanged
             if (_selectedLanguage != value)
             {
                 _selectedLanguage = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(SelectedLanguage));
+            }
+        }
+    }
+
+    private bool _showTerminal;
+    public bool ShowTerminal
+    {
+        get => _showTerminal;
+        set
+        {
+            if (_showTerminal != value)
+            {
+                _showTerminal = value;
+                OnPropertyChanged(nameof(ShowTerminal));
             }
         }
     }
@@ -99,20 +113,23 @@ public class SettingsViewModel : ViewModelBase, INotifyPropertyChanged
     {
         Categories = new ObservableCollection<SettingsCategory>
         {
-            new SettingsCategory { Name = "Appearance", Description = "Theme and visual settings" },
-            new SettingsCategory { Name = "Shortcuts", Description = "Keyboard shortcuts" },
-            new SettingsCategory { Name = "Paths", Description = "Default paths and directories" },
-            new SettingsCategory { Name = "Performance", Description = "Performance options" },
-            new SettingsCategory { Name = "About", Description = "Application information" }
+            new SettingsCategory { Id = "Appearance", Name = GetString("String.Appearance"), Description = GetString("String.ThemeDesc") },
+            new SettingsCategory { Id = "Shortcuts", Name = GetString("String.Shortcuts"), Description = GetString("String.ShortcutsDesc") },
+            new SettingsCategory { Id = "Paths", Name = GetString("String.Paths"), Description = GetString("String.PathsDesc") },
+            new SettingsCategory { Id = "Performance", Name = GetString("String.Performance"), Description = GetString("String.PerfDesc") },
+            new SettingsCategory { Id = "About", Name = GetString("String.About"), Description = GetString("String.AboutDesc") }
         };
         
         // TCP-0.8.2: Initialize shortcuts from registry
         var shortcutsRegistry = ShortcutsRegistry.Instance;
         Shortcuts = new ObservableCollection<ShortcutItem>(shortcutsRegistry.GetAll());
         
+        var settings = App.SettingsService.Load();
+
         Languages = new ObservableCollection<string> { "tr-TR", "en-US" };
-        var settings = App.LoadedSettings ?? new TCP.App.Models.AppSettings();
+        
         SelectedLanguage = settings.Language;
+        ShowTerminal = settings.ShowTerminal;
 
         SaveCommand = new RelayCommand<object>(_ => SaveSettings());
         
@@ -120,16 +137,22 @@ public class SettingsViewModel : ViewModelBase, INotifyPropertyChanged
         SelectedCategory = Categories.Count > 0 ? Categories[0] : null;
     }
 
+    private string GetString(string key)
+    {
+        return System.Windows.Application.Current.TryFindResource(key) as string ?? key;
+    }
+
     private void SaveSettings()
     {
-        var settings = App.LoadedSettings ?? new TCP.App.Models.AppSettings();
+        var settings = App.SettingsService.Load();
         settings.Language = SelectedLanguage;
-        
+        settings.ShowTerminal = ShowTerminal;
         App.SettingsService.Save(settings);
         App.UpdateLoadedSettings(settings);
         
         LanguageService.ApplyLanguage(SelectedLanguage);
-        NotificationService.Instance.ShowSuccess("Saved", "Settings updated");
+        TerminalService.Instance.SetVisibility(ShowTerminal);
+        TerminalService.Instance.LogSuccess("Saved: Settings updated");
     }
 }
 
@@ -141,7 +164,12 @@ public class SettingsViewModel : ViewModelBase, INotifyPropertyChanged
 public class SettingsCategory
 {
     /// <summary>
-    /// Kategori adı
+    /// Kategori ID'si (Trigger'lar için)
+    /// </summary>
+    public string Id { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Kategori adı (UI'da gösterilecek isim)
     /// </summary>
     public string Name { get; set; } = string.Empty;
     
@@ -150,3 +178,4 @@ public class SettingsCategory
     /// </summary>
     public string Description { get; set; } = string.Empty;
 }
+

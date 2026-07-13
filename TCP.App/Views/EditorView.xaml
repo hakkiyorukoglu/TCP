@@ -3,11 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:local="clr-namespace:TCP.App"
              xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="{DynamicResource Brush.Background.Primary}">
+             Background="Transparent">
     <!--
         EditorView.xaml - Editor view
         
@@ -53,169 +54,37 @@
                             Orientation="Horizontal"
                             HorizontalAlignment="Left">
                     <!-- Load Image Button -->
-                    <Button Content="Load Image"
-                            Command="{Binding LoadImageCommand}"
-                            Padding="12,6"
-                            Margin="0,0,8,0"
-                            Background="{DynamicResource Brush.Accent.Primary}"
-                            Foreground="White"
-                            BorderThickness="0"
-                            FontSize="{DynamicResource Font.Body}"
-                            FontFamily="{DynamicResource Font.Primary}"
-                            Cursor="Hand">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}"
-                                                    CornerRadius="4"
-                                                    Padding="{TemplateBinding Padding}">
-                                                <ContentPresenter HorizontalAlignment="Center"
-                                                                  VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Opacity" Value="0.9"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                    <ui:Button Content="Load Image"
+                               Command="{Binding LoadImageCommand}"
+                               Appearance="Primary"
+                               Margin="0,0,8,0"
+                               Cursor="Hand"/>
                     
                     <!-- Fit Button -->
-                    <Button Content="Fit"
-                            Command="{Binding SetFitModeCommand}"
-                            Padding="12,6"
-                            Margin="0,0,8,0"
-                            Background="{DynamicResource Brush.Background.Secondary}"
-                            Foreground="{DynamicResource Brush.Text.Primary}"
-                            BorderBrush="{DynamicResource Brush.Border}"
-                            BorderThickness="1"
-                            FontSize="{DynamicResource Font.Body}"
-                            FontFamily="{DynamicResource Font.Primary}"
-                            Cursor="Hand">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}"
-                                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                                    CornerRadius="4"
-                                                    Padding="{TemplateBinding Padding}">
-                                                <ContentPresenter HorizontalAlignment="Center"
-                                                                  VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Opacity" Value="0.9"/>
-                                    </Trigger>
-                                    <DataTrigger Binding="{Binding IsFitMode, Mode=OneWay}" Value="True">
-                                        <Setter Property="Background" Value="{DynamicResource Brush.Accent.Primary}"/>
-                                        <Setter Property="Foreground" Value="White"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                    <ui:Button Content="Fit"
+                               Command="{Binding SetFitModeCommand}"
+                               Appearance="Secondary"
+                               Margin="0,0,8,0"
+                               Cursor="Hand"/>
                     
                     <!-- Actual Button -->
-                    <Button Content="Actual"
-                            Command="{Binding SetActualModeCommand}"
-                            Padding="12,6"
-                            Margin="0,0,8,0"
-                            Background="{DynamicResource Brush.Background.Secondary}"
-                            Foreground="{DynamicResource Brush.Text.Primary}"
-                            BorderBrush="{DynamicResource Brush.Border}"
-                            BorderThickness="1"
-                            FontSize="{DynamicResource Font.Body}"
-                            FontFamily="{DynamicResource Font.Primary}"
-                            Cursor="Hand">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}"
-                                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                                    CornerRadius="4"
-                                                    Padding="{TemplateBinding Padding}">
-                                                <ContentPresenter HorizontalAlignment="Center"
-                                                                  VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Opacity" Value="0.9"/>
-                                    </Trigger>
-                                    <DataTrigger Binding="{Binding IsActualMode, Mode=OneWay}" Value="True">
-                                        <Setter Property="Background" Value="{DynamicResource Brush.Accent.Primary}"/>
-                                        <Setter Property="Foreground" Value="White"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                    <ui:Button Content="Actual"
+                               Command="{Binding SetActualModeCommand}"
+                               Appearance="Secondary"
+                               Margin="0,0,8,0"
+                               Cursor="Hand"/>
                     
                     <!-- Clear Button -->
-                    <Button Content="Clear"
-                            Command="{Binding ClearImageCommand}"
-                            Padding="12,6"
-                            Margin="0,0,8,0"
-                            Background="{DynamicResource Brush.Background.Secondary}"
-                            Foreground="{DynamicResource Brush.Text.Primary}"
-                            BorderBrush="{DynamicResource Brush.Border}"
-                            BorderThickness="1"
-                            FontSize="{DynamicResource Font.Body}"
-                            FontFamily="{DynamicResource Font.Primary}"
-                            Cursor="Hand">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}"
-                                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                                    CornerRadius="4"
-                                                    Padding="{TemplateBinding Padding}">
-                                                <ContentPresenter HorizontalAlignment="Center"
-                                                                  VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Opacity" Value="0.9"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                    <ui:Button Content="Clear"
+                               Command="{Binding ClearImageCommand}"
+                               Appearance="Danger"
+                               Margin="0,0,8,0"
+                               Cursor="Hand"/>
                     
                     <!-- Lock Button -->
                     <ToggleButton Content="{DynamicResource String.LockImage}"
                                   IsChecked="{Binding IsLocked}"
-                                  Padding="12,6"
                                   Margin="0,0,8,0"
-                                  Background="{DynamicResource Brush.Background.Secondary}"
-                                  Foreground="{DynamicResource Brush.Text.Primary}"
-                                  BorderBrush="{DynamicResource Brush.Border}"
-                                  BorderThickness="1"
-                                  FontSize="{DynamicResource Font.Body}"
-                                  FontFamily="{DynamicResource Font.Primary}"
                                   Cursor="Hand"/>
                 </StackPanel>
                 
@@ -286,8 +155,8 @@
                                         Padding="12,8"
                                         Margin="2">
                                     <StackPanel>
-                                        <!-- DisplayName (bold) -->
-                                        <TextBlock Text="{Binding DisplayName, Mode=OneWay}"
+                                        <!-- CustomName (bold) -->
+                                        <TextBlock Text="{Binding CustomName, Mode=OneWay}"
                                                    FontSize="{DynamicResource Font.Body}"
                                                    FontFamily="{DynamicResource Font.Primary}"
                                                    FontWeight="SemiBold"
@@ -308,7 +177,7 @@
                                                            Foreground="{DynamicResource Brush.Text.Secondary}"/>
                                             </Border>
                                             <!-- Status -->
-                                            <TextBlock Text="{Binding Status, Mode=OneWay, StringFormat='Status: {0}'}"
+                                            <TextBlock Text="{Binding IpAddress, Mode=OneWay, StringFormat='IP: {0}'}"
                                                        FontSize="{DynamicResource Font.Caption}"
                                                        FontFamily="{DynamicResource Font.Primary}"
                                                        Foreground="{DynamicResource Brush.Text.Secondary}"
@@ -346,43 +215,13 @@
                     </ListBox>
                     
                     <!-- Add to Map Button -->
-                    <Button Grid.Row="2"
-                            Content="Add to Map"
-                            Command="{Binding AddBoxCommand}"
-                            HorizontalAlignment="Stretch"
-                            Padding="16,8"
-                            Margin="16"
-                            Background="{DynamicResource Brush.Accent.Primary}"
-                            Foreground="White"
-                            BorderThickness="0"
-                            FontSize="{DynamicResource Font.Body}"
-                            FontFamily="{DynamicResource Font.Primary}"
-                            Cursor="Hand">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}"
-                                                    CornerRadius="4"
-                                                    Padding="{TemplateBinding Padding}">
-                                                <ContentPresenter HorizontalAlignment="Center"
-                                                                  VerticalAlignment="Center"/>
-                                            </Border>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Opacity" Value="0.9"/>
-                                    </Trigger>
-                                    <Trigger Property="IsEnabled" Value="False">
-                                        <Setter Property="Opacity" Value="0.5"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                    <ui:Button Grid.Row="2"
+                               Content="Add to Map"
+                               Command="{Binding AddBoxCommand}"
+                               Appearance="Primary"
+                               HorizontalAlignment="Stretch"
+                               Margin="16"
+                               Cursor="Hand"/>
                 </Grid>
             </Border>
             
@@ -517,14 +356,28 @@
                                             CornerRadius="4"
                                             Padding="12,8"
                                             MinWidth="150"
-                                            MaxWidth="200">
+                                            MaxWidth="200"
+                                            Cursor="SizeAll"
+                                            MouseLeftButtonDown="Box_MouseLeftButtonDown"
+                                            MouseMove="Box_MouseMove"
+                                            MouseLeftButtonUp="Box_MouseLeftButtonUp">
                                         <StackPanel>
-                                            <!-- DisplayName (bold) -->
-                                            <TextBlock Text="{Binding DisplayName, Mode=OneWay}"
-                                                       FontSize="{DynamicResource Font.Body}"
-                                                       FontFamily="{DynamicResource Font.Primary}"
-                                                       FontWeight="SemiBold"
-                                                       Foreground="{DynamicResource Brush.Text.Primary}"/>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding CustomName, Mode=OneWay}"
+                                                           FontSize="{DynamicResource Font.Body}"
+                                                           FontFamily="{DynamicResource Font.Primary}"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="{DynamicResource Brush.Text.Primary}"/>
+                                                <ToggleButton Grid.Column="1" 
+                                                              IsChecked="{Binding IsLocked, Mode=TwoWay}"
+                                                              Padding="4" Margin="4,0,0,0" Cursor="Hand" Background="Transparent" BorderThickness="0">
+                                                    <TextBlock Text="🔒" FontSize="10"/>
+                                                </ToggleButton>
+                                            </Grid>
                                             <!-- Type + Status line -->
                                             <StackPanel Orientation="Horizontal"
                                                         Margin="0,4,0,0">
@@ -541,7 +394,7 @@
                                                                Foreground="{DynamicResource Brush.Text.Secondary}"/>
                                                 </Border>
                                                 <!-- Status -->
-                                                <TextBlock Text="{Binding Status, Mode=OneWay}"
+                                                <TextBlock Text="{Binding IpAddress, Mode=OneWay}"
                                                            FontSize="{DynamicResource Font.Caption}"
                                                            FontFamily="{DynamicResource Font.Primary}"
                                                            Foreground="{DynamicResource Brush.Text.Secondary}"

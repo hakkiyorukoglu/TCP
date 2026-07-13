@@ -3,11 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
              xmlns:services="clr-namespace:TCP.App.Services"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="{DynamicResource Brush.Background.Primary}">
+             Background="Transparent">
     <!--
         InfoView.xaml - Info panel view
         
@@ -407,37 +408,13 @@
                             </ScrollViewer>
                         </Border>
                         <!-- TCP-1.0.0: Export Cursor Context button -->
-                        <Button Content="Export Cursor Context (TXT)"
-                                Command="{Binding ExportCursorContextCommand, Mode=OneWay}"
-                                HorizontalAlignment="Left"
-                                Padding="16,8"
-                                MinWidth="200"
-                                Background="{DynamicResource Brush.Accent.Primary}"
-                                Foreground="{DynamicResource Brush.Text.Primary}"
-                                BorderThickness="0"
-                                Cursor="Hand">
-                            <Button.Style>
-                                <Style TargetType="Button">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border Background="{TemplateBinding Background}"
-                                                        CornerRadius="4"
-                                                        Padding="{TemplateBinding Padding}">
-                                                    <ContentPresenter HorizontalAlignment="Center"
-                                                                      VerticalAlignment="Center"/>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource Brush.Accent.Secondary}"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                        </Button>
+                        <ui:Button Content="Export Cursor Context (TXT)"
+                                   Command="{Binding ExportCursorContextCommand, Mode=OneWay}"
+                                   Appearance="Primary"
+                                   HorizontalAlignment="Left"
+                                   Padding="16,8"
+                                   MinWidth="200"
+                                   Cursor="Hand" />
                     </StackPanel>
                     
                     <!-- Export TXT Button - TCP-0.9.1: Info panel & TXT export -->
@@ -461,37 +438,13 @@
                                        TextWrapping="Wrap"
                                        Margin="0,0,0,12"/>
                             <!-- TCP-0.9.1b: Architecture section binding crash fix - Command binding OneWay -->
-                            <Button Content="Export TXT"
-                                    Command="{Binding ExportTxtCommand, Mode=OneWay}"
-                                    HorizontalAlignment="Left"
-                                    Padding="16,8"
-                                    MinWidth="120"
-                                    Background="{DynamicResource Brush.Accent.Primary}"
-                                    Foreground="{DynamicResource Brush.Text.Primary}"
-                                    BorderThickness="0"
-                                    Cursor="Hand">
-                                <Button.Style>
-                                    <Style TargetType="Button">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="Button">
-                                                    <Border Background="{TemplateBinding Background}"
-                                                            CornerRadius="4"
-                                                            Padding="{TemplateBinding Padding}">
-                                                        <ContentPresenter HorizontalAlignment="Center"
-                                                                          VerticalAlignment="Center"/>
-                                                    </Border>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="{DynamicResource Brush.Accent.Secondary}"/>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
+                            <ui:Button Content="Export TXT"
+                                       Command="{Binding ExportTxtCommand, Mode=OneWay}"
+                                       Appearance="Primary"
+                                       HorizontalAlignment="Left"
+                                       Padding="16,8"
+                                       MinWidth="120"
+                                       Cursor="Hand" />
                         </StackPanel>
                     </Border>
                     

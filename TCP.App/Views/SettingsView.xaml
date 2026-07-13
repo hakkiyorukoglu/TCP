@@ -3,11 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
              xmlns:services="clr-namespace:TCP.App.Services"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="{DynamicResource Brush.Background.Primary}">
+             Background="Transparent">
     <!--
         SettingsView.xaml - Settings modülü view
         
@@ -142,7 +143,7 @@
                             <Style TargetType="StackPanel">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedCategory.Name}" Value="Appearance">
+                                    <DataTrigger Binding="{Binding SelectedCategory.Id}" Value="Appearance">
                                         <Setter Property="Visibility" Value="Visible"/>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -185,11 +186,23 @@
                                   Width="200" HorizontalAlignment="Left"
                                   Margin="0,0,0,12" />
 
+                        <!-- Show Terminal Option -->
+                        <TextBlock Text="{DynamicResource String.TerminalPanel}"
+                                   FontSize="{DynamicResource Font.Heading.Small}"
+                                   FontFamily="{DynamicResource Font.Primary}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                   Margin="0,16,0,8"/>
+                        <ui:ToggleSwitch Content="{DynamicResource String.ShowTerminal}"
+                                         IsChecked="{Binding ShowTerminal}"
+                                         Margin="0,0,0,12"/>
+
                         <!-- Save Button -->
-                        <Button Content="{DynamicResource String.Save}"
-                                Command="{Binding SaveCommand}"
-                                Width="100" HorizontalAlignment="Left"
-                                Margin="0,16,0,0" Padding="8,4" />
+                        <ui:Button Content="{DynamicResource String.Save}"
+                                   Command="{Binding SaveCommand}"
+                                   Appearance="Primary"
+                                   Width="100" HorizontalAlignment="Left"
+                                   Margin="0,16,0,0" Padding="8,4" />
                     </StackPanel>
                     
                     <!-- Shortcuts Category Content -->
@@ -198,13 +211,13 @@
                             <Style TargetType="StackPanel">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedCategory.Name}" Value="Shortcuts">
+                                    <DataTrigger Binding="{Binding SelectedCategory.Id}" Value="Shortcuts">
                                         <Setter Property="Visibility" Value="Visible"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock Text="Keyboard Shortcuts"
+                        <TextBlock Text="{DynamicResource String.KeyboardShortcuts}"
                                    FontSize="{DynamicResource Font.Heading.Small}"
                                    FontFamily="{DynamicResource Font.Primary}"
                                    FontWeight="SemiBold"
@@ -283,13 +296,13 @@
                             <Style TargetType="StackPanel">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedCategory.Name}" Value="Paths">
+                                    <DataTrigger Binding="{Binding SelectedCategory.Id}" Value="Paths">
                                         <Setter Property="Visibility" Value="Visible"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock Text="Default Paths"
+                        <TextBlock Text="{DynamicResource String.DefaultPaths}"
                                    FontSize="{DynamicResource Font.Heading.Small}"
                                    FontFamily="{DynamicResource Font.Primary}"
                                    FontWeight="SemiBold"
@@ -314,13 +327,13 @@
                             <Style TargetType="StackPanel">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedCategory.Name}" Value="Performance">
+                                    <DataTrigger Binding="{Binding SelectedCategory.Id}" Value="Performance">
                                         <Setter Property="Visibility" Value="Visible"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock Text="Performance Options"
+                        <TextBlock Text="{DynamicResource String.PerformanceOptions}"
                                    FontSize="{DynamicResource Font.Heading.Small}"
                                    FontFamily="{DynamicResource Font.Primary}"
                                    FontWeight="SemiBold"
@@ -340,13 +353,13 @@
                             <Style TargetType="StackPanel">
                                 <Setter Property="Visibility" Value="Collapsed"/>
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding SelectedCategory.Name}" Value="About">
+                                    <DataTrigger Binding="{Binding SelectedCategory.Id}" Value="About">
                                         <Setter Property="Visibility" Value="Visible"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock Text="About"
+                        <TextBlock Text="{DynamicResource String.About}"
                                    FontSize="{DynamicResource Font.Heading.Small}"
                                    FontFamily="{DynamicResource Font.Primary}"
                                    FontWeight="SemiBold"
@@ -378,7 +391,7 @@
                     </StackPanel>
                     
                     <!-- Fallback message when no category selected -->
-                    <TextBlock Text="Select a category to view settings"
+                    <TextBlock Text="{DynamicResource String.SelectCategory}"
                                FontSize="{DynamicResource Font.Body}"
                                FontFamily="{DynamicResource Font.Primary}"
                                Foreground="{DynamicResource Brush.Text.Secondary}"

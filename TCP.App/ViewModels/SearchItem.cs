@@ -8,9 +8,16 @@ namespace TCP.App.ViewModels;
 public class SearchItem
 {
     /// <summary>
-    /// Display title shown in suggestions
+    /// Resource key for localization
     /// </summary>
-    public string Title { get; set; } = string.Empty;
+    public string TitleKey { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Display title shown in suggestions (Localized)
+    /// </summary>
+    public string Title => !string.IsNullOrEmpty(TitleKey) 
+        ? (System.Windows.Application.Current?.TryFindResource(TitleKey) as string ?? TitleKey) 
+        : string.Empty;
     
     /// <summary>
     /// Keywords for matching search queries

@@ -6,9 +6,10 @@
              xmlns:viewmodels="clr-namespace:TCP.App.ViewModels"
              xmlns:local="clr-namespace:TCP.App"
              xmlns:components="clr-namespace:TCP.App.UI.Components"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="{DynamicResource Brush.Background.Primary}">
+             Background="Transparent">
     <UserControl.Resources>
         <local:IsNullToVisibilityConverter x:Key="IsNullToVisibilityConverter"/>
         <local:ThicknessConverter x:Key="ThicknessConverter"/>
@@ -61,11 +62,15 @@
                     <RowDefinition Height="Auto"/>
                     <!-- Board List -->
                     <RowDefinition Height="*"/>
+                    <!-- My Devices Header -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- My Devices List -->
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 
                 <!-- Header -->
                 <TextBlock Grid.Row="0"
-                           Text="Boards"
+                           Text="Templates"
                            FontSize="{DynamicResource Font.Heading.Medium}"
                            FontWeight="SemiBold"
                            Foreground="{DynamicResource Brush.Text.Primary}"
@@ -141,6 +146,70 @@
                         </Style>
                     </ListBox.ItemContainerStyle>
                 </ListBox>
+
+                <!-- My Devices Header -->
+                <TextBlock Grid.Row="2"
+                           Text="My Devices"
+                           FontSize="{DynamicResource Font.Heading.Medium}"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource Brush.Text.Primary}"
+                           Margin="15,15,15,10"/>
+                
+                <!-- My Devices List -->
+                <ListBox Grid.Row="3"
+                         ItemsSource="{Binding MyDevices}"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         Margin="10,0,10,10">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="ItemBorder"
+                                    Background="{DynamicResource Brush.Background.Primary}"
+                                    BorderBrush="{DynamicResource Brush.Border}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Margin="0,5,0,0"
+                                    Padding="10,8">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="💻"
+                                                   FontSize="{DynamicResource Font.Heading.Medium}"
+                                                   Foreground="{DynamicResource Brush.Accent.Primary}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,0"/>
+                                        <TextBlock Text="{Binding CustomName}"
+                                                   FontSize="{DynamicResource Font.Body}"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding Type}"
+                                               FontSize="{DynamicResource Font.Caption}"
+                                               Foreground="{DynamicResource Brush.Text.Secondary}"
+                                               Margin="32,2,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="0"
+                                                Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
             </Grid>
         </Border>
         
@@ -156,12 +225,23 @@
                 Margin="10,10,10,5">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="20">
-                    <!-- Board Name -->
-                    <TextBlock Text="{Binding SelectedBoard.Name, FallbackValue='No board selected'}"
-                               FontSize="{DynamicResource Font.Heading.Large}"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource Brush.Text.Primary}"
-                               Margin="0,0,0,16"/>
+                    <!-- Board Name and Create Button -->
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding SelectedBoard.Name, FallbackValue='No board selected'}"
+                                   FontSize="{DynamicResource Font.Heading.Large}"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"/>
+                        <ui:Button Grid.Column="1"
+                                   Content="Create Device"
+                                   Command="{Binding OpenCreatePopupCommand}"
+                                   Appearance="Primary"
+                                   Cursor="Hand"/>
+                    </Grid>
                     
                     <!-- Summary Cards using reusable components -->
                     <!-- TCP-0.6.1: Using BoardDetailCard and KeyValueRow components -->
@@ -226,6 +306,57 @@
                     </components:BoardDetailCard>
                 </StackPanel>
             </ScrollViewer>
+        </Border>
+
+        <!-- CREATE DEVICE POPUP OVERLAY -->
+        <Border Grid.ColumnSpan="2"
+                Grid.RowSpan="2"
+                Background="#80000000"
+                Panel.ZIndex="100"
+                Visibility="{Binding IsCreatePopupOpen, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border Background="{DynamicResource Brush.Surface}"
+                    BorderBrush="{DynamicResource Brush.Border}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Width="400"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Padding="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Text="Create New Device" FontSize="{DynamicResource Font.Heading.Medium}" FontWeight="SemiBold" Margin="0,0,0,20"/>
+                    
+                    <StackPanel Grid.Row="1" Margin="0,0,0,20">
+                        <TextBlock Text="Device Name:" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewDeviceName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                        
+                        <TextBlock Text="IP Address:" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewDeviceIp, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                        
+                        <TextBlock Text="Port:" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewDevicePort, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                        
+                        <TextBlock Text="MAC Address:" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewDeviceMac, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                        
+                        <TextBlock Text="LAN Cable:" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewDeviceLanCable, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                        
+                        <TextBlock Text="Location:" Margin="0,0,0,4"/>
+                        <ui:TextBox Text="{Binding NewDeviceLocation, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <ui:Button Content="Cancel" Command="{Binding CloseCreatePopupCommand}" Margin="0,0,10,0"/>
+                        <ui:Button Content="Save" Command="{Binding SaveDeviceCommand}" Appearance="Primary"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Border>
     </Grid>
 </UserControl>

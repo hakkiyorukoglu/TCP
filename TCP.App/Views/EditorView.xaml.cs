@@ -176,5 +176,64 @@ public partial class EditorView : UserControl
         if (newWidth > 50) ImageContainer.Width = newWidth;
         if (newHeight > 50) ImageContainer.Height = newHeight;
     }
+
+    private bool _isBoxDragging;
+    private System.Windows.Point _boxClickPosition;
+    private TCP.App.Models.Electronics.DeviceInstance? _draggedBoxData;
+
+    private void Box_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is System.Windows.FrameworkElement el && el.DataContext is TCP.App.Models.Electronics.DeviceInstance device)
+        {
+            if (device.IsLocked) return;
+
+            _isBoxDragging = true;
+            _draggedBoxData = device;
+            _boxClickPosition = e.GetPosition(ViewportCanvas);
+            el.CaptureMouse();
+            e.Handled = true;
+        }
+    }
+
+    private void Box_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (!_isBoxDragging || _draggedBoxData == null || sender is not System.Windows.FrameworkElement el) return;
+
+        var currentPosition = e.GetPosition(ViewportCanvas);
+        var transformX = currentPosition.X - _boxClickPosition.X;
+        var transformY = currentPosition.Y - _boxClickPosition.Y;
+
+        _draggedBoxData.X += transformX;
+        _draggedBoxData.Y += transformY;
+
+        System.Windows.DependencyObject parent = System.Windows.Media.VisualTreeHelper.GetParent(el);
+        while (parent != null && !(parent is ContentPresenter))
+        {
+            parent = System.Windows.Media.VisualTreeHelper.GetParent(parent);
+        }
+        
+        if (parent is ContentPresenter cp)
+        {
+            Canvas.SetLeft(cp, _draggedBoxData.X);
+            Canvas.SetTop(cp, _draggedBoxData.Y);
+        }
+
+        _boxClickPosition = currentPosition;
+        e.Handled = true;
+    }
+
+    private void Box_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (!_isBoxDragging) return;
+        _isBoxDragging = false;
+        
+        if (sender is System.Windows.FrameworkElement el)
+        {
+            el.ReleaseMouseCapture();
+        }
+        
+        TCP.App.Services.DeviceManager.Instance.SaveDevices();
+        e.Handled = true;
+    }
 }
 

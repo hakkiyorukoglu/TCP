@@ -25,6 +25,12 @@ public class AppSettings
     /// Default: "tr-TR"
     /// </summary>
     public string Language { get; set; } = "tr-TR";
+
+    /// <summary>
+    /// Terminalin görünüp görünmeyeceği
+    /// Default: true
+    /// </summary>
+    public bool ShowTerminal { get; set; } = true;
     
     /// <summary>
     /// Son ziyaret edilen sayfa route'u

@@ -147,7 +147,12 @@ public class MainViewModel : ViewModelBase, INotifyPropertyChanged
         
         if (string.IsNullOrWhiteSpace(SearchText))
         {
-            IsDropdownVisible = false;
+            // If empty, show all items
+            foreach (var item in _searchRegistry.GetAll())
+            {
+                FilteredSuggestions.Add(item);
+            }
+            IsDropdownVisible = FilteredSuggestions.Count > 0;
             return;
         }
         

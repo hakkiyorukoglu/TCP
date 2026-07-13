@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using TCP.App.Models.Editor;
+using TCP.App.Models.Electronics;
 using TCP.App.Services;
 
 namespace TCP.App.ViewModels;
@@ -44,10 +45,9 @@ public enum EditorImageMode
 public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
 {
     /// <summary>
-    /// Board registry - Single source of truth for board definitions
-    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// Device manager - Single source of truth for user devices
     /// </summary>
-    private readonly BoardRegistry _boardRegistry;
+    private readonly DeviceManager _deviceManager;
     
     /// <summary>
     /// Viewport state - Zoom and pan transformation
@@ -212,17 +212,15 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand ClearImageCommand { get; }
     
     /// <summary>
-    /// Palette boards (from registry)
-    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// Palette boards (from device manager)
     /// </summary>
-    public ObservableCollection<BoardDefinition> PaletteBoards { get; }
+    public ObservableCollection<DeviceInstance> PaletteBoards => _deviceManager.Devices;
     
     /// <summary>
     /// Selected palette board (for Add button)
-    /// TCP-1.0.3: Editor: Add board boxes from registry
     /// </summary>
-    private BoardDefinition? _selectedPaletteBoard;
-    public BoardDefinition? SelectedPaletteBoard
+    private DeviceInstance? _selectedPaletteBoard;
+    public DeviceInstance? SelectedPaletteBoard
     {
         get => _selectedPaletteBoard;
         set
@@ -241,17 +239,15 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     }
     
     /// <summary>
-    /// Placed boxes on editor canvas
-    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// Placed devices on editor canvas
     /// </summary>
-    public ObservableCollection<PlacedBoardBox> PlacedBoxes { get; }
+    public ObservableCollection<DeviceInstance> PlacedBoxes { get; }
     
     /// <summary>
-    /// Selected box (optional for highlight)
-    /// TCP-1.0.3: Editor: Add board boxes from registry
+    /// Selected device (optional for highlight)
     /// </summary>
-    private PlacedBoardBox? _selectedBox;
-    public PlacedBoardBox? SelectedBox
+    private DeviceInstance? _selectedBox;
+    public DeviceInstance? SelectedBox
     {
         get => _selectedBox;
         set
@@ -281,15 +277,21 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         ViewportState = new ViewportState();
         InputRouter = new EditorInputRouter(ViewportState);
         
-        // TCP-1.0.3: Initialize board registry
-        _boardRegistry = BoardRegistry.Instance;
+        // TCP-Custom: Initialize device manager
+        _deviceManager = DeviceManager.Instance;
         
-        // TCP-1.0.3: Load palette boards from registry (single source of truth)
-        var boards = _boardRegistry.GetAllBoards();
-        PaletteBoards = new ObservableCollection<BoardDefinition>(boards);
+        // PlacedBoxes currently maps to Devices that are on map. For now, we can just say ALL devices are placed or they maintain their state.
+        // Let's assume all devices added to map are in PlacedBoxes.
+        PlacedBoxes = new ObservableCollection<DeviceInstance>();
         
-        // TCP-1.0.3: Initialize placed boxes collection
-        PlacedBoxes = new ObservableCollection<PlacedBoardBox>();
+        // Load initially placed boxes
+        foreach(var device in _deviceManager.Devices)
+        {
+            if (device.X > 0 || device.Y > 0 || device.IsLocked)
+            {
+                PlacedBoxes.Add(device);
+            }
+        }
         
         // TCP-1.0.2: Initialize image commands
         LoadImageCommand = new RelayCommand<object>(_ => LoadImage());
@@ -334,13 +336,13 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                 IsLocked = false;
                 
                 // TCP-1.0.2: Show success toast
-                NotificationService.Instance.ShowSuccess("Background image loaded", $"Loaded: {BackgroundImageName}");
+                TerminalService.Instance.LogSuccess("Background image loaded: Loaded: {BackgroundImageName}");
             }
         }
         catch (Exception ex)
         {
             // TCP-1.0.2: Show error toast (no crash)
-            NotificationService.Instance.ShowError("Failed to load image", ex.Message);
+            TerminalService.Instance.LogError($"Failed to load image: {ex.Message}");
         }
     }
     
@@ -387,8 +389,8 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             BackgroundImage = null;
             BackgroundImageName = null;
             
-            // TCP-1.0.2: Show toast
-            NotificationService.Instance.ShowInfo("Background image cleared", "Image removed from editor");
+            // TCP-1.0.2: Show toast (Removed per user request)
+            // TerminalService.Instance.ShowInfo("Background image cleared", "Image removed from editor");
         }
         catch
         {
@@ -409,32 +411,35 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             // TCP-1.0.3: Safety guard - require selected palette board
             if (SelectedPaletteBoard == null)
             {
-                NotificationService.Instance.ShowWarning("Select a board first", "Please select a board from the palette before adding.");
+                TerminalService.Instance.LogWarning("Select a board first: Please select a board from the palette before adding.");
                 return;
             }
             
-            // TCP-1.0.3: Create new placed box
-            var box = new PlacedBoardBox
+            if (PlacedBoxes.Contains(SelectedPaletteBoard))
             {
-                BoardId = SelectedPaletteBoard.Id,
-                DisplayName = SelectedPaletteBoard.DisplayName,
-                Type = SelectedPaletteBoard.Type,
-                Status = SelectedPaletteBoard.Status,
-                X = 0.0, // Center for now (simplest)
-                Y = 0.0  // Center for now (simplest)
-            };
+                TerminalService.Instance.LogWarning("Device is already on the map.");
+                return;
+            }
             
-            // TCP-1.0.3: Add to collection
-            PlacedBoxes.Add(box);
+            // Set initial position if not already placed
+            if (SelectedPaletteBoard.X == 0 && SelectedPaletteBoard.Y == 0)
+            {
+                SelectedPaletteBoard.X = 100.0;
+                SelectedPaletteBoard.Y = 100.0;
+            }
             
-            // TCP-1.0.3: Show success toast
-            NotificationService.Instance.ShowSuccess("Added", $"Added: {box.DisplayName}");
+            // Add to collection
+            PlacedBoxes.Add(SelectedPaletteBoard);
+            DeviceManager.Instance.SaveDevices();
+            
+            TerminalService.Instance.LogSuccess($"Added to map: {SelectedPaletteBoard.CustomName}");
         }
         catch (Exception ex)
         {
             // TCP-1.0.3: Safety - show error toast (no crash)
-            NotificationService.Instance.ShowError("Failed to add box", ex.Message);
+            TerminalService.Instance.LogError($"Failed to add box: {ex.Message}");
         }
     }
 }
+
 

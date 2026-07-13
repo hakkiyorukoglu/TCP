@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "WMUPBk02L2k=",
+  "dgSpecHash": "EfSgfXJfdR0=",
   "success": true,
   "projectFilePath": "C:\\Users\\yoruk\\Desktop\\TCP\\TCP.App\\TCP.App.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\yoruk\\.nuget\\packages\\wpf-ui\\4.3.0\\wpf-ui.4.3.0.nupkg.sha512",
+    "C:\\Users\\yoruk\\.nuget\\packages\\wpf-ui.abstractions\\4.3.0\\wpf-ui.abstractions.4.3.0.nupkg.sha512"
+  ],
   "logs": []
 }

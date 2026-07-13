@@ -273,26 +273,26 @@ public class InfoViewModel : ViewModelBase, INotifyPropertyChanged
                     System.IO.File.WriteAllText(saveDialog.FileName, content);
                     
                     // TCP-0.9.2: Notifications / Toasts v1 - Success notification
-                    NotificationService.Instance.ShowSuccess("Export Completed", "Project information was exported as TXT.");
+                    TerminalService.Instance.LogSuccess("Export Completed: Project information was exported as TXT.");
                 }
                 catch (Exception ex)
                 {
                     // TCP-0.9.2: Notifications / Toasts v1 - Error notification
-                    NotificationService.Instance.ShowError("Export Failed", ex.Message);
+                    TerminalService.Instance.LogError($"Export Failed: {ex.Message}");
                 }
             }
             else
             {
                 // TCP-0.9.2: Notifications / Toasts v1 - Cancel notification (optional but clean)
                 // Kullanıcı dialog'u iptal etti
-                NotificationService.Instance.ShowWarning("Export Canceled", "TXT export was canceled by the user.");
+                TerminalService.Instance.LogWarning("Export Canceled: TXT export was canceled by the user.");
             }
         }
         catch (Exception ex)
         {
             // TCP-0.9.2: Notifications / Toasts v1 - Error notification
             // Dialog açılırken veya başka bir hata oluştu
-            NotificationService.Instance.ShowError("Export Failed", ex.Message);
+            TerminalService.Instance.LogError($"Export Failed: {ex.Message}");
         }
     }
     
@@ -320,22 +320,23 @@ public class InfoViewModel : ViewModelBase, INotifyPropertyChanged
                     var content = InfoContentProvider.GenerateCursorContextTxt();
                     System.IO.File.WriteAllText(saveDialog.FileName, content);
                     
-                    NotificationService.Instance.ShowSuccess("Export Completed", "Cursor context was exported as TXT.");
+                    TerminalService.Instance.LogSuccess("Export Completed: Cursor context was exported as TXT.");
                 }
                 catch (Exception ex)
                 {
-                    NotificationService.Instance.ShowError("Export Failed", ex.Message);
+                    TerminalService.Instance.LogError($"Export Failed: {ex.Message}");
                 }
             }
             else
             {
-                NotificationService.Instance.ShowWarning("Export Canceled", "Cursor context export was canceled by the user.");
+                TerminalService.Instance.LogWarning("Export Canceled: Cursor context export was canceled by the user.");
             }
         }
         catch (Exception ex)
         {
-            NotificationService.Instance.ShowError("Export Failed", ex.Message);
+            TerminalService.Instance.LogError($"Export Failed: {ex.Message}");
         }
     }
 }
+
 

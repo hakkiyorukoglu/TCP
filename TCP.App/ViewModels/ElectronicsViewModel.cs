@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
+using TCP.App.Models.Electronics;
 using TCP.App.Services;
 
 namespace TCP.App.ViewModels;
@@ -97,7 +99,121 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
         
         // Default selection: İlk board
         SelectedBoard = Boards.Count > 0 ? Boards[0] : null;
+
+        // TCP Custom Device Logic
+        OpenCreatePopupCommand = new RelayCommand<object>(_ => { if (SelectedBoard != null) OpenCreatePopup(); });
+        CloseCreatePopupCommand = new RelayCommand<object>(_ => CloseCreatePopup());
+        SaveDeviceCommand = new RelayCommand<object>(_ => { if (CanSaveDevice()) SaveDevice(); });
     }
+
+    /// <summary>
+    /// User's saved devices list
+    /// </summary>
+    public ObservableCollection<DeviceInstance> MyDevices => DeviceManager.Instance.Devices;
+
+    #region Create Device Popup State & Properties
+
+    private bool _isCreatePopupOpen;
+    public bool IsCreatePopupOpen
+    {
+        get => _isCreatePopupOpen;
+        set { _isCreatePopupOpen = value; OnPropertyChanged(); }
+    }
+
+    private string _newDeviceName = string.Empty;
+    public string NewDeviceName
+    {
+        get => _newDeviceName;
+        set
+        {
+            _newDeviceName = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private string _newDeviceIp = string.Empty;
+    public string NewDeviceIp
+    {
+        get => _newDeviceIp;
+        set { _newDeviceIp = value; OnPropertyChanged(); }
+    }
+
+    private int _newDevicePort = 80;
+    public int NewDevicePort
+    {
+        get => _newDevicePort;
+        set { _newDevicePort = value; OnPropertyChanged(); }
+    }
+
+    private string _newDeviceMac = string.Empty;
+    public string NewDeviceMac
+    {
+        get => _newDeviceMac;
+        set { _newDeviceMac = value; OnPropertyChanged(); }
+    }
+
+    private string _newDeviceLanCable = string.Empty;
+    public string NewDeviceLanCable
+    {
+        get => _newDeviceLanCable;
+        set { _newDeviceLanCable = value; OnPropertyChanged(); }
+    }
+
+    private string _newDeviceLocation = string.Empty;
+    public string NewDeviceLocation
+    {
+        get => _newDeviceLocation;
+        set { _newDeviceLocation = value; OnPropertyChanged(); }
+    }
+
+    public ICommand OpenCreatePopupCommand { get; }
+    public ICommand CloseCreatePopupCommand { get; }
+    public ICommand SaveDeviceCommand { get; }
+
+    private void OpenCreatePopup()
+    {
+        if (SelectedBoard == null) return;
+        
+        NewDeviceName = $"{SelectedBoard.Name} Instance";
+        NewDeviceIp = "192.168.1.10";
+        NewDevicePort = 80;
+        NewDeviceMac = "00:00:00:00:00:00";
+        NewDeviceLanCable = "ETH-1";
+        NewDeviceLocation = "Lab";
+        IsCreatePopupOpen = true;
+    }
+
+    private void CloseCreatePopup()
+    {
+        IsCreatePopupOpen = false;
+    }
+
+    private bool CanSaveDevice()
+    {
+        return !string.IsNullOrWhiteSpace(NewDeviceName);
+    }
+
+    private void SaveDevice()
+    {
+        if (SelectedBoard == null || string.IsNullOrWhiteSpace(NewDeviceName)) return;
+
+        var device = new DeviceInstance
+        {
+            TemplateId = SelectedBoard.Name,
+            CustomName = NewDeviceName,
+            IpAddress = NewDeviceIp,
+            Port = NewDevicePort,
+            MacAddress = NewDeviceMac,
+            LanCable = NewDeviceLanCable,
+            Location = NewDeviceLocation
+        };
+
+        DeviceManager.Instance.AddDevice(device);
+        TerminalService.Instance.LogSuccess($"Device created: {NewDeviceName}");
+        IsCreatePopupOpen = false;
+    }
+
+    #endregion
 }
 
 /// <summary>

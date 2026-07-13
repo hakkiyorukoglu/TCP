@@ -24,7 +24,7 @@ namespace TCP.App;
 /// - Navigation basit ve stable (NO complex router)
 /// - Constructor MUST call InitializeComponent() (startup stability)
 /// </summary>
-public partial class MainWindow : Window
+public partial class MainWindow : Wpf.Ui.Controls.FluentWindow
 {
     /// <summary>
     /// Mevcut route name (settings persistence için)
@@ -97,10 +97,6 @@ public partial class MainWindow : Window
             category: "Info / Feature",
             description: "Added Info panel with version history and topbar navigation. Clicking version text in TopBar opens Info page. Sections: Overview, Architecture, Features, Version History."
         );
-        
-        // Pencere sürükleme için MouseDown event'i ekle
-        // WindowStyle="None" olduğu için manuel sürükleme implementasyonu gerekli
-        this.MouseDown += MainWindow_MouseDown;
         
         // TCP-0.8.1 Hotfix-2: Load theme AFTER window is loaded
         // This prevents StaticResource resolution failures at startup
@@ -185,52 +181,6 @@ public partial class MainWindow : Window
                 // Note: Info is not in TopBar navigation tabs, so no SetActiveTab call
                 break;
         }
-    }
-    
-    /// <summary>
-    /// Pencere sürükleme event handler
-    /// TopBar'dan veya boş alanlardan pencereyi sürüklemek için
-    /// </summary>
-    private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
-    {
-        // Sadece sol tık ile sürükleme
-        if (e.ChangedButton == MouseButton.Left)
-        {
-            this.DragMove();
-        }
-    }
-    
-    /// <summary>
-    /// Minimize butonu click handler
-    /// </summary>
-    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
-    {
-        this.WindowState = WindowState.Minimized;
-    }
-    
-    /// <summary>
-    /// Maximize/Restore butonu click handler
-    /// </summary>
-    private void MaximizeRestoreButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (this.WindowState == WindowState.Maximized)
-        {
-            this.WindowState = WindowState.Normal;
-            MaximizeRestoreButton.Content = "□";
-        }
-        else
-        {
-            this.WindowState = WindowState.Maximized;
-            MaximizeRestoreButton.Content = "❐";
-        }
-    }
-    
-    /// <summary>
-    /// Close butonu click handler
-    /// </summary>
-    private void CloseButton_Click(object sender, RoutedEventArgs e)
-    {
-        this.Close();
     }
     
     /// <summary>
@@ -332,8 +282,7 @@ public partial class MainWindow : Window
             // App.LoadedSettings cache'ini güncelle
             App.UpdateLoadedSettings(settings);
             
-            // TCP-0.9.2: Notifications / Toasts v1 - Show success notification
-            NotificationService.Instance.ShowSuccess("Saved", "Settings updated");
+            // We removed the notification here so it doesn't pop up on every tab change
         }
         catch
         {
@@ -359,16 +308,19 @@ public partial class MainWindow : Window
     }
     
     /// <summary>
-    /// Search ListBox mouse click handler
+    /// Search ListBox selection handler
     /// TCP-0.5.1: Top-Right Search UI
     /// </summary>
-    private void SearchListBox_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    private void SearchListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (sender is ListBox listBox && listBox.SelectedItem is SearchItem item)
         {
             if (DataContext is MainViewModel viewModel)
             {
                 viewModel.SelectSearchItemCommand.Execute(item);
+                
+                // Clear selection so clicking the same item again works next time
+                listBox.SelectedItem = null;
             }
         }
     }
@@ -396,6 +348,33 @@ public partial class MainWindow : Window
                 e.Handled = true;
             }
             // Arrow keys handled automatically by ListBox
+        }
+    }
+    
+    /// <summary>
+    /// Search TextBox GotFocus handler
+    /// TCP-1.0.4: Show all suggestions when focused empty
+    /// </summary>
+    private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+        {
+            // Trigger FilterSuggestions to show all items if empty, or filter if not
+            // We can just set IsDropdownVisible to true directly if FilteredSuggestions has items
+            // but setting SearchText to itself will trigger the setter and FilterSuggestions()
+            // To avoid unnecessary property changes, let's call a method or just set IsDropdownVisible
+            // Wait, we can't call private FilterSuggestions(). 
+            // So we'll just set it to true if we have text, or force a refresh by setting empty to empty
+            if (string.IsNullOrEmpty(viewModel.SearchText))
+            {
+                // Force an update to populate the list
+                viewModel.SearchText = " ";
+                viewModel.SearchText = "";
+            }
+            else
+            {
+                viewModel.IsDropdownVisible = true;
+            }
         }
     }
 }

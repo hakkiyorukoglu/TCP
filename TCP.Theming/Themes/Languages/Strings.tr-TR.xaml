@@ -16,6 +16,25 @@
     <system:String x:Key="String.Language">Dil</system:String>
     <system:String x:Key="String.Appearance">Görünüm</system:String>
     <system:String x:Key="String.Application">Uygulama</system:String>
+    <system:String x:Key="String.TerminalPanel">Terminal Paneli</system:String>
+    <system:String x:Key="String.ShowTerminal">Terminali Göster</system:String>
+    <system:String x:Key="String.KeyboardShortcuts">Klavye Kısayolları</system:String>
+    <system:String x:Key="String.DefaultPaths">Varsayılan Yollar</system:String>
+    <system:String x:Key="String.PerformanceOptions">Performans Seçenekleri</system:String>
+    <system:String x:Key="String.About">Hakkında</system:String>
+    <system:String x:Key="String.SelectCategory">Ayarları görmek için bir kategori seçin</system:String>
+    <system:String x:Key="String.ThemeDesc">Tema ve görsel ayarlar</system:String>
+    <system:String x:Key="String.ShortcutsDesc">Klavye kısayolları</system:String>
+    <system:String x:Key="String.PathsDesc">Varsayılan yollar ve dizinler</system:String>
+    <system:String x:Key="String.PerfDesc">Performans seçenekleri</system:String>
+    <system:String x:Key="String.AboutDesc">Uygulama bilgileri</system:String>
+    <system:String x:Key="String.Shortcuts">Kısayollar</system:String>
+    <system:String x:Key="String.Paths">Yollar</system:String>
+    <system:String x:Key="String.Performance">Performans</system:String>
+    <system:String x:Key="String.Info">Bilgi</system:String>
+    <system:String x:Key="String.AboutTCP">TCP Hakkında</system:String>
+    <system:String x:Key="String.VersionHistory">Sürüm Geçmişi</system:String>
+    <system:String x:Key="String.Architecture">Mimari</system:String>
 
     <!-- Canvas -->
     <system:String x:Key="String.LoadImage">Resim Yükle</system:String>

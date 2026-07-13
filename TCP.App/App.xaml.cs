@@ -92,7 +92,7 @@ public partial class App : Application
         // Register Home page
         registry.Register(new SearchItem
         {
-            Title = "Home",
+            TitleKey = "String.Home",
             Keywords = new[] { "home", "main", "start" },
             Route = "Home"
         });
@@ -100,7 +100,7 @@ public partial class App : Application
         // Register Electronics page
         registry.Register(new SearchItem
         {
-            Title = "Electronics",
+            TitleKey = "String.Electronics",
             Keywords = new[] { "electronics", "boards", "arduino", "mega", "nano" },
             Route = "Electronics"
         });
@@ -108,7 +108,7 @@ public partial class App : Application
         // TCP-1.0.2: Register Editor page
         registry.Register(new SearchItem
         {
-            Title = "Editor",
+            TitleKey = "String.Editor",
             Keywords = new[] { "editor", "map", "background", "image" },
             Route = "Editor"
         });
@@ -116,7 +116,7 @@ public partial class App : Application
         // Register Settings page
         registry.Register(new SearchItem
         {
-            Title = "Settings",
+            TitleKey = "String.Settings",
             Keywords = new[] { "settings", "preferences", "options" },
             Route = "Settings"
         });
@@ -124,7 +124,7 @@ public partial class App : Application
         // TCP-0.8.2: Register Shortcuts page
         registry.Register(new SearchItem
         {
-            Title = "Shortcuts",
+            TitleKey = "String.Shortcuts",
             Keywords = new[] { "shortcuts", "keyboard", "hotkeys", "keys", "ctrl", "f1" },
             Route = "Settings"
         });
@@ -132,7 +132,7 @@ public partial class App : Application
         // Register Info page
         registry.Register(new SearchItem
         {
-            Title = "Info",
+            TitleKey = "String.Info",
             Keywords = new[] { "info", "about", "version", "changelog" },
             Route = "Info"
         });
@@ -140,21 +140,21 @@ public partial class App : Application
         // TCP-0.9.0: Register additional Info routes
         registry.Register(new SearchItem
         {
-            Title = "About TCP",
+            TitleKey = "String.AboutTCP",
             Keywords = new[] { "about", "tcp", "overview" },
             Route = "Info"
         });
         
         registry.Register(new SearchItem
         {
-            Title = "Version History",
+            TitleKey = "String.VersionHistory",
             Keywords = new[] { "version", "history", "changelog", "versions" },
             Route = "Info"
         });
         
         registry.Register(new SearchItem
         {
-            Title = "Architecture",
+            TitleKey = "String.Architecture",
             Keywords = new[] { "architecture", "mvvm", "wpf", "design" },
             Route = "Info"
         });
@@ -239,7 +239,7 @@ public partial class App : Application
         // TCP-0.9.3: Error Guardrails (No-crash policy) - Show error toast
         try
         {
-            NotificationService.Instance.ShowError("Unexpected Error", "An internal error occurred. The application recovered safely.");
+            TerminalService.Instance.LogError("Unexpected Error: An internal error occurred. The application recovered safely.");
         }
         catch
         {
@@ -266,7 +266,7 @@ public partial class App : Application
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    NotificationService.Instance.ShowError("Unexpected Error", "An internal error occurred. The application recovered safely.");
+                    TerminalService.Instance.LogError("Unexpected Error: An internal error occurred. The application recovered safely.");
                 });
             }
             catch
@@ -296,7 +296,7 @@ public partial class App : Application
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                NotificationService.Instance.ShowError("Unexpected Error", "An internal error occurred. The application recovered safely.");
+                TerminalService.Instance.LogError("Unexpected Error: An internal error occurred. The application recovered safely.");
             });
         }
         catch
@@ -305,4 +305,5 @@ public partial class App : Application
         }
     }
 }
+
 

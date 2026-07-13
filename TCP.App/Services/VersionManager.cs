@@ -31,7 +31,7 @@ public static class VersionManager
     /// Stage adı
     /// Mevcut geliştirme aşaması
     /// </summary>
-    public static string StageName => "Background Image Load with Zoom/Pan";
+    public static string StageName => "Custom Devices & Editor Mapping";
     
     /// <summary>
     /// Display versiyon
