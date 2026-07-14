@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using TCP.App.Models.Electronics;
 
 namespace TCP.App.Services;
@@ -13,6 +14,7 @@ public class NetworkState
     public MainPcInstance MainPc { get; set; } = new();
     public ObservableCollection<ModemInstance> Modems { get; set; } = new();
     public ObservableCollection<RfidTagInstance> RfidTags { get; set; } = new();
+    public ObservableCollection<TrainInstance> Trains { get; set; } = new();
 }
 
 /// <summary>
@@ -21,6 +23,13 @@ public class NetworkState
 public class NetworkManager
 {
     private static NetworkManager? _instance;
+
+    public static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+    {
+        WriteIndented = true,
+        ReferenceHandler = ReferenceHandler.Preserve,
+        PropertyNameCaseInsensitive = true
+    };
 
     public static NetworkManager Instance
     {
@@ -38,10 +47,12 @@ public class NetworkManager
     private MainPcInstance _mainPc;
     private readonly ObservableCollection<ModemInstance> _modems;
     private readonly ObservableCollection<RfidTagInstance> _rfidTags;
+    private readonly ObservableCollection<TrainInstance> _trains;
 
     public MainPcInstance MainPc => _mainPc;
     public ObservableCollection<ModemInstance> Modems => _modems;
     public ObservableCollection<RfidTagInstance> RfidTags => _rfidTags;
+    public ObservableCollection<TrainInstance> Trains => _trains;
 
     public event Action? NetworkChanged;
 
@@ -49,6 +60,7 @@ public class NetworkManager
     {
         _modems = new ObservableCollection<ModemInstance>();
         _rfidTags = new ObservableCollection<RfidTagInstance>();
+        _trains = new ObservableCollection<TrainInstance>();
         _mainPc = new MainPcInstance();
         
         var appData = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TCP");
@@ -65,14 +77,15 @@ public class NetworkManager
     {
         _modems.Clear();
         _rfidTags.Clear();
+        _trains.Clear();
         _mainPc = new MainPcInstance();
         NetworkChanged?.Invoke();
     }
 
     public string GetJsonState()
     {
-        var state = new NetworkState { MainPc = _mainPc, Modems = _modems, RfidTags = _rfidTags };
-        return JsonSerializer.Serialize(state);
+        var state = new NetworkState { MainPc = _mainPc, Modems = _modems, RfidTags = _rfidTags, Trains = _trains };
+        return JsonSerializer.Serialize(state, JsonOptions);
     }
 
     public void LoadFromJson(string json)
@@ -85,11 +98,12 @@ public class NetworkManager
 
         try
         {
-            var state = JsonSerializer.Deserialize<NetworkState>(json);
+            var state = JsonSerializer.Deserialize<NetworkState>(json, JsonOptions);
             if (state != null)
             {
                 _modems.Clear();
                 _rfidTags.Clear();
+                _trains.Clear();
                 _mainPc = state.MainPc ?? new MainPcInstance();
                 if (state.Modems != null)
                 {
@@ -107,7 +121,13 @@ public class NetworkManager
                 }
                 if (state.RfidTags != null)
                 {
-                    foreach (var r in state.RfidTags) _rfidTags.Add(r);
+                    foreach (var t in state.RfidTags)
+                        _rfidTags.Add(t);
+                }
+                if (state.Trains != null)
+                {
+                    foreach (var t in state.Trains)
+                        _trains.Add(t);
                 }
                 NetworkChanged?.Invoke();
             }
@@ -136,6 +156,22 @@ public class NetworkManager
         if (tag != null)
         {
             _rfidTags.Remove(tag);
+            NetworkChanged?.Invoke();
+        }
+    }
+
+    public void AddTrain(TrainInstance train)
+    {
+        _trains.Add(train);
+        NetworkChanged?.Invoke();
+    }
+
+    public void RemoveTrain(Guid id)
+    {
+        var train = _trains.FirstOrDefault(t => t.Id == id);
+        if (train != null)
+        {
+            _trains.Remove(train);
             NetworkChanged?.Invoke();
         }
     }

@@ -34,6 +34,7 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
     // Collections
     public ObservableCollection<ModemInstance> Modems => NetworkManager.Instance.Modems;
     public ObservableCollection<RfidTagInstance> RfidTags => NetworkManager.Instance.RfidTags;
+    public ObservableCollection<TrainInstance> Trains => NetworkManager.Instance.Trains;
     public MainPcInstance MainPc => NetworkManager.Instance.MainPc;
 
     private ModemInstance? _selectedModem;
@@ -246,6 +247,9 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand AddRfidTagCommand { get; }
     public ICommand DeleteRfidTagCommand { get; }
 
+    public ICommand AddTrainCommand { get; }
+    public ICommand DeleteTrainCommand { get; }
+
     public ElectronicsViewModel()
     {
         Templates = new ObservableCollection<BoardItem>(BoardRegistry.Instance.GetAll());
@@ -283,6 +287,9 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
 
         AddRfidTagCommand = new RelayCommand<object>(_ => AddRfidTag());
         DeleteRfidTagCommand = new RelayCommand<RfidTagInstance>(DeleteRfidTag);
+        
+        AddTrainCommand = new RelayCommand<object>(_ => AddTrain());
+        DeleteTrainCommand = new RelayCommand<TrainInstance>(DeleteTrain);
     }
     
     public void RefreshTemplates()
@@ -328,7 +335,15 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
     private void OpenCreateModemPopup()
     {
         NewModemName = $"Modem {Modems.Count + 1}";
-        NewModemIp = "192.168.1.1";
+        
+        // Find highest Modem IP ending
+        int maxModemIp = 9; // Start from .10
+        foreach(var m in Modems) {
+            if(m.IpAddress.StartsWith("192.168.1.") && int.TryParse(m.IpAddress.Split('.')[3], out int ipVal)) {
+                if(ipVal > maxModemIp && ipVal < 100) maxModemIp = ipVal;
+            }
+        }
+        NewModemIp = $"192.168.1.{maxModemIp + 1}";
         NewModemMac = "00:00:00:00:00:00";
         IsCreateModemPopupOpen = true;
     }
@@ -375,11 +390,22 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
         if (SelectedModem == null) return;
         if (SelectedModem.Stations.Count >= 3)
         {
-            TerminalService.Instance.LogWarning("Bir modem en fazla 3 istasyon yönetebilir!");
+            TerminalService.Instance.LogWarning("Bir modem en fazla 3 istasyon yönetebilir (Port 2, 3, 4)!");
             return;
         }
-        NewStationName = $"İstasyon {SelectedModem.Stations.Count + 1}";
-        NewStationIp = "192.168.1.10";
+        NewStationName = $"İstasyon {Modems.SelectMany(m => m.Stations).Count() + 1}";
+        
+        // Find highest Station IP ending
+        int maxStationIp = 99; // Start from .100
+        foreach(var m in Modems) {
+            foreach(var s in m.Stations) {
+                if(s.IpAddress.StartsWith("192.168.1.") && int.TryParse(s.IpAddress.Split('.')[3], out int ipVal)) {
+                    if(ipVal > maxStationIp) maxStationIp = ipVal;
+                }
+            }
+        }
+        
+        NewStationIp = $"192.168.1.{maxStationIp + 1}";
         NewStationPort = 80;
         NewStationMac = "00:00:00:00:00:00";
         IsCreateStationPopupOpen = true;
@@ -390,7 +416,7 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
         if (SelectedModem == null || string.IsNullOrWhiteSpace(NewStationName)) return;
         if (SelectedModem.Stations.Count >= 3)
         {
-            TerminalService.Instance.LogWarning("Bir modem en fazla 3 istasyon yönetebilir!");
+            TerminalService.Instance.LogWarning("Bir modem en fazla 3 istasyon yönetebilir (Port 2, 3, 4)!");
             IsCreateStationPopupOpen = false;
             return;
         }
@@ -401,7 +427,7 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
             IpAddress = NewStationIp,
             Port = NewStationPort,
             MacAddress = NewStationMac,
-            RouterPort = $"Port {SelectedModem.Stations.Count + 1}"
+            RouterPort = $"Port {SelectedModem.Stations.Count + 2}" // 1 is Uplink, so Stations get 2, 3, 4
         };
         SelectedModem.Stations.Add(st);
         NetworkManager.Instance.SaveModems();
@@ -532,6 +558,26 @@ public class ElectronicsViewModel : ViewModelBase, INotifyPropertyChanged
         if (tag != null)
         {
             NetworkManager.Instance.RemoveRfidTag(tag.Id);
+            NetworkManager.Instance.SaveModems();
+        }
+    }
+
+    private void AddTrain()
+    {
+        var train = new TrainInstance 
+        { 
+            Name = $"Tren {Trains.Count + 1}",
+            RfidTag = $"TRAIN_{Trains.Count + 1:D2}"
+        };
+        NetworkManager.Instance.AddTrain(train);
+        NetworkManager.Instance.SaveModems(); // To save network
+    }
+
+    private void DeleteTrain(TrainInstance? train)
+    {
+        if (train != null)
+        {
+            NetworkManager.Instance.RemoveTrain(train.Id);
             NetworkManager.Instance.SaveModems();
         }
     }

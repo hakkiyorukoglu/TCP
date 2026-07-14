@@ -1,13 +1,13 @@
 # TCP — Train Control Platform
 
-[![Version](https://img.shields.io/badge/version-TCP--2.9.0-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-TCP--2.9.1-blue.svg)](docs/CHANGELOG.md)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
 
 **TCP (Train Control Platform)**, tren kontrol sistemleri, ray yerleşim tasarımı ve donanım kartları yönetimini birleştiren tam donanımlı, profesyonel bir masaüstü (WPF) uygulamasıdır.
 
 ---
 
-## 🚀 Öne Çıkan Özellikler (v2.9.0)
+## 🚀 Öne Çıkan Özellikler (v2.9.1)
 
 Uygulama baştan aşağıya gelişmiş yetenekler, dinamik bir arayüz ve uç nokta donanım yönetimiyle donatıldı:
 
@@ -18,6 +18,8 @@ Uygulama baştan aşağıya gelişmiş yetenekler, dinamik bir arayüz ve uç no
 - 🧪 **Birim Testleri (xUnit & Moq)**: Veritabanı ve state yönetimi gibi kritik çekirdek parçalar endüstri standartlarındaki birim testleriyle koruma altında.
 - 🛤️ **Rota (Spline) Çizimi**: Editör üzerinde serbestçe tren hatları ve rotaları (TrackRoute) çizebilme.
 - 🚆 **Simülasyon Modülü**: Editör'de çizdiğiniz harita ve yerleştirdiğiniz donanımların *otomatik olarak* Simülasyon ekranına yüklenmesiyle sağlanan 2D kuşbakışı simülasyon deneyimi.
+- 🚇 **Kör Otonom Tren Mimarisi (Blind Autonomous Trains)**: Trenler (Arduino Nano kontrollü) Wi-Fi üzerinden gerçek zamanlı haberleşmez. Ana masaüstü bilgisayardan (Örn: "Tren 1, Masa 10'a git") başlangıç talimatını alıp kör otonom hareket ederler.
+- 🏷️ **RFID Sinyalizasyon**: Trenin altında RFID etiketi (Tag) bulunur. Ray ayrım noktalarında (makas girişlerinde) masalara/bölgelere ait RFID Okuyucular bulunur. Tren bir okuyucudan geçtiğinde Ana PC, trenin yönlendirilmesi gereken masaya göre ilgili istasyona (Servo Motor) sinyal gönderip makası açar.
 - 📡 **Canlı HTTP Donanım İletişimi**: Editör üzerindeki istasyonlarla asenkron (GET/POST) haberleşme.
 - 🎛️ **Uzaktan Röle / Pin Kontrolü**: İstasyonlara ait röleleri (ışık, motor, sensör tetikleyici vs.) canlı olarak uygulamadan yönetebilme.
 - 🚀 **Uzaktan OTA Firmware Güncelleme**: İstasyonların yazılımlarını (.bin) masaüstünden kablosuz/LAN üzerinden uzaktan tek tıkla yükleyebilme.

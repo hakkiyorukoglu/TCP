@@ -36,19 +36,35 @@ public class EditorInputRouter
     /// Mouse wheel UP: Zoom in (1.1x multiplier)
     /// Mouse wheel DOWN: Zoom out (0.9x multiplier)
     /// </summary>
-    public void HandleMouseWheel(MouseWheelEventArgs e)
+    public void HandleMouseWheel(MouseWheelEventArgs e, double mouseX, double mouseY)
     {
         try
         {
+            double oldZoom = _viewportState.ZoomLevel;
+            double newZoom = oldZoom;
+
             if (e.Delta > 0)
             {
                 // Zoom in
-                _viewportState.ZoomLevel *= 1.1;
+                newZoom = oldZoom * 1.1;
             }
             else if (e.Delta < 0)
             {
                 // Zoom out
-                _viewportState.ZoomLevel *= 0.9;
+                newZoom = oldZoom * 0.9;
+            }
+
+            // Clamp locally to see actual new zoom
+            newZoom = Math.Max(0.1, Math.Min(10.0, newZoom));
+
+            if (Math.Abs(oldZoom - newZoom) > 0.001)
+            {
+                // Calculate new Pan to keep mouse position fixed
+                _viewportState.PanX = mouseX - (mouseX - _viewportState.PanX) * (newZoom / oldZoom);
+                _viewportState.PanY = mouseY - (mouseY - _viewportState.PanY) * (newZoom / oldZoom);
+                
+                // Set the zoom (this will trigger property changes)
+                _viewportState.ZoomLevel = newZoom;
             }
 
             e.Handled = true;

@@ -1,5 +1,8 @@
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using System.Windows.Threading;
+using System.Linq;
+using System;
 using TCP.App.Models.Electronics;
 using TCP.App.Services;
 
@@ -10,6 +13,9 @@ namespace TCP.App.ViewModels;
 
 public class SimulationViewModel : ViewModelBase, INotifyPropertyChanged
 {
+    private DispatcherTimer? _gameLoopTimer;
+    private DateTime _lastFrameTime;
+
     public event PropertyChangedEventHandler? PropertyChanged;
     
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -36,6 +42,7 @@ public class SimulationViewModel : ViewModelBase, INotifyPropertyChanged
     public ObservableCollection<TCP.App.Models.Editor.ILayerItem> PlacedBoxes { get; } = new();
     public ObservableCollection<TrackRoute> Routes { get; } = new();
     public ObservableCollection<ConnectionLine> DaisyChainLines { get; } = new();
+    public ObservableCollection<TrainInstance> Trains { get; } = new();
 
     public ICommand StartSimulationCommand { get; }
     public ICommand StopSimulationCommand { get; }
@@ -119,6 +126,23 @@ public class SimulationViewModel : ViewModelBase, INotifyPropertyChanged
                     }
                 }
             }
+            
+            Trains.Clear();
+            foreach(var t in NetworkManager.Instance.Trains)
+            {
+                Trains.Add(t);
+                // Eğer trene atanmış bir Route yoksa veya üzerinde değilse, rastgele ilk Route'a koy
+                if (Routes.Any())
+                {
+                    var firstRoute = Routes.First();
+                    if (firstRoute.Nodes.Any())
+                    {
+                        t.X = firstRoute.Nodes.First().X;
+                        t.Y = firstRoute.Nodes.First().Y;
+                    }
+                }
+            }
+            
             SyncDaisyChainLines();
             SimulationStatus = $"Senaryo '{currentScenario.Name}' haritası yüklendi.";
         }
@@ -166,6 +190,15 @@ public class SimulationViewModel : ViewModelBase, INotifyPropertyChanged
         SimulationStatus = "Simülasyon çalışıyor...";
         (StartSimulationCommand as RelayCommandWithCanExecute<object>)?.RaiseCanExecuteChanged();
         (StopSimulationCommand as RelayCommandWithCanExecute<object>)?.RaiseCanExecuteChanged();
+        
+        _lastFrameTime = DateTime.Now;
+        if (_gameLoopTimer == null)
+        {
+            _gameLoopTimer = new DispatcherTimer();
+            _gameLoopTimer.Interval = TimeSpan.FromMilliseconds(16); // ~60fps
+            _gameLoopTimer.Tick += GameLoopTimer_Tick;
+        }
+        _gameLoopTimer.Start();
     }
 
     private void StopSimulation()
@@ -174,5 +207,56 @@ public class SimulationViewModel : ViewModelBase, INotifyPropertyChanged
         SimulationStatus = "Simülasyon durduruldu.";
         (StartSimulationCommand as RelayCommandWithCanExecute<object>)?.RaiseCanExecuteChanged();
         (StopSimulationCommand as RelayCommandWithCanExecute<object>)?.RaiseCanExecuteChanged();
+        
+        _gameLoopTimer?.Stop();
+    }
+    
+    private void GameLoopTimer_Tick(object? sender, EventArgs e)
+    {
+        var now = DateTime.Now;
+        var dt = (now - _lastFrameTime).TotalSeconds;
+        _lastFrameTime = now;
+
+        UpdateTrains(dt);
+    }
+    
+    private void UpdateTrains(double dt)
+    {
+        double speed = 100.0; // piksel/saniye hızı
+        
+        foreach (var train in Trains)
+        {
+            if (!Routes.Any()) continue;
+            
+            // Çok basit bir hareket simülasyonu: 
+            // Şimdilik sadece ilk route'un node'ları arasında git gel yapacak.
+            var route = Routes.First();
+            if (route.Nodes.Count < 2) continue;
+            
+            // Eğer tren node'lara göre progress'i yoksa, bunu tutacak bir property lazım.
+            // Biz şimdilik mesafe bazlı lineer interpolasyon yapalım.
+            // Treni ilk node'dan son node'a doğru hareket ettirelim
+            
+            // (İleride bunu TrackNode segmentleri ve Spline üzerinde PathMath kullanarak güncelleyeceğiz.)
+            // Basitlik için sadece ilk ve son node arası gidiyor diyelim
+            var startNode = route.Nodes.First();
+            var endNode = route.Nodes.Last();
+            
+            double dx = endNode.X - train.X;
+            double dy = endNode.Y - train.Y;
+            double dist = Math.Sqrt(dx * dx + dy * dy);
+            
+            if (dist > 2)
+            {
+                train.X += (dx / dist) * speed * dt;
+                train.Y += (dy / dist) * speed * dt;
+            }
+            else
+            {
+                // Başa dön
+                train.X = startNode.X;
+                train.Y = startNode.Y;
+            }
+        }
     }
 }

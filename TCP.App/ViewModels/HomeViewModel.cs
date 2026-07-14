@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using TCP.App.Data.Entities;
 using TCP.App.Services;
+using TCP.App.Models.Electronics;
 
 namespace TCP.App.ViewModels;
 
@@ -18,6 +19,9 @@ public class HomeViewModel : ViewModelBase, INotifyPropertyChanged
     }
 
     public ObservableCollection<ScenarioDb> Scenarios { get; } = new();
+    
+    // Expose Live Network Data for Monitoring
+    public ObservableCollection<ModemInstance> Modems => NetworkManager.Instance.Modems;
 
     private string _newScenarioName = string.Empty;
     public string NewScenarioName

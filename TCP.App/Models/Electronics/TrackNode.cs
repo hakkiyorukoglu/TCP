@@ -52,6 +52,13 @@ public class TrackNode : ILayerItem
         get => _isVisible;
         set { if (_isVisible != value) { _isVisible = value; OnPropertyChanged(); } }
     }
+    
+    private Guid? _boundComponentId;
+    public Guid? BoundComponentId
+    {
+        get => _boundComponentId;
+        set { if (_boundComponentId != value) { _boundComponentId = value; OnPropertyChanged(); } }
+    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

@@ -67,15 +67,7 @@ public class ProjectManager
     {
         if (!PromptForSaveIfDirty()) return;
 
-        _currentScenario = new ScenarioDb { Name = name };
-        
-        // Clear network
-        NetworkManager.Instance.ClearNetwork();
-        
-        // Editor will be cleared by the ViewModel listening to ScenarioLoaded
-        IsDirty = false;
-        ScenarioLoaded?.Invoke();
-        TerminalService.Instance.LogSuccess($"Started new scenario: {name}");
+        CreateNewScenario(name);
     }
 
     public void CreateNewScenario(string name)
@@ -175,7 +167,8 @@ public class ProjectManager
     {
         if (_currentScenario == null)
         {
-            _currentScenario = new ScenarioDb { Name = "Otomatik Kayıt", Id = Guid.NewGuid() };
+            TerminalService.Instance.LogError("Failed to save scenario: No active scenario exists.");
+            return;
         }
 
         try
@@ -234,13 +227,11 @@ public class ProjectManager
 
     public void SaveCustomCode(Guid targetNodeId, string codeContent)
     {
-        // TCP-0.8.3: Fix for silent custom code loss when scenario is not explicitly saved yet.
         if (_currentScenario == null)
         {
-            SaveScenario();
+            TerminalService.Instance.LogError("Kod kaydedilemedi: Aktif bir senaryo bulunmuyor.");
+            return; 
         }
-
-        if (_currentScenario == null) return; // Should not happen, but safety check
         
         try
         {

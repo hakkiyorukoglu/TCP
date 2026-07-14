@@ -37,7 +37,9 @@
                     <RowDefinition Height="*"/>    <!-- Modem Listesi -->
                     <RowDefinition Height="Auto"/> <!-- Bağımsız Cihazlar Başlık -->
                     <RowDefinition Height="Auto"/> <!-- RFID Etiket Listesi -->
-                    <RowDefinition Height="Auto"/> <!-- Modem/RFID Ekle Butonları -->
+                    <RowDefinition Height="Auto"/> <!-- Trenler Başlık -->
+                    <RowDefinition Height="Auto"/> <!-- Trenler Listesi -->
+                    <RowDefinition Height="Auto"/> <!-- Modem/RFID/Tren Ekle Butonları -->
                     <RowDefinition Height="Auto"/> <!-- Temel Elektronikler Başlık -->
                     <RowDefinition Height="*"/>    <!-- Templates Listesi -->
                     <RowDefinition Height="Auto"/> <!-- Template Butonları -->
@@ -168,18 +170,76 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
 
-                <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10">
-                    <ui:Button Content="+ Modem Ekle"
+                <!-- Trenler Başlık -->
+                <TextBlock Grid.Row="4"
+                           Text="Trenler (Otonom)"
+                           FontSize="{DynamicResource Font.Heading.Medium}"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource Brush.Text.Primary}"
+                           Margin="15,15,15,5"/>
+
+                <ListBox Grid.Row="5"
+                         ItemsSource="{Binding Trains}"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         Margin="10,0,10,5">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border x:Name="ItemBorder"
+                                    Background="{DynamicResource Brush.Background.Primary}"
+                                    BorderBrush="{DynamicResource Brush.Border}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Margin="0,2,0,2"
+                                    Padding="10,8">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="🚇"
+                                               FontSize="{DynamicResource Font.Heading.Medium}"
+                                               Foreground="{DynamicResource Brush.Palette.Orange}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,8,0"/>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}"
+                                                   FontSize="{DynamicResource Font.Body}"
+                                                   Foreground="{DynamicResource Brush.Text.Primary}"/>
+                                        <TextBlock Text="{Binding RfidTag, StringFormat='RFID: \{0\}'}"
+                                                   FontSize="10"
+                                                   Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="2" Content="🗑" 
+                                            Command="{Binding DataContext.DeleteTrainCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                            CommandParameter="{Binding}"
+                                            Background="Transparent" BorderThickness="0" Foreground="Red" Padding="4"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10">
+                    <ui:Button Content="+ Modem"
                                Command="{Binding OpenCreateModemPopupCommand}"
                                Appearance="Primary"
-                               Margin="0,0,10,0"/>
-                    <ui:Button Content="+ RFID Etiket"
+                               Margin="0,0,5,0"
+                               Padding="6,4"/>
+                    <ui:Button Content="+ RFID"
                                Command="{Binding AddRfidTagCommand}"
-                               Appearance="Secondary"/>
+                               Appearance="Secondary"
+                               Margin="0,0,5,0"
+                               Padding="6,4"/>
+                    <ui:Button Content="+ Tren"
+                               Command="{Binding AddTrainCommand}"
+                               Appearance="Secondary"
+                               Padding="6,4"/>
                 </StackPanel>
                            
                 <!-- Temel Elektronikler Başlık -->
-                <TextBlock Grid.Row="5"
+                <TextBlock Grid.Row="7"
                            Text="Temel Elektronikler"
                            FontSize="{DynamicResource Font.Heading.Medium}"
                            FontWeight="SemiBold"
@@ -187,7 +247,7 @@
                            Margin="15,10,15,5"/>
                            
                 <!-- Temel Elektronikler Listesi -->
-                <ListBox Grid.Row="6"
+                <ListBox Grid.Row="8"
                          ItemsSource="{Binding Templates}"
                          SelectedItem="{Binding SelectedTemplate}"
                          BorderThickness="0"
@@ -268,7 +328,7 @@
                     </ListBox.ItemContainerStyle>
                 </ListBox>
 
-                <ui:Button Grid.Row="7"
+                <ui:Button Grid.Row="9"
                            Content="Elektronik Ekle"
                            Command="{Binding AddTemplateCommand}"
                            Appearance="Secondary"

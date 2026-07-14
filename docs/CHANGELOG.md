@@ -2,6 +2,17 @@
 
 All notable changes to TCP (Train Control Platform) are documented in this file.
 
+## TCP-2.9.1 — Editor UI/UX and Database Integrity Fixes
+
+**Release Date**: 2026-07-14
+
+### Fixed & Improved
+- **Pivot Zoom (UI)**: Farenin tekerleğiyle yakınlaştırma yapıldığında oluşan merkez odaklanma sorunu (XAML `RenderTransformOrigin`) düzeltilerek imlece göre (Pivot Zoom) çalışması sağlandı.
+- **Rota Çizim Mantığı**: Sağ tık (Right Click) yapıldığında çizim iptali yerine çizimin tamamlanması (FinishRoute) sağlandı. Ayrıca kısa rotalarda okların (Direction Arrows) hemen belirmemesi sorunu düzeltildi.
+- **Veritabanı ve JSON Serileştirme (Core)**: SQLite kaydı esnasında derin nesnelerin (Modem, Station vb.) `$id` ve `$ref` kurgularını kaybetmemesi için `ReferenceHandler.Preserve` mimarisine geçildi. Aktif senaryo yokken oluşan "Hayalet Otomatik Kayıt" (Zombie Autosave) bug'ı silindi.
+
+---
+
 ## TCP-2.6.0 — Spline Routing & Simulation Module
 
 **Release Date**: [Current Date]

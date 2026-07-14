@@ -18,6 +18,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <TextBlock Text="Senaryo Yönetimi" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,20"/>
@@ -73,5 +74,68 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+
+        <!-- Canlı Ağ İzleme (Live Network Monitoring) -->
+        <Grid Grid.Row="3" Margin="0,20,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <TextBlock Text="Canlı Cihaz Durumları (Ana PC İzleme)" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,15"/>
+            
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Modems}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{DynamicResource Brush.Surface}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1" CornerRadius="8" Padding="15" Margin="0,0,0,15">
+                                <StackPanel>
+                                    <!-- Modem Header -->
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="📶" FontSize="18" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding IpAddress}" Foreground="{DynamicResource Brush.Text.Secondary}" Margin="0,0,15,0" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="3" Text="{Binding Status}" Foreground="{DynamicResource Brush.Palette.Orange}" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                                    </Grid>
+                                    
+                                    <!-- Stations List -->
+                                    <ItemsControl ItemsSource="{Binding Stations}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="30,5,0,5">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="200"/>
+                                                        <ColumnDefinition Width="120"/>
+                                                        <ColumnDefinition Width="120"/>
+                                                        <ColumnDefinition Width="100"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    
+                                                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                                        <TextBlock Text="💻" Margin="0,0,5,0"/>
+                                                        <TextBlock Text="{Binding Name}"/>
+                                                    </StackPanel>
+                                                    <TextBlock Grid.Column="1" Text="{Binding IpAddress}" Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                                    <TextBlock Grid.Column="2" Text="{Binding RouterPort}" Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                                    <TextBlock Grid.Column="3" Text="{Binding Status}" Foreground="{DynamicResource Brush.Palette.Green}" FontWeight="SemiBold"/>
+                                                    <TextBlock Grid.Column="4" Text="{Binding LastMessage}" Foreground="{DynamicResource Brush.Text.Secondary}" TextTrimming="CharacterEllipsis"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
     </Grid>
 </UserControl>

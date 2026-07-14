@@ -66,6 +66,34 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand RemoveSelectedLayerCommand { get; }
     public ICommand EditLayerPropertiesCommand { get; }
     
+    // Component Binding
+    public ICommand BindComponentCommand { get; }
+    public ICommand SaveComponentBindingCommand { get; }
+    public ICommand CancelComponentBindingCommand { get; }
+
+    private bool _isComponentBindPopupOpen;
+    public bool IsComponentBindPopupOpen
+    {
+        get => _isComponentBindPopupOpen;
+        set { if (_isComponentBindPopupOpen != value) { _isComponentBindPopupOpen = value; OnPropertyChanged(); } }
+    }
+
+    private ObservableCollection<ComponentInstance> _availableComponentsForBinding = new();
+    public ObservableCollection<ComponentInstance> AvailableComponentsForBinding
+    {
+        get => _availableComponentsForBinding;
+        set { _availableComponentsForBinding = value; OnPropertyChanged(); }
+    }
+
+    private ComponentInstance? _selectedComponentForBinding;
+    public ComponentInstance? SelectedComponentForBinding
+    {
+        get => _selectedComponentForBinding;
+        set { if (_selectedComponentForBinding != value) { _selectedComponentForBinding = value; OnPropertyChanged(); } }
+    }
+
+    private TrackNode? _bindingTargetNode;
+    
     public ObservableCollection<EditorImage> EditorImages { get; } = new();
 
     private EditorImage? _selectedImage;
@@ -310,6 +338,9 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand RefreshCommand { get; }
     public ICommand OpenRelayControlCommand { get; }
     public ICommand OpenOtaUpdateCommand { get; }
+    public ICommand RemoveRouteCommand { get; }
+    public ICommand ToggleOrthogonalModeCommand { get; }
+    public ICommand UndoRouteNodeCommand { get; }
     
     // Spline Drawing State
     public ObservableCollection<TrackRoute> Routes { get; } = new();
@@ -341,6 +372,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                 
                 if (_isDrawingRoute)
                 {
+                    if (IsSelectionMode) IsSelectionMode = false;
                     CurrentRoute = new TrackRoute { Name = $"Rota {Routes.Count + 1}" };
                     Routes.Add(CurrentRoute);
                     SyncLayers();
@@ -364,6 +396,39 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         }
     }
     
+    private bool _isSelectionMode;
+    public bool IsSelectionMode
+    {
+        get => _isSelectionMode;
+        set
+        {
+            if (_isSelectionMode != value)
+            {
+                _isSelectionMode = value;
+                OnPropertyChanged();
+                
+                if (_isSelectionMode && IsDrawingRoute)
+                {
+                    IsDrawingRoute = false; // Turn off drawing mode if selection mode is activated
+                }
+            }
+        }
+    }
+    
+    private bool _isOrthogonalMode;
+    public bool IsOrthogonalMode
+    {
+        get => _isOrthogonalMode;
+        set
+        {
+            if (_isOrthogonalMode != value)
+            {
+                _isOrthogonalMode = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+    
     public void AddRouteNode(double x, double y)
     {
         if (!IsDrawingRoute || CurrentRoute == null) return;
@@ -371,6 +436,22 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         var node = new TrackNode { X = x, Y = y };
         CurrentRoute.Nodes.Add(node);
         OnPropertyChanged(nameof(CurrentRoute)); // Trigger path redraw
+        ((RelayCommandWithCanExecute<object>)UndoRouteNodeCommand).RaiseCanExecuteChanged();
+    }
+    
+    private void UndoRouteNode()
+    {
+        if (CurrentRoute != null && CurrentRoute.Nodes.Any())
+        {
+            CurrentRoute.Nodes.RemoveAt(CurrentRoute.Nodes.Count - 1);
+            OnPropertyChanged(nameof(CurrentRoute));
+            ((RelayCommandWithCanExecute<object>)UndoRouteNodeCommand).RaiseCanExecuteChanged();
+        }
+    }
+    
+    private bool CanUndoRouteNode()
+    {
+        return IsDrawingRoute && CurrentRoute != null && CurrentRoute.Nodes.Any();
     }
     
     private bool _isLiveMode;
@@ -421,6 +502,10 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
 
         LoadImageCommand = new RelayCommand<object>(_ => LoadImage());
         
+        BindComponentCommand = new RelayCommand<TrackNode>(OpenBindPopup);
+        SaveComponentBindingCommand = new RelayCommand<object>(_ => SaveBinding());
+        CancelComponentBindingCommand = new RelayCommand<object>(_ => IsComponentBindPopupOpen = false);
+        
         PlacedBoxes = new ObservableCollection<ILayerItem>();
         
 
@@ -454,7 +539,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         SelectImageCommand = new RelayCommand<object>(img => SelectedImage = img as EditorImage);
         
         // Save/Load layout file commands are removed since ProjectManager handles DB
-        SaveLayoutCommand = new RelayCommand<object>(_ => { /* Deprecated */ });
+        SaveLayoutCommand = new RelayCommand<object>(_ => { ProjectManager.Instance.SaveScenario(); });
         LoadLayoutCommand = new RelayCommand<object>(_ => { /* Deprecated */ });
         
         ProjectManager.Instance.GetEditorJsonFunc = () => EditorLayoutService.Instance.GetCurrentLayoutJson(EditorImages, PlacedBoxes, Routes);
@@ -465,9 +550,25 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         {
             if (!IsLiveMode) RemoveSelectedLayer(param as ILayerItem);
         });
+        RemoveRouteCommand = new RelayCommand<object>(param => 
+        {
+            if (!IsLiveMode && param is TrackRoute route)
+            {
+                Routes.Remove(route);
+                SyncLayers();
+                TerminalService.Instance.LogInfo($"Rota silindi: {route.Name}");
+            }
+        });
         EditLayerPropertiesCommand = new RelayCommand<object>(param => EditLayerProperties(param as ILayerItem));
         RefreshCommand = new RelayCommand<object>(_ => RefreshEditor());
         
+        ToggleOrthogonalModeCommand = new RelayCommand<object>(_ => 
+        {
+            IsOrthogonalMode = !IsOrthogonalMode;
+            TerminalService.Instance.LogInfo(IsOrthogonalMode ? "Dik Açı (Orthogonal) Modu: AÇIK" : "Dik Açı (Orthogonal) Modu: KAPALI");
+        });
+        UndoRouteNodeCommand = new RelayCommandWithCanExecute<object>(_ => UndoRouteNode(), () => CanUndoRouteNode());
+
         OpenRelayControlCommand = new RelayCommand<object>(param => 
         {
             if (IsLiveMode && param is TCP.App.Models.Electronics.StationInstance station)
@@ -497,6 +598,56 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         ProjectManager.Instance.ScenarioLoaded += StopSimulation;
         
         SyncLayers();
+
+        if (ProjectManager.Instance.CurrentScenario != null && !string.IsNullOrEmpty(ProjectManager.Instance.CurrentScenario.EditorLayoutJson))
+        {
+            LoadEditorFromJson(ProjectManager.Instance.CurrentScenario.EditorLayoutJson);
+        }
+    }
+
+    private void RefreshLayout()
+    {
+        ProjectManager.Instance.MarkDirty();
+    }
+    
+    private void OpenBindPopup(TrackNode? node)
+    {
+        if (node == null) return;
+        _bindingTargetNode = node;
+        
+        AvailableComponentsForBinding.Clear();
+        foreach (var modem in _networkManager.Modems)
+        {
+            foreach (var station in modem.Stations)
+            {
+                foreach (var component in station.Components)
+                {
+                    // Only Servos are typically used for track switches, but we can list all for now
+                    if (component.Type.ToLower().Contains("servo"))
+                    {
+                        AvailableComponentsForBinding.Add(component);
+                    }
+                }
+            }
+        }
+        
+        SelectedComponentForBinding = AvailableComponentsForBinding.FirstOrDefault(c => c.Id == node.BoundComponentId);
+        IsComponentBindPopupOpen = true;
+    }
+
+    private void SaveBinding()
+    {
+        if (_bindingTargetNode != null && SelectedComponentForBinding != null)
+        {
+            _bindingTargetNode.BoundComponentId = SelectedComponentForBinding.Id;
+            RefreshLayout();
+        }
+        else if (_bindingTargetNode != null && SelectedComponentForBinding == null)
+        {
+            _bindingTargetNode.BoundComponentId = null;
+            RefreshLayout();
+        }
+        IsComponentBindPopupOpen = false;
     }
 
     private void RefreshEditor()
@@ -693,13 +844,41 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     
     private void RemoveSelectedLayer(ILayerItem? item = null)
     {
-        var target = item ?? SelectedLayerItem;
-        if (target == null) return;
+        var selectedImages = EditorImages.Where(i => i.IsSelected).ToList();
+        var selectedBoxes = PlacedBoxes.Where(b => b.IsSelected).ToList();
+        var selectedRoutes = Routes.Where(r => r.IsSelected).ToList();
+        
+        // If item is null OR item is currently selected (and we have multiple selected), delete all selected
+        bool isItemInSelection = item != null && item.IsSelected;
+        
+        if (item == null || isItemInSelection)
+        {
+            foreach (var img in selectedImages) RemoveLayerCore(img);
+            foreach (var box in selectedBoxes) RemoveLayerCore(box);
+            foreach (var route in selectedRoutes) RemoveLayerCore(route);
+            
+            if (selectedImages.Any() || selectedBoxes.Any() || selectedRoutes.Any())
+                return;
+        }
 
+        // If we reach here, we are just deleting the specific passed item
+        var target = item ?? SelectedLayerItem;
+        if (target != null) RemoveLayerCore(target);
+        
+        SyncLayers();
+    }
+
+    private void RemoveLayerCore(ILayerItem target)
+    {
         if (target is EditorImage img)
         {
             EditorImages.Remove(img);
             if (SelectedLayerItem == img) SelectedLayerItem = null;
+        }
+        else if (target is TrackRoute route)
+        {
+            Routes.Remove(route);
+            if (SelectedLayerItem == route) SelectedLayerItem = null;
         }
         else if (target is MainPcInstance pc)
         {

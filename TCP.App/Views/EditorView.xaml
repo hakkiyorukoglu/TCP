@@ -11,7 +11,13 @@
              xmlns:converters="clr-namespace:TCP.App.Converters"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             Background="Transparent">
+             Background="Transparent"
+             Focusable="True">
+    <UserControl.InputBindings>
+        <KeyBinding Key="Tab" Command="{Binding ToggleOrthogonalModeCommand}" />
+        <KeyBinding Key="Backspace" Command="{Binding UndoRouteNodeCommand}" />
+        <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoRouteNodeCommand}" />
+    </UserControl.InputBindings>
     <!--
         EditorView.xaml - Editor view
         
@@ -25,6 +31,7 @@
     -->
     <UserControl.Resources>
         <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <converters:InvertedBoolToVisibilityConverter x:Key="InvertedBoolToVisibilityConverter"/>
         <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
         <converters:LayerTypeToIconConverter x:Key="LayerTypeToIconConverter"/>
         <converters:ConnectionPathConverter x:Key="ConnectionPathConverter"/>
@@ -89,6 +96,22 @@
                             Value="{Binding SelectedImage.Opacity, Mode=TwoWay}"
                             IsEnabled="{Binding HasSelectedImage}"
                             Width="100" VerticalAlignment="Center" Margin="0,0,16,0"/>
+
+                    <!-- Seçim Modu Button -->
+                    <ToggleButton Content="Seçim Aracı"
+                                  IsChecked="{Binding IsSelectionMode, Mode=TwoWay}"
+                                  Margin="0,0,16,0"
+                                  Cursor="Hand">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton" BasedOn="{StaticResource {x:Type ToggleButton}}">
+                                <Style.Triggers>
+                                    <Trigger Property="IsChecked" Value="True">
+                                        <Setter Property="Foreground" Value="Cyan"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
 
                     <!-- Rota Çiz Button -->
                     <ToggleButton Content="Rota Çiz (Spline)"
@@ -182,6 +205,8 @@
                 <ColumnDefinition Width="260"/>
                 <!-- Middle: Editor Area (star) -->
                 <ColumnDefinition Width="*"/>
+                <!-- Drawing Tools Toolbar -->
+                <ColumnDefinition Width="Auto"/>
                 <!-- Right: Layers Panel (fixed width) -->
                 <ColumnDefinition Width="280"/>
             </Grid.ColumnDefinitions>
@@ -283,16 +308,62 @@
                 </Grid>
             </Border>
             
-            <!-- Right: Layers & Properties Panel -->
-            <Grid Grid.Column="2" Margin="16,0,16,16">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/> <!-- Layers Tree -->
-                    <RowDefinition Height="Auto"/> <!-- Properties -->
-                </Grid.RowDefinitions>
+            <!-- Drawing Tools Toolbar (Left of Layers) -->
+            <Grid Grid.Column="2" Margin="0,0,16,16" 
+                  Visibility="{Binding IsDrawingRoute, Converter={StaticResource BoolToVisibilityConverter}}"
+                  VerticalAlignment="Top">
+                
+                <Border Background="{DynamicResource Brush.Surface}"
+                        BorderBrush="{DynamicResource Brush.Border}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="4">
+                    <Border.Effect>
+                        <DropShadowEffect Color="Black" Opacity="0.1" BlurRadius="10" ShadowDepth="2" Direction="270" />
+                    </Border.Effect>
+                    
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="🛠" FontSize="14" HorizontalAlignment="Center" Margin="0,4,0,8" ToolTip="Çizim Araçları" Opacity="0.7"/>
+                        
+                        <!-- Undo Button -->
+                        <ui:Button Command="{Binding UndoRouteNodeCommand}"
+                                   Appearance="Transparent" Width="36" Height="36" Padding="0" Margin="0,0,0,4"
+                                   Cursor="Hand" ToolTip="Geri Al (Ctrl+Z / Backspace)">
+                            <ui:SymbolIcon Symbol="ArrowUndo24" FontSize="18" Foreground="{DynamicResource Brush.Text.Primary}"/>
+                        </ui:Button>
+                        
+                        <!-- Ortho Toggle -->
+                        <ToggleButton Command="{Binding ToggleOrthogonalModeCommand}"
+                                      IsChecked="{Binding IsOrthogonalMode, Mode=OneWay}"
+                                      Width="36" Height="36" Padding="0" Margin="0,0,0,4"
+                                      Cursor="Hand" ToolTip="Dik Açı Kısıtlaması (Tab)"
+                                      Style="{DynamicResource {x:Static ToolBar.ToggleButtonStyleKey}}">
+                            <ui:SymbolIcon Symbol="Grid24" FontSize="18" Foreground="{DynamicResource Brush.Text.Primary}"/>
+                        </ToggleButton>
+                        
+                        <Separator Margin="4" Background="{DynamicResource Brush.Border}"/>
+                        
+                        <!-- Finish Drawing Button -->
+                        <ui:Button Command="{Binding ToggleDrawingRouteCommand}"
+                                   Appearance="Transparent" Width="36" Height="36" Padding="0"
+                                   Cursor="Hand" ToolTip="Çizimi Bitir (Sağ Tık)">
+                            <ui:SymbolIcon Symbol="Checkmark24" FontSize="18" Foreground="{DynamicResource Brush.Success}"/>
+                        </ui:Button>
+                    </StackPanel>
+                </Border>
+            </Grid>
 
-                <!-- Layers Panel -->
-                <Border Grid.Row="0"
-                        Background="{DynamicResource Brush.Surface}"
+            <!-- Right: Layers & Properties Panel -->
+            <Grid Grid.Column="3" Margin="0,0,16,16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/> <!-- Layers Tree -->
+                        <RowDefinition Height="Auto"/> <!-- Properties -->
+                    </Grid.RowDefinitions>
+
+                    <!-- Layers Panel -->
+                    <Border Grid.Row="0"
+                            Background="{DynamicResource Brush.Surface}"
                         BorderBrush="{DynamicResource Brush.Border}"
                         BorderThickness="1"
                         Margin="0,0,0,8">
@@ -535,6 +606,7 @@
                         </TreeView>
                     </Grid>
                 </Border>
+                </Grid>
             </Grid>
             
             <!-- Middle: Editor Area -->
@@ -551,6 +623,7 @@
                     ClipToBounds="True"
                     MouseWheel="ViewportContainer_MouseWheel"
                     MouseDown="ViewportContainer_MouseDown"
+                    PreviewMouseRightButtonDown="ViewportContainer_PreviewMouseRightButtonDown"
                     MouseMove="ViewportContainer_MouseMove"
                     MouseUp="ViewportContainer_MouseUp">
                 <Grid>
@@ -559,7 +632,12 @@
                     <Canvas x:Name="ViewportCanvas"
                             Background="Transparent"
                             RenderTransform="{Binding ViewportState.Transform, Mode=OneWay}"
-                            RenderTransformOrigin="0.5,0.5">
+                            Tag="{Binding}">
+                        <Canvas.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Seçili Öğeleri Sil" Command="{Binding PlacementTarget.Tag.RemoveSelectedLayerCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+                            </ContextMenu>
+                        </Canvas.ContextMenu>
                         
                         <!-- AutoCAD-style Limited Space Grid (Z-Index -1) -->
                         <Rectangle Canvas.Left="-5000" Canvas.Top="-5000" 
@@ -739,7 +817,13 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Canvas>
+                                    <Canvas Background="Transparent" Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                        <Canvas.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Sil" Command="{Binding PlacementTarget.Tag.RemoveSelectedLayerCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding}" />
+                                                <MenuItem Header="Özellikler" Command="{Binding PlacementTarget.Tag.EditLayerPropertiesCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding}" />
+                                            </ContextMenu>
+                                        </Canvas.ContextMenu>
                                         <!-- Track Base / Gölge -->
                                         <Path Stroke="#222222" StrokeThickness="20" Opacity="0.4"
                                               Data="{Binding RoutePathData}" Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
@@ -753,12 +837,17 @@
                                               Data="{Binding LeftRailPathData}" Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
                                               
                                         <!-- Sağ Ray -->
+                                        <!-- Sağ Ray -->
                                         <Path Stroke="#C0C0C0" StrokeThickness="2" 
                                               Data="{Binding RightRailPathData}" Visibility="{Binding IsVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
 
                                         <!-- Merkez Çizgi -->
                                         <Path Stroke="Yellow" StrokeThickness="2" Opacity="0.9" StrokeDashArray="2, 2"
                                               Data="{Binding RoutePathData}" Visibility="{Binding IsCenterLineVisible, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                                        <!-- Direction Arrows -->
+                                        <Path Data="{Binding DirectionPathData}"
+                                              Stroke="White" StrokeThickness="2" />
                                         
                                         <!-- The Nodes -->
                                         <ItemsControl ItemsSource="{Binding Nodes}">
@@ -769,9 +858,21 @@
                                             </ItemsControl.ItemsPanel>
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Ellipse Width="8" Height="8" Fill="Red" 
+                                                    <Ellipse Width="12" Height="12" Fill="Red" 
                                                              Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}" 
-                                                             Margin="-4,-4,0,0" />
+                                                             Margin="-6,-6,0,0"
+                                                             Cursor="SizeAll"
+                                                             MouseLeftButtonDown="Node_MouseLeftButtonDown"
+                                                             MouseMove="Node_MouseMove"
+                                                             MouseLeftButtonUp="Node_MouseLeftButtonUp">
+                                                        <Ellipse.ContextMenu>
+                                                            <ContextMenu>
+                                                                <MenuItem Header="Cihaz Ata (Makas/Servo)" 
+                                                                          Command="{Binding DataContext.BindComponentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                                                                          CommandParameter="{Binding}" />
+                                                            </ContextMenu>
+                                                        </Ellipse.ContextMenu>
+                                                    </Ellipse>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
@@ -779,6 +880,34 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+
+                        <!-- Preview Line for Route Drawing -->
+                        <Line x:Name="DrawingPreviewLine"
+                              Stroke="{DynamicResource Brush.Accent.Primary}"
+                              StrokeThickness="2"
+                              StrokeDashArray="2,2"
+                              Visibility="Collapsed"
+                              IsHitTestVisible="False" />
+
+                        <!-- Snap Indicator (Z-Index 5) -->
+                        <Ellipse x:Name="SnapIndicator" Width="16" Height="16" 
+                                 Fill="White" Opacity="0.9" Panel.ZIndex="5"
+                                 Visibility="Collapsed" IsHitTestVisible="False"
+                                 Margin="-8,-8,0,0">
+                            <Ellipse.Effect>
+                                <DropShadowEffect Color="White" BlurRadius="15" ShadowDepth="0"/>
+                            </Ellipse.Effect>
+                        </Ellipse>
+
+                        <!-- Selection Rectangle (Z-Index 6) -->
+                        <Rectangle x:Name="SelectionRectangle"
+                                   Stroke="DodgerBlue"
+                                   StrokeThickness="1"
+                                   StrokeDashArray="4 2"
+                                   Fill="#331E90FF"
+                                   Visibility="Collapsed"
+                                   Panel.ZIndex="6"
+                                   IsHitTestVisible="False"/>
 
                         <!-- Placed Boxes Overlay (Z-Index 2) -->
                         <!-- TCP-1.0.3: Boxes drawn on top of background image -->
@@ -998,6 +1127,24 @@
                 </Grid>
             </Border>
         </Grid>
+        
+        <!-- Component Bind Popup -->
+        <Border Background="#80000000" Visibility="{Binding IsComponentBindPopupOpen, Converter={StaticResource BoolToVisibilityConverter}}" Grid.RowSpan="3" Grid.ColumnSpan="3" Panel.ZIndex="1000">
+            <Border Background="{DynamicResource Brush.Surface}" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1" CornerRadius="8" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center" MinWidth="300">
+                <StackPanel>
+                    <TextBlock Text="Makas Cihazı Ata" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource Brush.Text.Primary}" Margin="0,0,0,15"/>
+                    
+                    <TextBlock Text="Cihaz (Örn: Servo):" Foreground="{DynamicResource Brush.Text.Secondary}" Margin="0,0,0,5"/>
+                    <ComboBox ItemsSource="{Binding AvailableComponentsForBinding}" SelectedItem="{Binding SelectedComponentForBinding}" DisplayMemberPath="Name" Margin="0,0,0,20"/>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <ui:Button Content="İptal" Command="{Binding CancelComponentBindingCommand}" Appearance="Secondary" Margin="0,0,10,0"/>
+                        <ui:Button Content="Kaydet" Command="{Binding SaveComponentBindingCommand}" Appearance="Primary"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
     </Grid>
 </UserControl>
 

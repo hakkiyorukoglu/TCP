@@ -18,6 +18,7 @@ public class StationInstance : ILayerItem, INotifyPropertyChanged
     private bool _isSelected;
     private bool _isVisible = true;
     private NetworkStatus _status = NetworkStatus.Offline;
+    private string _lastMessage = "Bekliyor...";
 
     public Guid Id { get; set; } = Guid.NewGuid();
 
@@ -55,7 +56,14 @@ public class StationInstance : ILayerItem, INotifyPropertyChanged
         {
             ConsoleLogs.Insert(0, $"{DateTime.Now:HH:mm:ss} - {message}");
             if (ConsoleLogs.Count > 5) ConsoleLogs.RemoveAt(ConsoleLogs.Count - 1);
+            LastMessage = message;
         });
+    }
+
+    public string LastMessage
+    {
+        get => _lastMessage;
+        set { if (_lastMessage != value) { _lastMessage = value; OnPropertyChanged(); } }
     }
 
     public double X

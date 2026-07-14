@@ -77,7 +77,7 @@ public class EditorLayoutService
                 });
             }
 
-            return JsonSerializer.Serialize(state, new JsonSerializerOptions { WriteIndented = true });
+            return JsonSerializer.Serialize(state, NetworkManager.JsonOptions);
         }
         catch (Exception ex)
         {
@@ -105,7 +105,7 @@ public class EditorLayoutService
 
         try
         {
-            var state = JsonSerializer.Deserialize<EditorLayoutState>(json);
+            var state = JsonSerializer.Deserialize<EditorLayoutState>(json, NetworkManager.JsonOptions);
 
             if (state != null)
             {

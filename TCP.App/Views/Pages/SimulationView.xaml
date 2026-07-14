@@ -224,6 +224,30 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
+                            <!-- Trains Overlay -->
+                            <ItemsControl ItemsSource="{Binding Trains}" Panel.ZIndex="5">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemContainerStyle>
+                                    <Style TargetType="ContentPresenter">
+                                        <Setter Property="Canvas.Left" Value="{Binding X, Mode=OneWay}"/>
+                                        <Setter Property="Canvas.Top" Value="{Binding Y, Mode=OneWay}"/>
+                                    </Style>
+                                </ItemsControl.ItemContainerStyle>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="-15,-15,0,0">
+                                            <!-- Simple Train Rect -->
+                                            <Rectangle Width="30" Height="20" Fill="{DynamicResource Brush.Accent.Primary}" RadiusX="4" RadiusY="4" Stroke="White" StrokeThickness="2" />
+                                            <TextBlock Text="{Binding Name}" Foreground="White" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
                         </Canvas>
                     </Viewbox>
                 </Grid>
