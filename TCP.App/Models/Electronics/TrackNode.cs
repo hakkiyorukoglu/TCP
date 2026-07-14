@@ -60,6 +60,14 @@ public class TrackNode : ILayerItem
         set { if (_boundComponentId != value) { _boundComponentId = value; OnPropertyChanged(); } }
     }
 
+    private bool _isEndPoint;
+    [JsonIgnore]
+    public bool IsEndPoint
+    {
+        get => _isEndPoint;
+        set { if (_isEndPoint != value) { _isEndPoint = value; OnPropertyChanged(); } }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {

@@ -181,6 +181,12 @@ public class NetworkManager
         var modem = _modems.FirstOrDefault(m => m.Id == id);
         if (modem != null)
         {
+            // Clean up custom codes for child stations
+            foreach (var st in modem.Stations)
+            {
+                ProjectManager.Instance.DeleteCustomCode(st.Id);
+            }
+            
             // Remove incoming/outgoing references from other modems
             foreach(var m in _modems)
             {
@@ -190,6 +196,39 @@ public class NetworkManager
             
             _modems.Remove(modem);
             SaveNetwork();
+        }
+    }
+
+    public void RemoveStation(Guid id)
+    {
+        foreach (var modem in _modems)
+        {
+            var station = modem.Stations.FirstOrDefault(s => s.Id == id);
+            if (station != null)
+            {
+                ProjectManager.Instance.DeleteCustomCode(station.Id);
+                modem.Stations.Remove(station);
+                SaveNetwork();
+                return;
+            }
+        }
+    }
+
+    public void RemoveComponent(Guid id)
+    {
+        foreach (var modem in _modems)
+        {
+            foreach (var station in modem.Stations)
+            {
+                var component = station.Components.FirstOrDefault(c => c.Id == id);
+                if (component != null)
+                {
+                    ProjectManager.Instance.DeleteCustomCode(component.Id);
+                    station.Components.Remove(component);
+                    SaveNetwork();
+                    return;
+                }
+            }
         }
     }
 

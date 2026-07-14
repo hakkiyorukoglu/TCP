@@ -1,13 +1,13 @@
 # TCP — Train Control Platform
 
-[![Version](https://img.shields.io/badge/version-TCP--2.9.1-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-TCP--2.9.2-blue.svg)](docs/CHANGELOG.md)
 [![.NET](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
 
 **TCP (Train Control Platform)**, tren kontrol sistemleri, ray yerleşim tasarımı ve donanım kartları yönetimini birleştiren tam donanımlı, profesyonel bir masaüstü (WPF) uygulamasıdır.
 
 ---
 
-## 🚀 Öne Çıkan Özellikler (v2.9.1)
+## 🚀 Öne Çıkan Özellikler (v2.9.2)
 
 Uygulama baştan aşağıya gelişmiş yetenekler, dinamik bir arayüz ve uç nokta donanım yönetimiyle donatıldı:
 

@@ -15,6 +15,7 @@ public class LayerGroup : ILayerItem
     private bool _isSelected;
     private bool _isLocked;
     private bool _isVisible = true;
+    private bool _isExpanded = true;
 
     public Guid Id { get; } = Guid.NewGuid();
 
@@ -73,13 +74,22 @@ public class LayerGroup : ILayerItem
     public double X { get; set; }
     public double Y { get; set; }
 
+    public bool IsExpanded
+    {
+        get => _isExpanded;
+        set { if (_isExpanded != value) { _isExpanded = value; OnPropertyChanged(); } }
+    }
+
     /// <summary>
     /// Child layers in this group
     /// </summary>
     public ObservableCollection<ILayerItem> Children { get; } = new();
 
-    public LayerGroup(string name)
+    public string GroupId { get; set; }
+
+    public LayerGroup(string groupId, string name)
     {
+        GroupId = groupId;
         _layerName = name;
         Children.CollectionChanged += (s, e) => OnPropertyChanged(nameof(Children));
     }

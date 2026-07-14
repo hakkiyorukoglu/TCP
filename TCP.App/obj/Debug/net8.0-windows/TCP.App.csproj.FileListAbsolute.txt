@@ -284,3 +284,5 @@ C:\Users\yoruk\Desktop\TCP\TCP.App\bin\Debug\net8.0-windows\ru\Microsoft.CodeAna
 C:\Users\yoruk\Desktop\TCP\TCP.App\bin\Debug\net8.0-windows\tr\Microsoft.CodeAnalysis.Scripting.resources.dll
 C:\Users\yoruk\Desktop\TCP\TCP.App\bin\Debug\net8.0-windows\zh-Hans\Microsoft.CodeAnalysis.Scripting.resources.dll
 C:\Users\yoruk\Desktop\TCP\TCP.App\bin\Debug\net8.0-windows\zh-Hant\Microsoft.CodeAnalysis.Scripting.resources.dll
+C:\Users\yoruk\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\Dialogs\CustomCodeWindow.baml
+C:\Users\yoruk\Desktop\TCP\TCP.App\obj\Debug\net8.0-windows\Views\Dialogs\CustomCodeWindow.g.cs

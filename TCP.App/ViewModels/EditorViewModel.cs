@@ -65,6 +65,9 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     
     public ICommand RemoveSelectedLayerCommand { get; }
     public ICommand EditLayerPropertiesCommand { get; }
+    public ICommand EditCustomCodeCommand { get; }
+    
+    private System.Collections.Generic.List<string> _savedExpandedGroups = new();
     
     // Component Binding
     public ICommand BindComponentCommand { get; }
@@ -339,11 +342,13 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     public ICommand OpenRelayControlCommand { get; }
     public ICommand OpenOtaUpdateCommand { get; }
     public ICommand RemoveRouteCommand { get; }
+    public ICommand RemoveLogicalRouteCommand { get; }
     public ICommand ToggleOrthogonalModeCommand { get; }
     public ICommand UndoRouteNodeCommand { get; }
     
     // Spline Drawing State
     public ObservableCollection<TrackRoute> Routes { get; } = new();
+    public ObservableCollection<LogicalRoute> LogicalRoutes { get; } = new();
     
     private TrackRoute? _currentRoute;
     public TrackRoute? CurrentRoute
@@ -360,7 +365,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
     }
     
     private bool _isDrawingRoute;
-    public bool IsDrawingRoute
+    public bool IsDrawingRoute // Mod for Rail
     {
         get => _isDrawingRoute;
         set
@@ -373,10 +378,12 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                 if (_isDrawingRoute)
                 {
                     if (IsSelectionMode) IsSelectionMode = false;
-                    CurrentRoute = new TrackRoute { Name = $"Rota {Routes.Count + 1}" };
+                    if (IsDrawingLogicalRoute) IsDrawingLogicalRoute = false;
+                    
+                    CurrentRoute = new TrackRoute { Name = $"Ray {Routes.Count + 1}" };
                     Routes.Add(CurrentRoute);
                     SyncLayers();
-                    TerminalService.Instance.LogInfo("Rota çizim modu aktif. Haritaya tıklayarak noktalar ekleyin.");
+                    TerminalService.Instance.LogInfo("Ray çizim modu aktif. Haritaya tıklayarak düğümler ekleyin.");
                 }
                 else
                 {
@@ -384,14 +391,63 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                     {
                         Routes.Remove(CurrentRoute);
                         SyncLayers();
-                        TerminalService.Instance.LogWarning("Rota en az 2 nokta içermelidir. İptal edildi.");
+                        TerminalService.Instance.LogWarning("Ray en az 2 düğüm içermelidir. İptal edildi.");
                     }
-                    else
+                    else if (CurrentRoute != null)
                     {
-                        TerminalService.Instance.LogSuccess("Rota çizimi tamamlandı.");
+                        TerminalService.Instance.LogSuccess("Ray çizimi tamamlandı.");
                     }
                     CurrentRoute = null;
                 }
+            }
+        }
+    }
+
+    private bool _isDrawingLogicalRoute;
+    public bool IsDrawingLogicalRoute
+    {
+        get => _isDrawingLogicalRoute;
+        set
+        {
+            if (_isDrawingLogicalRoute != value)
+            {
+                _isDrawingLogicalRoute = value;
+                OnPropertyChanged();
+                
+                if (_isDrawingLogicalRoute)
+                {
+                    if (IsSelectionMode) IsSelectionMode = false;
+                    if (IsDrawingRoute) IsDrawingRoute = false;
+                    
+                    foreach (var route in Routes)
+                    {
+                        route.UpdateEndPoints();
+                    }
+                    
+                    _pendingLogicalRouteStartNode = null;
+                    SyncLayers();
+                    TCP.App.Services.TerminalService.Instance.LogInfo("Rota çizim modu aktif. Önce bir düğüme, sonra hattın üzerindeki başka bir düğüme tıklayın.");
+                }
+                else
+                {
+                    _pendingLogicalRouteStartNode = null;
+                    SyncLayers();
+                    TCP.App.Services.TerminalService.Instance.LogInfo("Rota çizim modu kapatıldı.");
+                }
+            }
+        }
+    }
+    
+    private LogicalRoute? _currentLogicalRoute;
+    public LogicalRoute? CurrentLogicalRoute
+    {
+        get => _currentLogicalRoute;
+        set
+        {
+            if (_currentLogicalRoute != value)
+            {
+                _currentLogicalRoute = value;
+                OnPropertyChanged();
             }
         }
     }
@@ -410,6 +466,10 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                 if (_isSelectionMode && IsDrawingRoute)
                 {
                     IsDrawingRoute = false; // Turn off drawing mode if selection mode is activated
+                }
+                if (_isSelectionMode && IsDrawingLogicalRoute)
+                {
+                    IsDrawingLogicalRoute = false;
                 }
             }
         }
@@ -437,6 +497,76 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         CurrentRoute.Nodes.Add(node);
         OnPropertyChanged(nameof(CurrentRoute)); // Trigger path redraw
         ((RelayCommandWithCanExecute<object>)UndoRouteNodeCommand).RaiseCanExecuteChanged();
+    }
+    
+    private TrackNode? _pendingLogicalRouteStartNode;
+
+    public void AddLogicalRouteNode(TrackNode node)
+    {
+        if (!IsDrawingLogicalRoute) return;
+        
+        if (_pendingLogicalRouteStartNode == null)
+        {
+            _pendingLogicalRouteStartNode = node;
+            TCP.App.Services.TerminalService.Instance.LogInfo("Başlangıç noktası seçildi. Şimdi aynı ray üzerindeki bitiş noktasını seçin.");
+        }
+        else
+        {
+            var firstNode = _pendingLogicalRouteStartNode;
+            
+            if (firstNode == node) 
+            {
+                return; // Aynı noktaya tıkladı
+            }
+            
+            // Find TrackRoute
+            TCP.App.Models.Electronics.TrackRoute? parentRoute = null;
+            bool isReversed = false;
+            
+            foreach(var track in Routes)
+            {
+                bool hasFirst = track.Nodes.Contains(firstNode);
+                bool hasSecond = track.Nodes.Contains(node);
+                
+                if (hasFirst && hasSecond)
+                {
+                    parentRoute = track;
+                    var index1 = track.Nodes.IndexOf(firstNode);
+                    var index2 = track.Nodes.IndexOf(node);
+                    isReversed = index1 > index2;
+                    break;
+                }
+            }
+            
+            if (parentRoute != null)
+            {
+                var newLogicalRoute = new TCP.App.Models.Electronics.LogicalRoute 
+                { 
+                    Name = $"Rota {LogicalRoutes.Count + 1}",
+                    ParentTrackId = parentRoute.Id,
+                    IsReversed = isReversed,
+                    StartNodeId = firstNode.Id,
+                    EndNodeId = node.Id
+                };
+                
+                // Sadece iki mavi nokta arasındaki en kısa mesafeyi çizmek için aradaki düğümleri atlıyoruz
+                newLogicalRoute.Nodes.Add(firstNode);
+                if (firstNode != node)
+                {
+                    newLogicalRoute.Nodes.Add(node);
+                }
+                
+                LogicalRoutes.Add(newLogicalRoute);
+                SyncLayers();
+                TCP.App.Services.TerminalService.Instance.LogSuccess("Rota başarıyla oluşturuldu. Yeni rota çizmeye devam edebilirsiniz.");
+            }
+            else
+            {
+                TCP.App.Services.TerminalService.Instance.LogWarning("Seçilen iki nokta aynı ray üzerinde değil. İşlem iptal edildi.");
+            }
+            
+            _pendingLogicalRouteStartNode = null;
+        }
     }
     
     private void UndoRouteNode()
@@ -542,7 +672,11 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         SaveLayoutCommand = new RelayCommand<object>(_ => { ProjectManager.Instance.SaveScenario(); });
         LoadLayoutCommand = new RelayCommand<object>(_ => { /* Deprecated */ });
         
-        ProjectManager.Instance.GetEditorJsonFunc = () => EditorLayoutService.Instance.GetCurrentLayoutJson(EditorImages, PlacedBoxes, Routes);
+        ProjectManager.Instance.GetEditorJsonFunc = () => 
+        {
+            var expandedGroups = Layers.OfType<LayerGroup>().Where(g => g.IsExpanded).Select(g => g.LayerName).ToList();
+            return EditorLayoutService.Instance.GetCurrentLayoutJson(EditorImages, PlacedBoxes, Routes, LogicalRoutes, expandedGroups);
+        };
         ProjectManager.Instance.LoadEditorJsonAction = json => LoadEditorFromJson(json);
         
         AddBoxCommand = new RelayCommandWithCanExecute<object>(_ => AddBox(), () => SelectedPaletteItem != null);
@@ -556,10 +690,20 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             {
                 Routes.Remove(route);
                 SyncLayers();
+                TerminalService.Instance.LogInfo($"Ray silindi: {route.Name}");
+            }
+        });
+        RemoveLogicalRouteCommand = new RelayCommand<object>(param => 
+        {
+            if (!IsLiveMode && param is LogicalRoute route)
+            {
+                LogicalRoutes.Remove(route);
+                SyncLayers();
                 TerminalService.Instance.LogInfo($"Rota silindi: {route.Name}");
             }
         });
         EditLayerPropertiesCommand = new RelayCommand<object>(param => EditLayerProperties(param as ILayerItem));
+        EditCustomCodeCommand = new RelayCommand<object>(param => EditCustomCode(param as ILayerItem));
         RefreshCommand = new RelayCommand<object>(_ => RefreshEditor());
         
         ToggleOrthogonalModeCommand = new RelayCommand<object>(_ => 
@@ -592,6 +736,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         EditorImages.CollectionChanged += (s, e) => { SyncLayers(); ProjectManager.Instance.MarkDirty(); };
         PlacedBoxes.CollectionChanged += (s, e) => { SyncLayers(); ProjectManager.Instance.MarkDirty(); };
         Routes.CollectionChanged += (s, e) => { SyncLayers(); ProjectManager.Instance.MarkDirty(); };
+        LogicalRoutes.CollectionChanged += (s, e) => { SyncLayers(); ProjectManager.Instance.MarkDirty(); };
         
         RefreshPaletteItems();
         _networkManager.NetworkChanged += OnNetworkChanged;
@@ -718,7 +863,50 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             }
         }
 
+        RebuildLogicalRoutes();
         SyncLayers();
+    }
+
+    private void RebuildLogicalRoutes()
+    {
+        TCP.App.Services.TerminalService.Instance.LogInfo($"Rebuilding Logical Routes... Found {LogicalRoutes.Count} logical routes.");
+        foreach (var logicalRoute in LogicalRoutes)
+        {
+            var parent = Routes.FirstOrDefault(r => r.Id == logicalRoute.ParentTrackId);
+            if (parent != null)
+            {
+                if (parent.Nodes.Count == 0)
+                {
+                    TCP.App.Services.TerminalService.Instance.LogWarning($"Parent track {parent.Id} has 0 nodes. Skipping.");
+                    continue;
+                }
+                
+                logicalRoute.Nodes.Clear();
+                int startIndex = parent.Nodes.ToList().FindIndex(n => n.Id == logicalRoute.StartNodeId);
+                int endIndex = parent.Nodes.ToList().FindIndex(n => n.Id == logicalRoute.EndNodeId);
+                
+                if (startIndex == -1) startIndex = 0;
+                if (endIndex == -1) endIndex = parent.Nodes.Count - 1;
+
+                int step = logicalRoute.IsReversed ? -1 : 1;
+                
+                // Ensure indices are within bounds
+                startIndex = Math.Clamp(startIndex, 0, parent.Nodes.Count - 1);
+                endIndex = Math.Clamp(endIndex, 0, parent.Nodes.Count - 1);
+                
+                // Sadece iki mavi nokta arasındaki en kısa mesafeyi çizmek için aradaki düğümleri atlıyoruz
+                logicalRoute.Nodes.Add(parent.Nodes[startIndex]);
+                if (startIndex != endIndex)
+                {
+                    logicalRoute.Nodes.Add(parent.Nodes[endIndex]);
+                }
+                TCP.App.Services.TerminalService.Instance.LogInfo($"Logical route {logicalRoute.Name} rebuilt with {logicalRoute.Nodes.Count} nodes.");
+            }
+            else
+            {
+                TCP.App.Services.TerminalService.Instance.LogWarning($"Parent track {logicalRoute.ParentTrackId} not found for logical route {logicalRoute.Name}.");
+            }
+        }
     }
 
     private void RefreshPaletteItems()
@@ -731,13 +919,19 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
 
     private void SyncLayers()
     {
+        var currentExpanded = Layers.OfType<LayerGroup>().Where(g => g.IsExpanded).Select(g => g.GroupId).ToList();
+        if (currentExpanded.Any())
+        {
+            _savedExpandedGroups = currentExpanded;
+        }
+
         var selectedId = SelectedLayerItem?.Id;
         Layers.Clear();
         
         // 1. Group Images
         if (EditorImages.Any())
         {
-            var imagesGroup = new LayerGroup("Arka Planlar");
+            var imagesGroup = new LayerGroup("Images", "Arka Planlar");
             foreach (var img in EditorImages)
                 imagesGroup.Children.Add(img);
             Layers.Add(imagesGroup);
@@ -746,10 +940,18 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         // 1.5. Group Routes
         if (Routes.Any())
         {
-            var routesGroup = new LayerGroup("Rotalar");
+            var routesGroup = new LayerGroup("Routes", "Raylar");
             foreach(var route in Routes)
                 routesGroup.Children.Add(route);
             Layers.Add(routesGroup);
+        }
+
+        if (LogicalRoutes.Any())
+        {
+            var logRoutesGroup = new LayerGroup("LogicalRoutes", "Mantıksal Rotalar");
+            foreach(var lr in LogicalRoutes)
+                logRoutesGroup.Children.Add(lr);
+            Layers.Add(logRoutesGroup);
         }
 
         // 2. Group by Modem (Ağ)
@@ -757,30 +959,38 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
             .Where(b => b is ModemInstance || b is StationInstance || b is ComponentInstance || b is MainPcInstance || b is RfidTagInstance)
             .GroupBy(b => 
             {
-                if (b is MainPcInstance p) return $"Ağ: {p.Name}";
-                if (b is ModemInstance m) return $"Ağ: {m.Name}";
+                if (b is MainPcInstance p) return (p.Id.ToString(), $"Ağ: {p.Name}");
+                if (b is ModemInstance m) return (m.Id.ToString(), $"Ağ: {m.Name}");
                 if (b is StationInstance s) 
                 {
                     var parent = _networkManager.Modems.FirstOrDefault(m => m.Stations.Contains(s));
-                    return parent != null ? $"Ağ: {parent.Name}" : "Ağ: Bilinmeyen";
+                    return parent != null ? (parent.Id.ToString(), $"Ağ: {parent.Name}") : ("Unknown", "Ağ: Bilinmeyen");
                 }
                 if (b is ComponentInstance c) 
                 {
                     var parentStation = _networkManager.Modems.SelectMany(m => m.Stations).FirstOrDefault(st => st.Id == c.StationId);
                     var parentModem = _networkManager.Modems.FirstOrDefault(m => parentStation != null && m.Stations.Contains(parentStation));
-                    return parentModem != null ? $"Ağ: {parentModem.Name}" : "Ağ: Bilinmeyen";
+                    return parentModem != null ? (parentModem.Id.ToString(), $"Ağ: {parentModem.Name}") : ("Unknown", "Ağ: Bilinmeyen");
                 }
-                if (b is RfidTagInstance) return "RFID Etiketler";
-                return "Diğer";
+                if (b is RfidTagInstance) return ("RfidTags", "RFID Etiketler");
+                return ("Other", "Diğer");
             })
-            .OrderBy(g => g.Key);
+            .OrderBy(g => g.Key.Item2);
         
         foreach (var group in grouped)
         {
-            var layerGroup = new LayerGroup(group.Key);
+            var layerGroup = new LayerGroup(group.Key.Item1, group.Key.Item2);
             foreach (var box in group)
                 layerGroup.Children.Add(box);
             Layers.Add(layerGroup);
+        }
+
+        foreach (var layer in Layers.OfType<LayerGroup>())
+        {
+            if (_savedExpandedGroups.Contains(layer.GroupId))
+                layer.IsExpanded = true;
+            else if (_savedExpandedGroups.Any())
+                layer.IsExpanded = false;
         }
 
         SyncDaisyChainLines();
@@ -903,7 +1113,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                 }
             }
             if (SelectedLayerItem == m) SelectedLayerItem = null;
-            NetworkManager.Instance.SaveNetwork();
+            NetworkManager.Instance.RemoveModem(m.Id);
         }
         else if (target is StationInstance st)
         {
@@ -916,14 +1126,14 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                 PlacedBoxes.Remove(c);
             }
             if (SelectedLayerItem == st) SelectedLayerItem = null;
-            NetworkManager.Instance.SaveModems();
+            NetworkManager.Instance.RemoveStation(st.Id);
         }
         else if (target is ComponentInstance comp)
         {
             comp.X = 0; comp.Y = 0; comp.IsLocked = false;
             PlacedBoxes.Remove(comp);
             if (SelectedLayerItem == comp) SelectedLayerItem = null;
-            NetworkManager.Instance.SaveModems();
+            NetworkManager.Instance.RemoveComponent(comp.Id);
         }
         else if (target is RfidTagInstance rfid)
         {
@@ -978,6 +1188,20 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         {
             SyncLayers();
             NetworkManager.Instance.SaveModems();
+        }
+    }
+    
+    private void EditCustomCode(ILayerItem? item = null)
+    {
+        var target = item ?? SelectedLayerItem;
+        if (target is StationInstance || target is MainPcInstance)
+        {
+            var window = new TCP.App.Views.Dialogs.CustomCodeWindow(target.Id, target.LayerName);
+            window.ShowDialog();
+        }
+        else
+        {
+            TerminalService.Instance.LogWarning("Kod yazma işlemi sadece programlanabilir cihazlar (Main PC, İstasyon) için geçerlidir.");
         }
     }
     
@@ -1041,11 +1265,22 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
         var state = EditorLayoutService.Instance.LoadFromJson(json);
         if (state != null)
         {
+            if (state.ExpandedGroups != null && state.ExpandedGroups.Any())
+            {
+                _savedExpandedGroups = state.ExpandedGroups;
+            }
+
             EditorImages.Clear();
             foreach (var img in state.Images) EditorImages.Add(img);
 
             Routes.Clear();
             foreach (var route in state.Routes) Routes.Add(route);
+
+            LogicalRoutes.Clear();
+            if (state.LogicalRoutes != null)
+            {
+                foreach (var route in state.LogicalRoutes) LogicalRoutes.Add(route);
+            }
 
             PlacedBoxes.Clear();
             foreach (var stState in state.PlacedItems)
@@ -1101,6 +1336,7 @@ public class EditorViewModel : ViewModelBase, INotifyPropertyChanged
                 }
             }
             
+            RebuildLogicalRoutes();
             SelectedImage = null;
             SelectedLayerItem = null;
         }

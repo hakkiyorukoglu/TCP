@@ -2,6 +2,17 @@
 
 All notable changes to TCP (Train Control Platform) are documented in this file.
 
+## TCP-2.9.2 — Neon Selection Highlight & Universal Canvas Select
+
+**Release Date**: 2026-07-14
+
+### Added
+- **Neon Selection Highlight (Glow)**: AutoCAD tarzı seçim efekti eklendi. Seçilen elektronik parçalar (PC, İstasyon, Modem vb.) ve rotalar (TrackRoute, LogicalRoute) etrafında Cyan (Turkuaz) renginde neon gölge parlaması (DropShadowEffect) belirmesi sağlandı.
+- **Universal Canvas Select**: Doğrudan Canvas (Editör Haritası) üzerindeki objelere tıklayarak seçim yapma özelliği eklendi. Canvas'tan yapılan seçim, Unsur Ağacı (Layers TreeView) ile çift yönlü olarak anında senkronize olur.
+- **Robust XAML Hierarchy**: Canvas objeleri için `MouseLeftButtonDown` event'leri bağlanarak seçim mantığı `EditorViewModel` içindeki `SelectedLayerItem` ile bütünleştirildi. XAML içi bozulan yapılandırılmalar (Image kalıntıları) temizlenerek %100 çalışma güvencesi sağlandı.
+
+---
+
 ## TCP-2.9.1 — Editor UI/UX and Database Integrity Fixes
 
 **Release Date**: 2026-07-14

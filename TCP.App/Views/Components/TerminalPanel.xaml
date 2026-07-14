@@ -83,9 +83,16 @@
                 <ListView.Style>
                     <Style TargetType="ListView">
                         <Setter Property="Visibility" Value="Visible"/>
+                        <Setter Property="Height" Value="200"/> <!-- Varsayılan Normal yükseklik -->
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsMinimized}" Value="True">
-                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Setter Property="Height" Value="80"/> <!-- Yaklaşık 4 satır için yükseklik -->
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsNormal}" Value="True">
+                                <Setter Property="Height" Value="200"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsExpanded}" Value="True">
+                                <Setter Property="Height" Value="NaN"/> <!-- Auto height for expanded -->
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>

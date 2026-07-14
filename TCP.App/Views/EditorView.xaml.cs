@@ -110,6 +110,28 @@ public partial class EditorView : UserControl
                 viewModel.AddRouteNode(snapped.X, snapped.Y);
                 e.Handled = true;
             }
+            else if (e.LeftButton == MouseButtonState.Pressed && viewModel.IsDrawingLogicalRoute)
+            {
+                var pos = e.GetPosition(ViewportCanvas);
+                var snapped = GetSnappedPosition(pos, viewModel);
+                
+                if (snapped.Magnetized)
+                {
+                    TCP.App.Models.Electronics.TrackNode? snappedNode = null;
+                    foreach(var route in viewModel.Routes)
+                    {
+                        // Note: Using a small tolerance for floating point comparisons just in case, though they should be exact
+                        snappedNode = route.Nodes.FirstOrDefault(n => Math.Abs(n.X - snapped.X) < 0.1 && Math.Abs(n.Y - snapped.Y) < 0.1);
+                        if (snappedNode != null) break;
+                    }
+                    
+                    if (snappedNode != null)
+                    {
+                        viewModel.AddLogicalRouteNode(snappedNode);
+                    }
+                }
+                e.Handled = true;
+            }
             else if (e.LeftButton == MouseButtonState.Pressed && viewModel.IsSelectionMode)
             {
                 _isSelecting = true;
@@ -146,7 +168,7 @@ public partial class EditorView : UserControl
         {
             viewModel.InputRouter.HandleMouseMove(e);
             
-            if (viewModel.IsDrawingRoute)
+            if (viewModel.IsDrawingRoute || viewModel.IsDrawingLogicalRoute)
             {
                 var pos = e.GetPosition(ViewportCanvas);
                 var snapped = GetSnappedPosition(pos, viewModel);
@@ -167,9 +189,18 @@ public partial class EditorView : UserControl
                 }
 
                 // Update DrawingPreviewLine
-                if (viewModel.CurrentRoute != null && viewModel.CurrentRoute.Nodes.Any())
+                if (viewModel.IsDrawingRoute && viewModel.CurrentRoute != null && viewModel.CurrentRoute.Nodes.Any())
                 {
                     var lastNode = viewModel.CurrentRoute.Nodes.Last();
+                    DrawingPreviewLine.X1 = lastNode.X;
+                    DrawingPreviewLine.Y1 = lastNode.Y;
+                    DrawingPreviewLine.X2 = snapped.X;
+                    DrawingPreviewLine.Y2 = snapped.Y;
+                    DrawingPreviewLine.Visibility = System.Windows.Visibility.Visible;
+                }
+                else if (viewModel.IsDrawingLogicalRoute && viewModel.CurrentLogicalRoute != null && viewModel.CurrentLogicalRoute.Nodes.Any())
+                {
+                    var lastNode = viewModel.CurrentLogicalRoute.Nodes.Last();
                     DrawingPreviewLine.X1 = lastNode.X;
                     DrawingPreviewLine.Y1 = lastNode.Y;
                     DrawingPreviewLine.X2 = snapped.X;
@@ -214,6 +245,12 @@ public partial class EditorView : UserControl
                 viewModel.IsDrawingRoute = false;
                 DrawingPreviewLine.Visibility = System.Windows.Visibility.Collapsed;
                 e.Handled = true; // Prevent context menu
+            }
+            else if (viewModel.IsDrawingLogicalRoute)
+            {
+                viewModel.IsDrawingLogicalRoute = false;
+                DrawingPreviewLine.Visibility = System.Windows.Visibility.Collapsed;
+                e.Handled = true;
             }
         }
     }
@@ -395,6 +432,11 @@ public partial class EditorView : UserControl
 
         if (sender is System.Windows.FrameworkElement el)
         {
+            if (DataContext is EditorViewModel viewModel && el.DataContext is TCP.App.Models.Editor.ILayerItem layerItem)
+            {
+                viewModel.SelectedLayerItem = layerItem;
+            }
+
             if (el.DataContext is TCP.App.Models.Electronics.RfidTagInstance rfidTag)
             {
                 if (rfidTag.IsLocked) return;
@@ -574,14 +616,25 @@ public partial class EditorView : UserControl
 
     private void Node_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (DataContext is EditorViewModel viewModel && viewModel.IsLiveMode) return;
-        if (sender is System.Windows.FrameworkElement el && el.DataContext is TCP.App.Models.Electronics.TrackNode node)
+        if (DataContext is EditorViewModel viewModel)
         {
-            _isDraggingNode = true;
-            _draggedNode = node;
-            _clickPosition = e.GetPosition(ViewportCanvas);
-            el.CaptureMouse();
-            e.Handled = true;
+            if (viewModel.IsLiveMode) return;
+            
+            if (sender is System.Windows.FrameworkElement el && el.DataContext is TCP.App.Models.Electronics.TrackNode node)
+            {
+                if (viewModel.IsDrawingLogicalRoute)
+                {
+                    viewModel.AddLogicalRouteNode(node);
+                    e.Handled = true;
+                    return;
+                }
+
+                _isDraggingNode = true;
+                _draggedNode = node;
+                _clickPosition = e.GetPosition(ViewportCanvas);
+                el.CaptureMouse();
+                e.Handled = true;
+            }
         }
     }
 
@@ -624,7 +677,17 @@ public partial class EditorView : UserControl
             parentRoute?.ForceUpdatePaths();
             TCP.App.Services.NetworkManager.Instance.SaveNetwork();
         }
-        
         _draggedNode = null;
+    }
+
+    private void Route_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is System.Windows.FrameworkElement el && el.DataContext is TCP.App.Models.Editor.ILayerItem layerItem)
+        {
+            if (DataContext is EditorViewModel viewModel)
+            {
+                viewModel.SelectedLayerItem = layerItem;
+            }
+        }
     }
 }

@@ -15,15 +15,25 @@ public class EditorLayoutService
 
     private EditorLayoutService() { }
 
-    public string GetCurrentLayoutJson(IEnumerable<EditorImage> images, IEnumerable<ILayerItem> placedItems, IEnumerable<TrackRoute> routes)
+    public string GetCurrentLayoutJson(IEnumerable<EditorImage> images, IEnumerable<ILayerItem> placedItems, IEnumerable<TrackRoute> routes, IEnumerable<LogicalRoute> logicalRoutes, IEnumerable<string> expandedGroups)
     {
         try
         {
             var state = new EditorLayoutState();
             
+            if (expandedGroups != null)
+            {
+                foreach(var g in expandedGroups) state.ExpandedGroups.Add(g);
+            }
+
             foreach(var route in routes)
             {
                 state.Routes.Add(route);
+            }
+            
+            foreach(var route in logicalRoutes)
+            {
+                state.LogicalRoutes.Add(route);
             }
             
             foreach (var img in images)
@@ -89,9 +99,9 @@ public class EditorLayoutService
     /// <summary>
     /// Saves the current layout state to a JSON file. (Deprecated: ProjectManager handles DB)
     /// </summary>
-    public void SaveLayout(string filePath, IEnumerable<EditorImage> images, IEnumerable<ILayerItem> placedItems, IEnumerable<TrackRoute> routes)
+    public void SaveLayout(string filePath, IEnumerable<EditorImage> images, IEnumerable<ILayerItem> placedItems, IEnumerable<TrackRoute> routes, IEnumerable<LogicalRoute> logicalRoutes)
     {
-        var json = GetCurrentLayoutJson(images, placedItems, routes);
+        var json = GetCurrentLayoutJson(images, placedItems, routes, logicalRoutes, new List<string>());
         if (json != "{}")
         {
             File.WriteAllText(filePath, json);

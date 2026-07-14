@@ -261,6 +261,25 @@ public class ProjectManager
         }
     }
 
+    public void DeleteCustomCode(Guid targetNodeId)
+    {
+        if (_currentScenario == null) return;
+        try
+        {
+            using var db = CreateDbContext();
+            var code = db.CustomCodes.FirstOrDefault(c => c.ScenarioId == _currentScenario.Id && c.TargetNodeId == targetNodeId);
+            if (code != null)
+            {
+                db.CustomCodes.Remove(code);
+                db.SaveChanges();
+            }
+        }
+        catch (Exception ex)
+        {
+            TerminalService.Instance.LogError($"Failed to delete custom code: {ex.Message}");
+        }
+    }
+
     /// <summary>
     /// Prompts user to save if there are unsaved changes. 
     /// Returns false if user CANCELS the operation.
